@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>KlimaServis – Montážny protokol</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ice:#e8f4f8;--frost:#c2dde8;--cold:#1a6b8a;--deep:#0d3d52;--accent:#00c2e0;--warm:#ff6b35;--success:#22c55e;--bg:#f0f7fa;--card:#ffffff;--text:#0d2b38;--muted:#5a7a88;--border:#c2dde8;--orange:#E8500A;}
+/* LOGIN */
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--deep) 0%,var(--cold) 100%);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;}
+.login-box{background:white;border-radius:24px;padding:36px 28px;width:100%;max-width:360px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.login-logo{margin-bottom:24px;}
+.login-logo img{height:42px;width:auto;}
+.login-box h2{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:var(--deep);margin-bottom:6px;}
+.login-box p{font-size:.82rem;color:var(--muted);margin-bottom:24px;}
+.login-input{width:100%;padding:13px 16px;border:2px solid var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--text);text-align:center;letter-spacing:.1em;-webkit-appearance:none;appearance:none;transition:border-color .2s;}
+.login-input:focus{outline:none;border-color:var(--orange);}
+.login-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--orange),#ff8c42);color:white;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;margin-top:12px;box-shadow:0 4px 14px rgba(232,80,10,.3);transition:transform .15s;}
+.login-btn:active{transform:scale(.97);}
+.login-error{color:#dc2626;font-size:.8rem;margin-top:8px;display:none;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;}
+header{background:#fff;border-bottom:2px solid #f0f0f0;padding:12px 20px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.08);}
+.header-inner{max-width:600px;margin:0 auto;}
+.header-logo{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.header-logo img{height:36px;width:auto;}
+.header-title{font-size:.72rem;color:var(--muted);font-weight:500;}
+.progress-bar{display:flex;gap:4px;}
+.progress-bar .step{flex:1;height:4px;background:#e5e7eb;border-radius:2px;transition:background .3s;}
+.progress-bar .step.active{background:var(--orange);}
+.progress-bar .step.done{background:var(--success);}
+#setup-screen{max-width:500px;margin:0 auto;padding:22px 16px;}
+.setup-card{background:white;border-radius:20px;padding:26px 22px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(13,61,82,.08);}
+.setup-card h2{font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;color:var(--deep);margin-bottom:6px;}
+.setup-card>p{font-size:.83rem;color:var(--muted);line-height:1.55;margin-bottom:18px;}
+.steps-list{list-style:none;margin-bottom:18px;}
+.steps-list li{display:flex;gap:11px;align-items:flex-start;margin-bottom:12px;}
+.steps-list .num{width:24px;height:24px;background:var(--orange);color:white;border-radius:50%;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.steps-list .desc{font-size:.81rem;color:var(--text);line-height:1.5;}
+.container{max-width:600px;margin:0 auto;padding:0 16px;}
+.section{display:none;animation:slideIn .28s ease;}
+.section.visible{display:block;}
+@keyframes slideIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.sec-hdr{padding:20px 0 13px;display:flex;align-items:center;gap:11px;}
+.sec-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--orange),#ff8c42);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex-shrink:0;}
+.sec-hdr h2{font-family:'Syne',sans-serif;font-size:1.08rem;font-weight:700;color:var(--deep);}
+.sec-hdr p{font-size:.73rem;color:var(--muted);margin-top:1px;}
+.card{background:var(--card);border-radius:16px;padding:17px;margin-bottom:12px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(13,61,82,.05);}
+.field{margin-bottom:13px;}.field:last-child{margin-bottom:0;}
+label{display:block;font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
+input,select,textarea{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.92rem;color:var(--text);background:#fafdff;-webkit-appearance:none;appearance:none;transition:border-color .2s,box-shadow .2s;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(232,80,10,.1);background:white;}
+textarea{min-height:78px;resize:vertical;}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a7a88' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:36px;}
+.req{color:var(--orange);}
+.fhint{font-size:.69rem;color:var(--muted);margin-top:4px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.scan-field{position:relative;}
+.scan-field input{padding-right:46px;}
+.scan-btn{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:33px;height:33px;background:linear-gradient(135deg,var(--orange),#ff8c42);border:none;border-radius:8px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:transform .15s;}
+.scan-btn:active{transform:translateY(-50%) scale(.88);}
+.photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.photo-slot{aspect-ratio:1;border:2px dashed var(--border);border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;background:#f5fbfd;}
+.photo-slot.has-photo{border-style:solid;border-color:var(--success);}
+.photo-slot img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+.photo-slot .ov{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.6));color:white;font-size:.66rem;padding:7px 7px 5px;font-weight:600;}
+.photo-slot .ph{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px;text-align:center;}
+.photo-slot .ph .ic{font-size:1.7rem;opacity:.4;}
+.photo-slot .ph span{font-size:.68rem;color:var(--muted);font-weight:500;}
+.photo-slot input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.chk{position:absolute;top:7px;right:7px;width:21px;height:21px;background:var(--success);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:.68rem;z-index:2;}
+.nav-buttons{display:flex;gap:10px;padding:12px 16px;max-width:600px;margin:0 auto;position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--border);z-index:90;}
+.btn{flex:1;padding:13px;border:none;border-radius:11px;font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:transform .15s;}
+.btn:active{transform:scale(.96);}
+.btn-primary{background:linear-gradient(135deg,var(--orange),#ff8c42);color:white;box-shadow:0 4px 13px rgba(232,80,10,.3);}
+.btn-secondary{background:var(--ice);color:var(--cold);border:1.5px solid var(--border);}
+.btn-success{background:linear-gradient(135deg,#16a34a,var(--success));color:white;box-shadow:0 4px 13px rgba(34,197,94,.26);}
+.rv-item{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--ice);gap:10px;}
+.rv-item:last-child{border-bottom:none;}
+.rv-item .rk{font-size:.7rem;color:var(--muted);font-weight:600;flex-shrink:0;width:95px;}
+.rv-item .rv{font-size:.85rem;color:var(--text);font-weight:500;text-align:right;word-break:break-word;}
+.rv-photos{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px;}
+.rv-photos img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;}
+.up-box{background:white;border-radius:16px;padding:26px 18px;text-align:center;margin:0 0 12px;border:1px solid var(--border);}
+.spinner{width:42px;height:42px;border:4px solid var(--frost);border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 13px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.prog-track{background:var(--ice);border-radius:99px;height:7px;margin-top:13px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--orange),#ff8c42);border-radius:99px;transition:width .4s ease;width:0%;}
+.up-step{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:.8rem;color:var(--muted);}
+.up-step.done{color:var(--success);}
+.up-step.active{color:var(--orange);font-weight:600;}
+.up-step .dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0;}
+.up-step.done .dot{background:var(--success);}
+.up-step.active .dot{background:var(--orange);animation:pulse 1s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.suc-screen{text-align:center;padding:38px 18px 20px;}
+.suc-icon{width:76px;height:76px;background:linear-gradient(135deg,#16a34a,var(--success));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.1rem;margin:0 auto 16px;box-shadow:0 8px 24px rgba(34,197,94,.3);animation:popIn .5s cubic-bezier(.175,.885,.32,1.275);}
+@keyframes popIn{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+.suc-screen h2{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--deep);margin-bottom:7px;}
+.suc-screen p{color:var(--muted);font-size:.86rem;line-height:1.6;}
+.drive-card{display:flex;align-items:center;gap:11px;background:white;border-radius:13px;padding:14px 16px;margin:14px 16px;border:1px solid var(--border);text-decoration:none;color:var(--cold);}
+.drive-card .dc-icon{font-size:1.35rem;}
+.drive-card .dc-label{font-size:.84rem;font-weight:600;}
+.drive-card .dc-sub{font-size:.7rem;color:var(--muted);}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:1000;display:none;flex-direction:column;align-items:center;justify-content:center;}
+.modal.open{display:flex;}
+.scan-wrap{width:100%;max-width:370px;padding:0 16px;}
+.scan-box{position:relative;border-radius:16px;overflow:hidden;background:black;}
+#scan-vid{width:100%;display:block;max-height:280px;object-fit:cover;}
+.scan-frame{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:200px;height:65px;border:2px solid var(--orange);border-radius:7px;box-shadow:0 0 0 1000px rgba(0,0,0,.42);}
+.scan-line{position:absolute;left:0;right:0;height:2px;background:var(--orange);animation:scanAnim 1.8s ease-in-out infinite;box-shadow:0 0 7px var(--orange);}
+@keyframes scanAnim{0%{top:0;}50%{top:calc(100% - 2px);}100%{top:0;}}
+.scan-hint{color:rgba(255,255,255,.7);text-align:center;font-size:.8rem;padding:12px 0 9px;}
+.scan-manual{display:flex;gap:8px;}
+.scan-manual input{flex:1;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.22);color:white;}
+.scan-manual input::placeholder{color:rgba(255,255,255,.35);}
+.scan-close{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.13);border:none;color:white;width:30px;height:30px;border-radius:50%;font-size:.95rem;cursor:pointer;z-index:2;}
+.info-box{background:rgba(232,80,10,.06);border:1px solid rgba(232,80,10,.2);border-radius:11px;padding:12px 13px;margin-bottom:12px;font-size:.78rem;color:var(--orange);display:flex;gap:9px;align-items:flex-start;}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--deep);color:white;padding:10px 18px;border-radius:10px;font-size:.8rem;font-weight:500;z-index:2000;transition:transform .3s;white-space:nowrap;box-shadow:0 5px 18px rgba(0,0,0,.2);}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.btn-wide{width:100%;padding:14px;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;margin-top:8px;background:linear-gradient(135deg,var(--orange),#ff8c42);color:white;box-shadow:0 4px 13px rgba(232,80,10,.3);}
+.fhint a{color:var(--orange);}
+.typ-btn{flex:1;padding:11px;border:2px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:600;cursor:pointer;background:white;color:var(--muted);transition:all .2s;}
+.typ-btn.active{border-color:var(--orange);background:rgba(232,80,10,.08);color:var(--orange);}
+.unit-card{background:var(--ice);border-radius:12px;padding:13px;margin-bottom:10px;border:1px solid var(--border);}
+.unit-card-title{font-size:.75rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;}
+.tech-item{display:flex;align-items:center;gap:10px;padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-size:.92rem;background:#fafdff;transition:border-color .2s,background .2s;}
+.tech-item:has(input:checked){border-color:var(--orange);background:rgba(232,80,10,.06);font-weight:600;color:var(--orange);}
+.tech-item input{display:none;}
+.tech-item .tech-check{width:22px;height:22px;border:2px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:.9rem;}
+.tech-item:has(input:checked) .tech-check{background:var(--orange);border-color:var(--orange);color:white;}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <img src="data:image/jpeg;base64,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" alt="Elwork">
+    </div>
+    <h2>Montážny protokol</h2>
+    <p>Zadajte heslo pre prístup do aplikácie</p>
+    <input type="password" class="login-input" id="login-pass" placeholder="••••••" onkeydown="if(event.key==='Enter') checkLogin()">
+    <button class="login-btn" onclick="checkLogin()">Prihlásiť sa →</button>
+    <div class="login-error" id="login-error">⚠️ Nesprávne heslo</div>
+  </div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div class="header-logo">
+      <img src="data:image/jpeg;base64,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" alt="Elwork logo">
+      <span class="header-title">Montážny protokol</span>
+    </div>
+    <div class="progress-bar" id="prog-bar" style="display:none">
+      <div class="step" id="p1"></div><div class="step" id="p2"></div>
+      <div class="step" id="p3"></div><div class="step" id="p4"></div>
+      <div class="step" id="p5"></div><div class="step" id="p6"></div>
+    </div>
+  </div>
+</header>
+
+<!-- SETUP -->
+<div id="setup-screen">
+  <div style="max-width:500px;margin:0 auto;padding:22px 16px;">
+    <div class="setup-card">
+      <h2>⚙️ Nastavenie</h2>
+      <p>Zadajte URL vášho Google Apps Script a ID priečinka na Google Disku.</p>
+      <ul class="steps-list">
+        <li><div class="num">1</div><div class="desc">Otvorte <strong>script.google.com</strong> → nový projekt → vložte kód z <em>KlimaServis.gs</em></div></li>
+        <li><div class="num">2</div><div class="desc"><strong>Deploy → New deployment → Web app</strong><br>Execute as: <em>Me</em> | Access: <em>Anyone</em></div></li>
+        <li><div class="num">3</div><div class="desc">Skopírujte <strong>Web app URL</strong> a vložte sem</div></li>
+      </ul>
+      <div class="field">
+        <label>Google Apps Script URL <span class="req">*</span></label>
+        <input type="url" id="script-url" placeholder="https://script.google.com/macros/s/.../exec">
+      </div>
+      <div class="field" style="margin-top:12px;">
+        <label>Google Drive – ID priečinka <span class="req">*</span></label>
+        <input type="text" id="folder-id" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs">
+        <div class="fhint">Z URL: drive.google.com/drive/folders/<strong style="color:var(--orange)">TOTO_JE_ID</strong></div>
+      </div>
+      <button onclick="testAndSave()" class="btn-wide" id="test-btn">🔗 Otestovať a spustiť aplikáciu</button>
+      <div id="test-result" style="margin-top:12px;display:none;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="main-app" style="display:none">
+<div class="container">
+
+  <!-- SEC 0 – TECHNICI -->
+  <div class="section visible" id="sec1">
+    <div class="sec-hdr"><div class="sec-icon">👷</div><div><h2>Výber technikov</h2><p>Krok 1 z 5</p></div></div>
+    <div class="card">
+      <div class="field">
+        <label>Vyberte technikov na montáži <span class="req">*</span></label>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;" id="technici-list">
+          <label class="tech-item"><input type="checkbox" value="Miroslav Paška"><div class="tech-check">✓</div> Miroslav Paška</label>
+          <label class="tech-item"><input type="checkbox" value="Jaroslav Brna"><div class="tech-check">✓</div> Jaroslav Brna</label>
+          <label class="tech-item"><input type="checkbox" value="Adam Brziak"><div class="tech-check">✓</div> Adam Brziak</label>
+          <label class="tech-item"><input type="checkbox" value="Ľuboš Hamza"><div class="tech-check">✓</div> Ľuboš Hamza</label>
+          <label class="tech-item"><input type="checkbox" value="__iny__" id="cb-iny"><div class="tech-check">✓</div> Iný</label>
+        </div>
+      </div>
+      <div class="field" id="iny-technik-wrap" style="display:none">
+        <label>Meno iného technika</label>
+        <input type="text" id="iny-technik" placeholder="Meno a priezvisko">
+      </div>
+    </div>
+  </div>
+
+  <!-- SEC 1 – ZÁKAZNÍK -->
+  <div class="section" id="sec2">
+    <div class="sec-hdr"><div class="sec-icon">👤</div><div><h2>Údaje zákazníka</h2><p>Krok 2 z 5</p></div></div>
+    <div class="card">
+      <div class="two-col">
+        <div class="field"><label>Meno <span class="req">*</span></label><input type="text" id="meno" placeholder="Ján" autocomplete="given-name"></div>
+        <div class="field"><label>Priezvisko <span class="req">*</span></label><input type="text" id="priezvisko" placeholder="Novák" autocomplete="family-name"></div>
+      </div>
+      <div class="field"><label>Adresa / Ulica <span class="req">*</span></label><input type="text" id="adresa" placeholder="Hlavná 12, Bratislava"></div>
+      <div class="field"><label>Telefónne číslo <span class="req">*</span></label><input type="tel" id="telefon" placeholder="+421 900 000 000"></div>
+      <div class="field"><label>Email zákazníka</label><input type="email" id="email" placeholder="zakaznik@email.sk"></div>
+    </div>
+  </div>
+
+  <!-- SEC 2 -->
+  <div class="section" id="sec3">
+    <div class="sec-hdr"><div class="sec-icon">🌡️</div><div><h2>Klimatizačná jednotka</h2><p>Krok 2 z 4</p></div></div>
+    <div class="card">
+      <div class="field">
+        <label>Výrobca <span class="req">*</span></label>
+        <select id="vyrobca">
+          <option value="">– Vybrať výrobcu –</option>
+          <option>Daikin</option><option>Mitsubishi Electric</option><option>Mitsubishi Heavy</option>
+          <option>Samsung</option><option>LG</option><option>Panasonic</option>
+          <option>Toshiba</option><option>Fujitsu</option><option>Midea</option>
+          <option>Gree</option><option>Carrier</option><option>Bosch</option>
+          <option>Naitec</option><option>Sinclair</option><option>Hisense</option>
+          <option>Iný</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Model <span class="req">*</span></label>
+        <input type="text" id="model" placeholder="napr. FTXB25C">
+      </div>
+      <div class="field">
+        <label>Sériové číslo</label>
+        <div class="scan-field">
+          <input type="text" id="serial" placeholder="Zadajte alebo naskenujte 📷">
+          <button class="scan-btn" onclick="openScanner()">📷</button>
+        </div>
+        <div class="fhint">Stlačte 📷 pre skenovanie čiarového kódu kamerou</div>
+      </div>
+
+      <!-- Typ systému -->
+      <div class="field">
+        <label>Typ systému <span class="req">*</span></label>
+        <div style="display:flex;gap:10px;">
+          <button type="button" class="typ-btn active" id="btn-split" onclick="setTyp('split')">Split</button>
+          <button type="button" class="typ-btn" id="btn-multisplit" onclick="setTyp('multisplit')">Multisplit</button>
+        </div>
+      </div>
+
+      <!-- Multisplit – počet jednotiek -->
+      <div class="field" id="multisplit-pocet-wrap" style="display:none">
+        <label>Počet vnútorných jednotiek <span class="req">*</span></label>
+        <select id="multisplit-pocet" onchange="updateMultisplitUnits()">
+          <option value="">– Vybrať –</option>
+          <option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
+        </select>
+      </div>
+
+      <div class="two-col">
+        <div class="field">
+          <label>Typ chladiva <span class="req">*</span></label>
+          <select id="chladivo">
+            <option value="">– Vybrať –</option>
+            <option>R-32</option><option>R-410A</option><option>R-22</option>
+            <option>R-134a</option><option>R-290</option><option>R-407C</option><option>Iný</option>
+          </select>
+        </div>
+        <div class="field"><label>Doplnené (g)</label><input type="number" id="chladivo_g" placeholder="napr. 150"></div>
+      </div>
+
+      <!-- Split – tlaky -->
+      <div id="split-tlaky">
+        <div class="two-col">
+          <div class="field">
+            <label>Tlak – Kúrenie (bar)</label>
+            <input type="number" step="0.1" id="tlak_kurenie_1" placeholder="napr. 18.5">
+          </div>
+          <div class="field">
+            <label>Tlak – Chladenie (bar)</label>
+            <input type="number" step="0.1" id="tlak_chladenie_1" placeholder="napr. 8.5">
+          </div>
+        </div>
+      </div>
+
+      <!-- Multisplit – tlaky dynamicky -->
+      <div id="multisplit-tlaky" style="display:none"></div>
+
+      <!-- Dátum montáže -->
+      <div class="field" style="margin-top:4px;">
+        <label>Dátum montáže</label>
+        <input type="date" id="datum_montaze">
+      </div>
+    </div>
+  </div>
+
+  <!-- SEC 3 -->
+  <div class="section" id="sec4">
+    <div class="sec-hdr"><div class="sec-icon">📸</div><div><h2>Foto z montáže</h2><p>Krok 4 z 6</p></div></div>
+    <div class="card">
+      <div class="photo-grid">
+        <div class="photo-slot" id="slot-vnutorna">
+          <div class="ph"><div class="ic">🏠</div><span>Vnútorná<br>jednotka</span></div>
+          <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'vnutorna','Vnútorná jednotka')">
+        </div>
+        <div class="photo-slot" id="slot-vonkajsia">
+          <div class="ph"><div class="ic">🏗️</div><span>Vonkajšia<br>jednotka</span></div>
+          <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'vonkajsia','Vonkajšia jednotka')">
+        </div>
+        <div class="photo-slot" id="slot-detail">
+          <div class="ph"><div class="ic">🔍</div><span>Detail<br>(voliteľné)</span></div>
+          <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'detail','Detail')">
+        </div>
+        <div class="photo-slot" id="slot-stit">
+          <div class="ph"><div class="ic">🏷️</div><span>Štítok /<br>sér. číslo</span></div>
+          <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'stit','Štítok')">
+        </div>
+      </div>
+    </div>
+    <div class="card"><div class="field"><label>Poznámky z montáže</label><textarea id="poznamky" placeholder="Prípadné poznámky, komplikácie, odporúčania..."></textarea></div></div>
+  </div>
+
+  <!-- SEC 5 – PODPISY -->
+  <div class="section" id="sec5p">
+    <div class="sec-hdr"><div class="sec-icon">✍️</div><div><h2>Podpisy</h2><p>Krok 5 z 6</p></div></div>
+
+    <div class="card">
+      <div style="font-size:.75rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">✍️ Podpis zákazníka</div>
+      <div style="font-size:.8rem;color:var(--muted);margin-bottom:8px;">Zákazník potvrdzuje prevzatie a správnosť montáže</div>
+      <canvas id="canvas-zakaznik" style="width:100%;height:180px;border:2px solid var(--border);border-radius:12px;background:white;touch-action:none;display:block;cursor:crosshair;"></canvas>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button onclick="clearCanvas('canvas-zakaznik')" style="flex:1;padding:9px;background:var(--ice);border:1.5px solid var(--border);border-radius:9px;font-size:.8rem;font-weight:600;cursor:pointer;color:var(--muted);">🗑️ Vymazať</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:.75rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">🔵 Podpis technika a razítko ELWORK</div>
+      <div class="two-col" style="gap:12px;align-items:start;">
+        <div>
+          <div style="font-size:.72rem;color:var(--muted);margin-bottom:6px;font-weight:500;">Podpis technika:</div>
+          <canvas id="canvas-technik" style="width:100%;height:150px;border:2px solid var(--border);border-radius:12px;background:white;touch-action:none;display:block;cursor:crosshair;"></canvas>
+          <button onclick="clearCanvas('canvas-technik')" style="width:100%;margin-top:6px;padding:8px;background:var(--ice);border:1.5px solid var(--border);border-radius:9px;font-size:.75rem;font-weight:600;cursor:pointer;color:var(--muted);">🗑️ Vymazať</button>
+        </div>
+        <div>
+          <div style="font-size:.72rem;color:var(--muted);margin-bottom:6px;font-weight:500;">Razítko ELWORK:</div>
+          <div style="width:100%;height:150px;border:2px dashed var(--border);border-radius:12px;background:#f5fbfd;display:flex;align-items:center;justify-content:center;">
+            <div style="text-align:center;padding:12px;">
+              <div style="font-size:2rem;opacity:.3;">🔵</div>
+              <div style="font-size:.68rem;color:var(--muted);margin-top:4px;">Razítko<br>bude doplnené</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEC 6 – KONTROLA -->
+  <div class="section" id="sec5">
+    <div class="sec-hdr"><div class="sec-icon">✅</div><div><h2>Kontrola a nahratie</h2><p>Krok 6 z 6</p></div></div>
+    <div class="info-box"><span>🔵</span><span>Protokol a fotky sa nahrajú priamo na <strong>Google Disk</strong>.</span></div>
+    <div class="card" id="rv-zakaznik"></div>
+    <div class="card" id="rv-klima"></div>
+    <div class="card">
+      <div style="font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:9px;">Fotografie</div>
+      <div class="rv-photos" id="rv-photos"></div>
+    </div>
+    <div id="up-state"></div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="section" id="sec6">
+    <div class="suc-screen">
+      <div class="suc-icon">✓</div>
+      <h2>Nahraté na Google Disk!</h2>
+      <p>Protokol a fotky boli úspešne uložené.</p>
+      <p style="margin-top:7px;font-size:.76rem;" id="saved-date"></p>
+    </div>
+    <a id="drive-link" href="#" target="_blank" class="drive-card">
+      <div class="dc-icon">📂</div>
+      <div><div class="dc-label">Otvoriť priečinok na Google Disku</div><div class="dc-sub">Kliknite pre zobrazenie súborov</div></div>
+    </a>
+    <div style="padding:0 16px 16px;">
+      <button class="btn-wide" onclick="downloadPDFLocal()" style="background:linear-gradient(135deg,var(--cold),var(--accent));margin-bottom:8px;">📄 Stiahnuť PDF protokol</button>
+      <button class="btn-wide" onclick="resetApp()">➕ Nový protokol</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- NAV -->
+<div class="nav-buttons" id="nav-buttons" style="display:none">
+  <button class="btn btn-secondary" id="btn-back" onclick="goBack()" style="display:none">← Späť</button>
+  <button class="btn btn-primary" id="btn-next" onclick="goNext()">Ďalej →</button>
+</div>
+
+<!-- SCANNER -->
+<div class="modal" id="scan-modal">
+  <div class="scan-wrap">
+    <div class="scan-box">
+      <video id="scan-vid" autoplay playsinline muted></video>
+      <div class="scan-frame"><div class="scan-line"></div></div>
+      <button class="scan-close" onclick="closeScanner()">✕</button>
+    </div>
+    <div class="scan-hint">Namierte kameru na čiarový kód</div>
+    <div class="scan-manual">
+      <input type="text" id="manual-serial" placeholder="alebo zadajte ručne...">
+      <button class="btn btn-primary" style="flex:0;padding:10px 13px;" onclick="applySerial()">OK</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ TYP SYSTÉMU ══
+let typSystem = 'split';
+
+function setTyp(typ) {
+  typSystem = typ;
+  document.getElementById('btn-split').classList.toggle('active', typ==='split');
+  document.getElementById('btn-multisplit').classList.toggle('active', typ==='multisplit');
+  document.getElementById('multisplit-pocet-wrap').style.display = typ==='multisplit' ? '' : 'none';
+  document.getElementById('split-tlaky').style.display = typ==='split' ? '' : 'none';
+  document.getElementById('multisplit-tlaky').style.display = typ==='multisplit' ? '' : 'none';
+  if (typ==='multisplit') updateMultisplitUnits();
+}
+
+function updateMultisplitUnits() {
+  const pocet = parseInt(document.getElementById('multisplit-pocet').value) || 0;
+  const wrap = document.getElementById('multisplit-tlaky');
+  wrap.innerHTML = '';
+  for (let i = 1; i <= pocet; i++) {
+    wrap.innerHTML += `
+      <div class="unit-card">
+        <div class="unit-card-title">Vnútorná jednotka ${i}</div>
+        <div class="two-col">
+          <div class="field">
+            <label>Tlak – Kúrenie (bar)</label>
+            <input type="number" step="0.1" id="tlak_kurenie_${i}" placeholder="napr. 18.5">
+          </div>
+          <div class="field">
+            <label>Tlak – Chladenie (bar)</label>
+            <input type="number" step="0.1" id="tlak_chladenie_${i}" placeholder="napr. 8.5">
+          </div>
+        </div>
+      </div>`;
+  }
+}
+
+function getTlaky() {
+  const tlaky = [];
+  if (typSystem === 'split') {
+    tlaky.push({
+      jednotka: 'Vnútorná jednotka',
+      kurenie: document.getElementById('tlak_kurenie_1')?.value || '',
+      chladenie: document.getElementById('tlak_chladenie_1')?.value || ''
+    });
+  } else {
+    const pocet = parseInt(document.getElementById('multisplit-pocet').value) || 0;
+    for (let i = 1; i <= pocet; i++) {
+      tlaky.push({
+        jednotka: `Vnútorná jednotka ${i}`,
+        kurenie: document.getElementById(`tlak_kurenie_${i}`)?.value || '',
+        chladenie: document.getElementById(`tlak_chladenie_${i}`)?.value || ''
+      });
+    }
+  }
+  return tlaky;
+}
+
+function getModel() {
+  return g('model');
+}
+
+// ══ PHOTOS ══
+function handlePhoto(input, key, label) {
+  const file = input.files[0]; if (!file) return;
+  photos[key] = {file,label};
+  const reader = new FileReader();
+  reader.onload = e => {
+    const slot = document.getElementById('slot-'+key);
+    slot.classList.add('has-photo');
+    slot.innerHTML = `<img src="${e.target.result}"><div class="ov">${label}</div><div class="chk">✓</div>
+      <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'${key}','${label}')">`;
+  };
+  reader.readAsDataURL(file);
+  showToast('📸 '+label);
+}
+
+// ══ REVIEW ══
+function buildReview() {
+  const rows = (arr,title,icon) =>
+    `<div style="font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">${icon} ${title}</div>`+
+    arr.map(([k,v])=>`<div class="rv-item"><span class="rk">${k}</span><span class="rv">${v||'–'}</span></div>`).join('');
+
+  document.getElementById('rv-zakaznik').innerHTML = rows([
+    ['Meno',g('meno')+' '+g('priezvisko')],['Adresa',g('adresa')],
+    ['Telefón',g('telefon')],['Email',g('email')]
+  ],'Zákazník','👤');
+
+  const technici = getTechnici();
+  const tlaky = getTlaky();
+  const tlakRows = tlaky.map(t => [t.jednotka, `Kúrenie: ${t.kurenie||'–'} bar | Chladenie: ${t.chladenie||'–'} bar`]);
+
+  document.getElementById('rv-klima').innerHTML = rows([
+    ['Technici', technici.join(', ') || '–'],
+    ['Typ systému', typSystem === 'split' ? 'Split' : `Multisplit (${document.getElementById('multisplit-pocet').value} jednotky)`],
+    ['Výrobca',g('vyrobca')],['Model',getModel()],['Sériové č.',g('serial')],
+    ['Chladivo',g('chladivo')],['Doplnené',g('chladivo_g')?g('chladivo_g')+' g':''],
+    ...tlakRows,
+    ['Dátum montáže', g('datum_montaze')],
+    ['Poznámky',g('poznamky')]
+  ],'Klimatizácia','🌡️');
+
+  const grid = document.getElementById('rv-photos');
+  const keys = Object.keys(photos);
+  if (!keys.length){grid.innerHTML='<span style="font-size:.8rem;color:var(--muted)">Žiadne fotky</span>';return;}
+  grid.innerHTML='';
+  keys.forEach(k=>{const img=document.createElement('img');img.src=URL.createObjectURL(photos[k].file);img.title=photos[k].label;grid.appendChild(img);});
+}
+
+// ══ PDF GENERÁTOR ══
+async function generatePDF(zakaznik, klima, photoKeys, technici, podpisZakaznik, podpisTechnik) {
+  technici = technici || [];
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const W = 210; const margin = 18;
+
+  // Oranžová farba Elwork
+  const orange = [232, 80, 10];
+  const dark   = [13, 61, 82];
+  const gray   = [90, 122, 136];
+  const light  = [240, 247, 250];
+
+  // Header pruh
+  doc.setFillColor(...orange);
+  doc.rect(0, 0, W, 28, 'F');
+
+  // Logo text
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(20);
+  doc.setFont('helvetica','bold');
+  doc.text('ELWORK', margin, 13);
+  doc.setFontSize(9);
+  doc.setFont('helvetica','normal');
+  doc.text('Montážny protokol – klimatizácia', margin, 21);
+
+  // Dátum vpravo
+  doc.setFontSize(9);
+  doc.text(zakaznik.datum, W - margin, 21, {align:'right'});
+
+  let y = 38;
+
+  // Sekcia zákazník
+  doc.setFillColor(...light);
+  doc.roundedRect(margin, y, W - margin*2, 7, 2, 2, 'F');
+  doc.setTextColor(...orange);
+  doc.setFontSize(9);
+  doc.setFont('helvetica','bold');
+  doc.text('ZÁKAZNÍK', margin+4, y+5);
+  y += 11;
+
+  const zRows = [
+    ['Meno a priezvisko', `${zakaznik.meno} ${zakaznik.priezvisko}`],
+    ['Adresa', zakaznik.adresa],
+    ['Telefón', zakaznik.telefon],
+    ['Email', zakaznik.email || '–'],
+  ];
+  zRows.forEach(([k,v]) => {
+    doc.setTextColor(...gray); doc.setFontSize(8); doc.setFont('helvetica','normal');
+    doc.text(k, margin+2, y);
+    doc.setTextColor(...dark); doc.setFont('helvetica','bold');
+    doc.text(v, margin+52, y);
+    y += 6;
+  });
+
+  y += 4;
+
+  // Sekcia klimatizácia
+  doc.setFillColor(...light);
+  doc.roundedRect(margin, y, W - margin*2, 7, 2, 2, 'F');
+  doc.setTextColor(...orange);
+  doc.setFontSize(9);
+  doc.setFont('helvetica','bold');
+  doc.text('KLIMATIZÁCIA', margin+4, y+5);
+  y += 11;
+
+  const kRows = [
+    ['Výrobca', klima.vyrobca],
+    ['Model', klima.model],
+    ['Sériové číslo', klima.serial || '–'],
+    ['Typ chladiva', klima.chladivo],
+    ['Doplnené chladivo', klima.chladivo_g ? klima.chladivo_g + ' g' : '–'],
+  ];
+  kRows.forEach(([k,v]) => {
+    doc.setTextColor(...gray); doc.setFontSize(8); doc.setFont('helvetica','normal');
+    doc.text(k, margin+2, y);
+    doc.setTextColor(...dark); doc.setFont('helvetica','bold');
+    doc.text(String(v), margin+52, y);
+    y += 6;
+  });
+
+  // Poznámky
+  if (klima.poznamky) {
+    y += 2;
+    doc.setTextColor(...gray); doc.setFontSize(8); doc.setFont('helvetica','normal');
+    doc.text('Poznámky', margin+2, y);
+    doc.setTextColor(...dark); doc.setFont('helvetica','normal');
+    const lines = doc.splitTextToSize(klima.poznamky, W - margin*2 - 54);
+    doc.text(lines, margin+52, y);
+    y += lines.length * 5 + 2;
+  }
+
+  y += 6;
+
+  // Fotky
+  if (photoKeys.length > 0) {
+    doc.setFillColor(...light);
+    doc.roundedRect(margin, y, W - margin*2, 7, 2, 2, 'F');
+    doc.setTextColor(...orange);
+    doc.setFontSize(9);
+    doc.setFont('helvetica','bold');
+    doc.text('FOTOGRAFIE Z MONTÁŽE', margin+4, y+5);
+    y += 11;
+
+    const colW = (W - margin*2 - 8) / 2;
+    const imgH = 55;
+    let col = 0;
+
+    for (const k of photoKeys) {
+      try {
+        const dataUrl = await fileToDataUrl(photos[k].file);
+        const x = margin + col * (colW + 8);
+        doc.addImage(dataUrl, 'JPEG', x, y, colW, imgH, '', 'MEDIUM');
+        // Popis pod fotkou
+        doc.setFillColor(0,0,0);
+        doc.setFillColor(...dark);
+        doc.rect(x, y + imgH - 7, colW, 7, 'F');
+        doc.setTextColor(255,255,255);
+        doc.setFontSize(7);
+        doc.setFont('helvetica','normal');
+        doc.text(photos[k].label, x + colW/2, y + imgH - 2.5, {align:'center'});
+        col++;
+        if (col >= 2) { col = 0; y += imgH + 10; }
+      } catch(e) {}
+    }
+    if (col > 0) y += imgH + 10;
+  }
+
+  // Podpisy
+  if (y > 220) { doc.addPage(); y = 20; }
+  y += 6;
+  doc.setFillColor(...light);
+  doc.roundedRect(margin, y, W - margin*2, 7, 2, 2, 'F');
+  doc.setTextColor(...orange);
+  doc.setFontSize(9);
+  doc.setFont('helvetica','bold');
+  doc.text('PODPISY', margin+4, y+5);
+  y += 11;
+
+  const sigW = (W - margin*2 - 8) / 2;
+  const sigH = 35;
+
+  // Zákazník
+  doc.setTextColor(...gray); doc.setFontSize(7); doc.setFont('helvetica','normal');
+  doc.text('Podpis zákazníka:', margin, y);
+  doc.text('Podpis technika:', margin + sigW + 8, y);
+  y += 4;
+
+  if (podpisZakaznik) {
+    doc.addImage(podpisZakaznik, 'PNG', margin, y, sigW, sigH);
+  }
+  doc.rect(margin, y, sigW, sigH);
+
+  if (podpisTechnik) {
+    doc.addImage(podpisTechnik, 'PNG', margin + sigW + 8, y, sigW, sigH);
+  }
+  doc.rect(margin + sigW + 8, y, sigW, sigH);
+
+  y += sigH + 4;
+  doc.setTextColor(...gray); doc.setFontSize(7);
+  doc.text(`${zakaznik.meno} ${zakaznik.priezvisko}`, margin, y);
+  doc.text(technici.join(', ') || '–', margin + sigW + 8, y);
+  y += 10;
+
+  // Razítko placeholder
+  doc.setFillColor(...light);
+  doc.roundedRect(margin + sigW + 8, y, sigW, 25, 3, 3, 'F');
+  doc.setTextColor(...gray); doc.setFontSize(7);
+  doc.text('Razítko ELWORK', margin + sigW + 8 + sigW/2, y + 13, {align:'center'});
+  y += 30;
+
+  // Technici
+  if (technici && technici.length > 0) {
+    if (y > 260) { doc.addPage(); y = 20; }
+    doc.setFillColor(...light);
+    doc.roundedRect(margin, y, W - margin*2, 7, 2, 2, 'F');
+    doc.setTextColor(...orange);
+    doc.setFontSize(9);
+    doc.setFont('helvetica','bold');
+    doc.text('TECHNICI', margin+4, y+5);
+    y += 11;
+    doc.setTextColor(...dark);
+    doc.setFontSize(9);
+    doc.setFont('helvetica','normal');
+    doc.text(technici.join(', '), margin+2, y);
+    y += 8;
+  }
+
+  // Footer
+  doc.setFillColor(...dark);
+  doc.rect(0, 287, W, 10, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(7);
+  doc.setFont('helvetica','normal');
+  doc.text('ELWORK – Montážny protokol', margin, 293);
+  doc.text(zakaznik.datum, W-margin, 293, {align:'right'});
+
+  return doc.output('arraybuffer');
+}
+
+function fileToDataUrl(file) {
+  return new Promise((res,rej) => {
+    const reader = new FileReader();
+    reader.onload = () => res(reader.result);
+    reader.onerror = rej;
+    reader.readAsDataURL(file);
+  });
+}
+
+// ══ UPLOAD ══
+async function doUpload() {
+  const datum = new Date().toLocaleDateString('sk-SK').replace(/\.\s*/g,'-').replace(/-$/,'');
+  const technici = getTechnici();
+  const podpisZakaznik = getCanvasDataUrl('canvas-zakaznik');
+  const podpisTechnik = getCanvasDataUrl('canvas-technik');
+  const zakaznik = {meno:g('meno'),priezvisko:g('priezvisko'),adresa:g('adresa'),telefon:g('telefon'),email:g('email'),datum};
+  const klima = {vyrobca:g('vyrobca'),model:getModel(),serial:g('serial'),chladivo:g('chladivo'),chladivo_g:g('chladivo_g'),poznamky:g('poznamky'),typSystem,tlaky:getTlaky(),datum_montaze:g('datum_montaze')};
+  const photoKeys = Object.keys(photos);
+
+  const steps = [
+    {id:'s1',label:'Vytváram priečinok na Google Disku'},
+    {id:'s2',label:'Generujem PDF protokol'},
+    {id:'s3',label:'Nahrávam PDF na Google Disk'},
+    ...photoKeys.map((k,i)=>({id:'s'+(4+i),label:`Foto: ${photos[k].label}`})),
+    {id:'s'+(4+photoKeys.length),label:'Odosielam emaily'}
+  ];
+
+  document.getElementById('up-state').innerHTML = `
+    <div class="up-box">
+      <div class="spinner"></div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--deep);margin-bottom:12px;">Nahrávam na Google Disk...</div>
+      ${steps.map(s=>`<div class="up-step" id="${s.id}"><div class="dot"></div>${s.label}</div>`).join('')}
+      <div class="prog-track"><div class="prog-fill" id="upfill"></div></div>
+    </div>`;
+  document.getElementById('nav-buttons').style.display = 'none';
+
+  const setStep = (id,state) => { const el=document.getElementById(id); if(el) el.className='up-step '+state; };
+  const setProg = pct => { const f=document.getElementById('upfill'); if(f) f.style.width=pct+'%'; };
+
+  try {
+    // Protokol + priečinok
+    setStep('s1','active');
+    const r1 = await apiCall({type:'protokol', zakaznik, klima, technici});
+    if (!r1.ok) throw new Error(r1.error||'Chyba uloženia protokolu');
+    const folderId = r1.folderId;
+    setStep('s1','done');
+    setProg(10);
+
+    // Generuj PDF
+    setStep('s2','active');
+    const pdfBuffer = await generatePDF(zakaznik, klima, photoKeys, technici, podpisZakaznik, podpisTechnik);
+    const pdfB64 = btoa(String.fromCharCode(...new Uint8Array(pdfBuffer)));
+    setStep('s2','done');
+    setProg(25);
+
+    // Nahraj PDF
+    setStep('s3','active');
+    const rPdf = await apiCall({type:'foto', zakaznik, nazov:'protokol.pdf', mime:'application/pdf', obsah:pdfB64});
+    if (!rPdf.ok) throw new Error(rPdf.error||'Chyba nahrávania PDF');
+    setStep('s3','done');
+    setProg(40);
+
+    // Fotky
+    for (let i=0;i<photoKeys.length;i++) {
+      const k=photoKeys[i];
+      setStep('s'+(4+i),'active');
+      const b64 = await toBase64(photos[k].file);
+      const ext = photos[k].file.name.split('.').pop()||'jpg';
+      const r2 = await apiCall({type:'foto',zakaznik,nazov:`foto_${k}.${ext}`,mime:photos[k].file.type||'image/jpeg',obsah:b64});
+      if (!r2.ok) throw new Error(r2.error||`Chyba nahrávania foto: ${photos[k].label}`);
+      setStep('s'+(4+i),'done');
+      setProg(Math.round(40 + (i+1)/photoKeys.length*45));
+    }
+
+    // Emaily
+    const emailStepId = 's'+(4+photoKeys.length);
+    setStep(emailStepId,'active');
+    try {
+      await apiCall({type:'email', zakaznik, klima, technici});
+      setStep(emailStepId,'done');
+    } catch(e) {
+      setStep(emailStepId,'done'); // Email chyba nie je fatálna
+      showToast('⚠️ Email sa nepodarilo odoslať');
+    }
+
+    setProg(100); await sleep(400);
+    const driveUrl = folderId ? `https://drive.google.com/drive/folders/${folderId}` : `https://drive.google.com/drive/folders/1GZEbrZJSnWzRbidR8SbRcQ8FjOgVgzqB`;
+    showSuccess(datum, driveUrl);
+  } catch(err) {
+    document.getElementById('up-state').innerHTML = `
+      <div class="card" style="border-color:#ef4444;background:#fff8f8;padding:18px;text-align:center;">
+        <div style="font-size:1.3rem;margin-bottom:7px;">⚠️</div>
+        <div style="font-weight:700;color:#dc2626;margin-bottom:5px;">Chyba nahrávania</div>
+        <div style="font-size:.78rem;color:#7f1d1d;margin-bottom:14px;">${err.message}</div>
+        <button onclick="doUpload()" style="padding:10px 16px;background:var(--orange);color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer;margin-right:8px;">🔄 Skúsiť znova</button>
+      </div>`;
+    document.getElementById('nav-buttons').style.display = 'flex';
+  }
+}
+
+async function apiCall(payload) {
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzm0CCE9ywtOSRIxpIXKLBN1QrcPlHmZ6AuR5zRiAqoYDjMpx8Xnsfjah2NUz9n5ZYPjw/exec';
+  const r = await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload),headers:{'Content-Type':'text/plain'}});
+  return r.json();
+}
+
+function toBase64(file) {
+  return new Promise((res,rej)=>{
+    const reader=new FileReader();
+    reader.onload=()=>res(reader.result.split(',')[1]);
+    reader.onerror=rej;
+    reader.readAsDataURL(file);
+  });
+}
+
+function goToSetup() {
+  document.getElementById('setup-screen').style.display='';
+  document.getElementById('main-app').style.display='none';
+  document.getElementById('nav-buttons').style.display='none';
+  document.getElementById('prog-bar').style.display='none';
+}
+
+// ══ SCANNER ══
+async function openScanner() {
+  document.getElementById('scan-modal').classList.add('open');
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    scanStream=stream; document.getElementById('scan-vid').srcObject=stream;
+    if ('BarcodeDetector' in window) {
+      const det=new BarcodeDetector({formats:['code_128','code_39','ean_13','qr_code','data_matrix']});
+      const vid=document.getElementById('scan-vid');
+      const iv=setInterval(async()=>{
+        if(!scanStream){clearInterval(iv);return;}
+        try{const codes=await det.detect(vid);if(codes.length){document.getElementById('serial').value=codes[0].rawValue;showToast('✅ '+codes[0].rawValue);closeScanner();clearInterval(iv);}}catch(e){}
+      },400);
+    }
+  } catch(e){showToast('⚠️ Kamera nedostupná');}
+}
+function closeScanner(){
+  document.getElementById('scan-modal').classList.remove('open');
+  if(scanStream){scanStream.getTracks().forEach(t=>t.stop());scanStream=null;}
+}
+function applySerial(){
+  const val=document.getElementById('manual-serial').value.trim();
+  if(val){document.getElementById('serial').value=val;showToast('✅ Uložené');closeScanner();}
+}
+
+// ══ SUCCESS ══
+function showSuccess(datum,link){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('visible'));
+  document.getElementById('sec6').classList.add('visible');
+  document.getElementById('nav-buttons').style.display='none';
+  document.getElementById('up-state').innerHTML='';
+  document.getElementById('saved-date').textContent='Uložené: '+datum;
+  const dl=document.getElementById('drive-link');
+  dl.href=link; dl.style.display='flex';
+  for(let i=1;i<=6;i++){const e=document.getElementById('p'+i);if(e)e.className='step done';}
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function downloadPDFLocal() {
+  const datum = new Date().toLocaleDateString('sk-SK').replace(/\.\s*/g,'-').replace(/-$/,'');
+  const technici = getTechnici();
+  const zakaznik = {meno:g('meno'),priezvisko:g('priezvisko'),adresa:g('adresa'),telefon:g('telefon'),email:g('email'),datum};
+  const klima = {vyrobca:g('vyrobca'),model:getModel(),serial:g('serial'),chladivo:g('chladivo'),chladivo_g:g('chladivo_g'),poznamky:g('poznamky'),typSystem,tlaky:getTlaky(),datum_montaze:g('datum_montaze')};
+  showToast('⏳ Generujem PDF...');
+  const pdfBuffer = await generatePDF(zakaznik, klima, Object.keys(photos), technici);
+  const blob = new Blob([pdfBuffer], {type:'application/pdf'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `protokol_${zakaznik.priezvisko}_${datum}.pdf`;
+  a.click();
+  showToast('✅ PDF stiahnuté!');
+}
+
+// ══ PODPISY – CANVAS ══
+function initCanvas(id) {
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  // Set actual pixel size
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * window.devicePixelRatio;
+  canvas.height = rect.height * window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  ctx.strokeStyle = '#0d2b38';
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  let drawing = false;
+  let lastX = 0, lastY = 0;
+
+  const getPos = e => {
+    const r = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x: src.clientX - r.left, y: src.clientY - r.top };
+  };
+
+  canvas.addEventListener('mousedown', e => { drawing = true; const p = getPos(e); lastX = p.x; lastY = p.y; });
+  canvas.addEventListener('mousemove', e => {
+    if (!drawing) return;
+    const p = getPos(e);
+    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke();
+    lastX = p.x; lastY = p.y;
+  });
+  canvas.addEventListener('mouseup', () => drawing = false);
+  canvas.addEventListener('mouseleave', () => drawing = false);
+
+  canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; const p = getPos(e); lastX = p.x; lastY = p.y; }, {passive:false});
+  canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (!drawing) return;
+    const p = getPos(e);
+    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke();
+    lastX = p.x; lastY = p.y;
+  }, {passive:false});
+  canvas.addEventListener('touchend', () => drawing = false);
+}
+
+function clearCanvas(id) {
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function getCanvasDataUrl(id) {
+  const canvas = document.getElementById(id);
+  if (!canvas) return null;
+  // Check if empty
+  const ctx = canvas.getContext('2d');
+  const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  const isEmpty = !data.some(v => v !== 0);
+  if (isEmpty) return null;
+  return canvas.toDataURL('image/png');
+}
+
+// Init canvases when signature step is shown
+function initSignatureCanvases() {
+  setTimeout(() => {
+    initCanvas('canvas-zakaznik');
+    initCanvas('canvas-technik');
+  }, 100);
+}
+
+// ══ TECHNICI ══
+function getTechnici() {
+  const checked = [...document.querySelectorAll('#technici-list input[type=checkbox]:checked')].map(cb => cb.value);
+  const result = checked.filter(v => v !== '__iny__');
+  if (checked.includes('__iny__')) {
+    const iny = document.getElementById('iny-technik').value.trim();
+    if (iny) result.push(iny);
+  }
+  return result;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('cb-iny')?.addEventListener('change', function() {
+    document.getElementById('iny-technik-wrap').style.display = this.checked ? '' : 'none';
+  });
+});
+
+// ══ NAVIGATION ══
+let currentStep = 1;
+const photos = {};
+let scanStream = null;
+
+function showStep(n) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  const secId = n === 5 ? 'sec5p' : (n === 6 ? 'sec5' : (n === 7 ? 'sec6' : 'sec'+n));
+  document.getElementById(secId)?.classList.add('visible');
+  const btnBack = document.getElementById('btn-back');
+  const btnNext = document.getElementById('btn-next');
+  btnBack.style.display = (n > 1 && n < 7) ? 'block' : 'none';
+  if (n === 6) {
+    buildReview();
+    btnNext.textContent = '📤 Nahrať na Google Disk';
+    btnNext.className = 'btn btn-success';
+  } else if (n === 7) {
+    document.getElementById('nav-buttons').style.display = 'none';
+    return;
+  } else {
+    btnNext.textContent = 'Ďalej →';
+    btnNext.className = 'btn btn-primary';
+  }
+  if (n === 5) initSignatureCanvases();
+  document.getElementById('nav-buttons').style.display = 'flex';
+  for (let i=1;i<=6;i++) {
+    const el = document.getElementById('p'+i);
+    if (el) el.className = 'step'+(i<n?' done':i===n?' active':'');
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goNext() {
+  if (currentStep===1 && !val0()) return;
+  if (currentStep===2 && !val1()) return;
+  if (currentStep===3 && !val2()) return;
+  if (currentStep===6) { doUpload(); return; }
+  currentStep++; showStep(currentStep);
+}
+function goBack() { if(currentStep>1){currentStep--;showStep(currentStep);} }
+
+function val0() {
+  const t = getTechnici();
+  if (!t.length) { showToast('⚠️ Vyberte aspoň jedného technika'); return false; }
+  return true;
+}
+function val1() {
+  for (const id of ['meno','priezvisko','adresa','telefon']) {
+    if (!g(id)) { showToast('⚠️ Vyplňte všetky povinné polia'); document.getElementById(id).focus(); return false; }
+  }
+  return true;
+}
+function val2() {
+  if (!g('vyrobca')) { showToast('⚠️ Vyberte výrobcu'); return false; }
+  if (!g('model'))   { showToast('⚠️ Zadajte model'); return false; }
+  if (!g('chladivo')){ showToast('⚠️ Vyberte typ chladiva'); return false; }
+  if (typSystem === 'multisplit' && !document.getElementById('multisplit-pocet').value) {
+    showToast('⚠️ Vyberte počet vnútorných jednotiek'); return false;
+  }
+  return true;
+}
+
+function resetApp(){
+  ['meno','priezvisko','adresa','telefon','email','serial','chladivo','chladivo_g','poznamky'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('vyrobca').value='';
+  document.getElementById('model').value='';
+  document.querySelectorAll('#technici-list input[type=checkbox]').forEach(cb=>cb.checked=false);
+  document.getElementById('iny-technik-wrap').style.display='none';
+  document.getElementById('iny-technik').value='';
+  const defs={vnutorna:['🏠','Vnútorná<br>jednotka','Vnútorná jednotka'],vonkajsia:['🏗️','Vonkajšia<br>jednotka','Vonkajšia jednotka'],detail:['🔍','Detail<br>(voliteľné)','Detail'],stit:['🏷️','Štítok /<br>sér. číslo','Štítok']};
+  Object.entries(defs).forEach(([k,[ic,lbl,lab]])=>{
+    const slot=document.getElementById('slot-'+k); if(!slot)return;
+    slot.classList.remove('has-photo');
+    slot.innerHTML=`<div class="ph"><div class="ic">${ic}</div><span>${lbl}</span></div><input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'${k}','${lab}')">`;
+  });
+  clearCanvas('canvas-zakaznik');
+  clearCanvas('canvas-technik');
+  Object.keys(photos).forEach(k=>delete photos[k]);
+  document.getElementById('nav-buttons').style.display='flex';
+  document.getElementById('up-state').innerHTML='';
+  currentStep=1; showStep(1);
+  const today = new Date().toISOString().split('T')[0];
+  const dm = document.getElementById('datum_montaze');
+  if (dm) dm.value = today;
+}
+
+const g=id=>document.getElementById(id)?.value?.trim()||'';
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+// ══ LOGIN ══
+function checkLogin() {
+  const pass = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-error');
+  if (pass === 'elwork') {
+    document.getElementById('login-screen').style.display = 'none';
+    sessionStorage.setItem('klima_auth', '1');
+    // Skryť setup, zobraziť app rovno
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = '';
+    document.getElementById('nav-buttons').style.display = 'flex';
+    document.getElementById('prog-bar').style.display = 'flex';
+    currentStep = 1; showStep(1);
+    // Nastav dátum
+    const today = new Date().toISOString().split('T')[0];
+    const dm = document.getElementById('datum_montaze');
+    if (dm) dm.value = today;
+  } else {
+    err.style.display = 'block';
+    document.getElementById('login-pass').value = '';
+    document.getElementById('login-pass').focus();
+    setTimeout(() => err.style.display = 'none', 2500);
+  }
+}
+
+window.addEventListener('load', () => {
+  // Ak je už prihlásený v tejto session
+  if (sessionStorage.getItem('klima_auth') === '1') {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = '';
+    document.getElementById('nav-buttons').style.display = 'flex';
+    document.getElementById('prog-bar').style.display = 'flex';
+    currentStep = 1; showStep(1);
+  }
+  // Nastav dnešný dátum montáže
+  const today = new Date().toISOString().split('T')[0];
+  const dm = document.getElementById('datum_montaze');
+  if (dm) dm.value = today;
+});
+</script>
+</body>
+</html>
