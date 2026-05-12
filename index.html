@@ -130,6 +130,10 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .tech-item input{display:none;}
 .tech-item .tech-check{width:22px;height:22px;border:2px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:.9rem;}
 .tech-item:has(input:checked) .tech-check{background:var(--orange);border-color:var(--orange);color:white;}
+.nem-label{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted);cursor:pointer;margin-top:6px;text-transform:none;letter-spacing:0;font-weight:500;}
+.nem-check{width:18px;height:18px;border:2px solid var(--border);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:.75rem;}
+input[type=checkbox].nem-cb{display:none;}
+input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border-color:var(--orange);color:white;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
@@ -297,7 +301,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       <!-- Dátum montáže -->
       <div class="field">
         <label>Dátum montáže</label>
-        <input type="date" id="datum_montaze">
+        <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:.85rem;color:var(--muted);font-weight:500;white-space:nowrap;">Dňa:</span><input type="date" id="datum_montaze" style="flex:1;"></div>
       </div>
     </div>
 
@@ -337,18 +341,18 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
             <label>Tlak – Kúrenie (bar)</label>
             <input type="number" step="0.1" id="sp_vnut_kurenie" placeholder="napr. 18.5"
               oninput="uncheckNemerané('sp_vnut_kurenie_nem')">
-            <label style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted);text-transform:none;letter-spacing:0;cursor:pointer;">
-              <input type="checkbox" id="sp_vnut_kurenie_nem" onchange="toggleNem('sp_vnut_kurenie',this)"
-                style="width:16px;height:16px;accent-color:var(--orange);">Nemerané
+            <label class="nem-label">
+              <input type="checkbox" id="sp_vnut_kurenie_nem" class="nem-cb" onchange="toggleNem('sp_vnut_kurenie',this)">
+              <div class="nem-check">✓</div>Nemerané
             </label>
           </div>
           <div class="field">
             <label>Tlak – Chladenie (bar)</label>
             <input type="number" step="0.1" id="sp_vnut_chladenie" placeholder="napr. 8.5"
               oninput="uncheckNemerané('sp_vnut_chladenie_nem')">
-            <label style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted);text-transform:none;letter-spacing:0;cursor:pointer;">
-              <input type="checkbox" id="sp_vnut_chladenie_nem" onchange="toggleNem('sp_vnut_chladenie',this)"
-                style="width:16px;height:16px;accent-color:var(--orange);">Nemerané
+            <label class="nem-label">
+              <input type="checkbox" id="sp_vnut_chladenie_nem" class="nem-cb" onchange="toggleNem('sp_vnut_chladenie',this)">
+              <div class="nem-check">✓</div>Nemerané
             </label>
           </div>
         </div>
@@ -367,10 +371,6 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       <!-- Vonkajšia jednotka -->
       <div class="card">
         <div class="unit-card-title" style="font-size:.82rem;margin-bottom:12px;">🏗️ Vonkajšia jednotka</div>
-        <div class="field">
-          <label>Typ jednotky</label>
-          <input type="text" id="sp_vonk_typ" placeholder="napr. nástenná, parapetná...">
-        </div>
         <div class="field">
           <label>Model</label>
           <div class="scan-field">
@@ -525,14 +525,18 @@ function setTyp(typ) {
 function toggleNem(inputId, cb) {
   const input = document.getElementById(inputId);
   if (!input) return;
+  // Update visual nem-check div
+  const nemCheck = cb.nextElementSibling;
   if (cb.checked) {
     input.value = ''; input.disabled = true;
     input.placeholder = 'Nemerané';
     input.style.background = '#f0f0f0'; input.style.color = '#999';
+    if (nemCheck) { nemCheck.style.background = 'var(--orange)'; nemCheck.style.borderColor = 'var(--orange)'; nemCheck.style.color = 'white'; }
   } else {
     input.disabled = false;
     input.placeholder = inputId.includes('kurenie') ? 'napr. 18.5' : 'napr. 8.5';
     input.style.background = ''; input.style.color = '';
+    if (nemCheck) { nemCheck.style.background = ''; nemCheck.style.borderColor = ''; nemCheck.style.color = ''; }
   }
 }
 
@@ -555,11 +559,11 @@ function toggleNemeraneState(typ, i) {
 function updateCelkomChladivo() {
   let total = 0;
   if (typSystem === 'split') {
-    total += parseFloat(document.getElementById('sp_vnut_chladivo_g')?.value) || 0;
+    total += parseFloat(document.getElementById('sp_vnut__chladivo_g')?.value) || 0;
   } else {
     const pocet = parseInt(document.getElementById('multisplit-pocet')?.value) || 0;
     for (let i = 1; i <= pocet; i++) {
-      total += parseFloat(document.getElementById(`ms_chladivo_g_${i}`)?.value) || 0;
+      total += parseFloat(document.getElementById(`ms_vnut_${i}_chladivo_g`)?.value) || 0;
     }
   }
   const el = document.getElementById('chladivo_celkom');
@@ -572,10 +576,11 @@ function unitCardHTML(prefix, index, label, showTlaky, showChladivo) {
   return `
     <div class="card">
       <div class="unit-card-title" style="font-size:.82rem;margin-bottom:12px;">${label}</div>
+      ${showTlaky ? `
       <div class="field">
         <label>Typ jednotky</label>
         <input type="text" id="${p}_typ" placeholder="napr. nástenná, kazetová...">
-      </div>
+      </div>` : ''}
       <div class="field">
         <label>Model</label>
         <div class="scan-field">
@@ -604,18 +609,18 @@ function unitCardHTML(prefix, index, label, showTlaky, showChladivo) {
           <label>Tlak – Kúrenie (bar)</label>
           <input type="number" step="0.1" id="${p}_kurenie" placeholder="napr. 18.5"
             oninput="uncheckNemerané('${p}_kurenie_nem')">
-          <label style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted);text-transform:none;letter-spacing:0;cursor:pointer;">
-            <input type="checkbox" id="${p}_kurenie_nem" onchange="toggleNem('${p}_kurenie',this)"
-              style="width:16px;height:16px;accent-color:var(--orange);">Nemerané
+          <label class="nem-label">
+            <input type="checkbox" id="${p}_kurenie_nem" class="nem-cb" onchange="toggleNem('${p}_kurenie',this)">
+            <div class="nem-check">✓</div>Nemerané
           </label>
         </div>
         <div class="field">
           <label>Tlak – Chladenie (bar)</label>
           <input type="number" step="0.1" id="${p}_chladenie" placeholder="napr. 8.5"
             oninput="uncheckNemerané('${p}_chladenie_nem')">
-          <label style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted);text-transform:none;letter-spacing:0;cursor:pointer;">
-            <input type="checkbox" id="${p}_chladenie_nem" onchange="toggleNem('${p}_chladenie',this)"
-              style="width:16px;height:16px;accent-color:var(--orange);">Nemerané
+          <label class="nem-label">
+            <input type="checkbox" id="${p}_chladenie_nem" class="nem-cb" onchange="toggleNem('${p}_chladenie',this)">
+            <div class="nem-check">✓</div>Nemerané
           </label>
         </div>
       </div>
@@ -800,42 +805,51 @@ function buildReview() {
 }
 
 // ══ PDF GENERÁTOR ══
-async function generatePDF(zakaznik, klima, photoKeys, technici, podpisZakaznik, podpisTechnik) {
+async function generatePDF(zakaznik, klima, photoKeys, technici, podpisZakaznik, podpisTechnik, showTechnici) {
   technici = technici || [];
+  if (showTechnici === undefined) showTechnici = true;
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const W = 210; const margin = 18;
 
-  // Oranžová farba Elwork
-  const orange = [232, 80, 10];
   const dark   = [13, 61, 82];
   const gray   = [90, 122, 136];
   const light  = [240, 247, 250];
+  const orange = [232, 80, 10];
 
-  // Header pruh
-  doc.setFillColor(...orange);
-  doc.rect(0, 0, W, 28, 'F');
+  // Header – biely s logom a tmavomodrý pruh dole
+  doc.setFillColor(255, 255, 255);
+  doc.rect(0, 0, W, 30, 'F');
 
-  // Logo obrázok
+  // Logo – správne proporcie
   try {
     const logoB64 = document.querySelector('header img')?.src;
-    if (logoB64) doc.addImage(logoB64, 'JPEG', margin, 4, 50, 20, '', 'MEDIUM');
+    if (logoB64) {
+      // Logo 562x90 pomer = 6.24:1, výška 14mm => šírka ~87mm – príliš veľké, dáme výšku 12mm
+      doc.addImage(logoB64, 'JPEG', margin, 9, 75, 12, '', 'MEDIUM');
+    }
   } catch(e) {
-    doc.setTextColor(255,255,255);
-    doc.setFontSize(20);
+    doc.setTextColor(...dark);
+    doc.setFontSize(18);
     doc.setFont('helvetica','bold');
-    doc.text('ELWORK', margin, 18);
+    doc.text('ELWORK', margin, 20);
   }
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(9);
-  doc.setFont('helvetica','normal');
-  doc.text('Montážny protokol – klimatizácia', margin + 55, 21);
 
-  // Dátum vpravo
-  doc.setFontSize(9);
+  // Nadpis vpravo
+  doc.setTextColor(...gray);
+  doc.setFontSize(8);
+  doc.setFont('helvetica','normal');
+  doc.text('Montážny protokol – klimatizácia', W - margin, 13, {align:'right'});
+  doc.setTextColor(...dark);
+  doc.setFontSize(8);
   doc.text(zakaznik.datum, W - margin, 21, {align:'right'});
 
-  let y = 38;
+  // Tenká linka dole pod hlavičkou
+  doc.setDrawColor(...dark);
+  doc.setLineWidth(0.5);
+  doc.line(margin, 28, W - margin, 28);
+
+  let y = 36;
 
   // Sekcia zákazník
   doc.setFillColor(...light);
@@ -865,36 +879,76 @@ async function generatePDF(zakaznik, klima, photoKeys, technici, podpisZakaznik,
   // Sekcia klimatizácia
   doc.setFillColor(...light);
   doc.roundedRect(margin, y, W - margin*2, 7, 2, 2, 'F');
-  doc.setTextColor(...orange);
+  doc.setTextColor(...dark);
   doc.setFontSize(9);
   doc.setFont('helvetica','bold');
-  doc.text('KLIMATIZÁCIA', margin+4, y+5);
+  doc.text('KLIMATIZACIA', margin+4, y+5);
   y += 11;
 
-  const kRows = [
-    ['Výrobca', klima.vyrobca],
-    ['Model', klima.model],
-    ['Sériové číslo', klima.serial || '–'],
-    ['Typ chladiva', klima.chladivo],
-    ['Doplnené chladivo', klima.chladivo_g ? klima.chladivo_g + ' g' : '–'],
-  ];
-  kRows.forEach(([k,v]) => {
+  const addRow = (label, value) => {
+    if (y > 270) { doc.addPage(); y = 20; }
     doc.setTextColor(...gray); doc.setFontSize(8); doc.setFont('helvetica','normal');
-    doc.text(k, margin+2, y);
+    doc.text(label, margin+2, y);
     doc.setTextColor(...dark); doc.setFont('helvetica','bold');
-    doc.text(String(v), margin+52, y);
-    y += 6;
-  });
+    const val = String(value || '–');
+    const lines = doc.splitTextToSize(val, W - margin*2 - 54);
+    doc.text(lines, margin+52, y);
+    y += Math.max(6, lines.length * 5);
+  };
+
+  const typSystemText = klima.typSystem === 'multisplit'
+    ? `Multisplit (${klima.vonkajsie_pocet||'?'} vonk. / ${klima.tlaky?.length||0} vnut.)`
+    : 'Split';
+
+  addRow('Typ systemu', typSystemText);
+  addRow('Vyrobca', klima.vyrobca);
+  addRow('Typ chladiva', klima.chladivo);
+  addRow('Doplnene celkom', klima.chladivo_celkom ? klima.chladivo_celkom + ' g' : '–');
+  addRow('Datum montaze', klima.datum_montaze || zakaznik.datum);
+
+  // Vnútorné jednotky
+  if (klima.tlaky && klima.tlaky.length > 0) {
+    klima.tlaky.forEach(t => {
+      y += 3;
+      if (y > 270) { doc.addPage(); y = 20; }
+      doc.setFillColor(230, 240, 245);
+      doc.roundedRect(margin, y, W - margin*2, 6, 1, 1, 'F');
+      doc.setTextColor(...dark);
+      doc.setFontSize(8);
+      doc.setFont('helvetica','bold');
+      doc.text(t.jednotka || 'Vnutorna jednotka', margin+3, y+4.5);
+      y += 9;
+      if (t.typ) addRow('  Typ', t.typ);
+      if (t.model) addRow('  Model', t.model);
+      if (t.serial) addRow('  Seriove c.', t.serial);
+      addRow('  Kurenie', t.kurenie ? (t.kurenie + (t.kurenie !== 'Nemerané' ? ' bar' : '')) : '–');
+      addRow('  Chladenie', t.chladenie ? (t.chladenie + (t.chladenie !== 'Nemerané' ? ' bar' : '')) : '–');
+      if (t.chladivo_g) addRow('  Doplnene chladivo', t.chladivo_g + ' g');
+      if (t.potrubie) addRow('  Dlzka CU potrubia', t.potrubie + ' m');
+    });
+  }
+
+  // Vonkajšie jednotky
+  if (klima.vonkajsie && klima.vonkajsie.length > 0) {
+    klima.vonkajsie.forEach(v => {
+      y += 3;
+      if (y > 270) { doc.addPage(); y = 20; }
+      doc.setFillColor(230, 240, 245);
+      doc.roundedRect(margin, y, W - margin*2, 6, 1, 1, 'F');
+      doc.setTextColor(...dark);
+      doc.setFontSize(8);
+      doc.setFont('helvetica','bold');
+      doc.text(v.jednotka || 'Vonkajsia jednotka', margin+3, y+4.5);
+      y += 9;
+      if (v.model) addRow('  Model', v.model);
+      if (v.serial) addRow('  Seriove c.', v.serial);
+    });
+  }
 
   // Poznámky
   if (klima.poznamky) {
-    y += 2;
-    doc.setTextColor(...gray); doc.setFontSize(8); doc.setFont('helvetica','normal');
-    doc.text('Poznámky', margin+2, y);
-    doc.setTextColor(...dark); doc.setFont('helvetica','normal');
-    const lines = doc.splitTextToSize(klima.poznamky, W - margin*2 - 54);
-    doc.text(lines, margin+52, y);
-    y += lines.length * 5 + 2;
+    y += 3;
+    addRow('Poznamky', klima.poznamky);
   }
 
   y += 6;
@@ -949,8 +1003,8 @@ async function generatePDF(zakaznik, klima, photoKeys, technici, podpisZakaznik,
 
   // Zákazník
   doc.setTextColor(...gray); doc.setFontSize(7); doc.setFont('helvetica','normal');
-  doc.text('Podpis zákazníka:', margin, y);
-  doc.text('Pečiatka ELWORK:', margin + sigW + 8, y);
+  doc.text('Podpis zakaznika:', margin, y);
+  doc.text('Peciatka ELWORK:', margin + sigW + 8, y);
   y += 4;
 
   // Podpis zákazníka
@@ -969,8 +1023,8 @@ async function generatePDF(zakaznik, klima, photoKeys, technici, podpisZakaznik,
   doc.text(`${zakaznik.meno} ${zakaznik.priezvisko}`, margin, y);
   y += 10;
 
-  // Technici
-  if (technici && technici.length > 0) {
+  // Technici – len pre firemný protokol
+  if (showTechnici && technici && technici.length > 0) {
     if (y > 260) { doc.addPage(); y = 20; }
     doc.setFillColor(...light);
     doc.roundedRect(margin, y, W - margin*2, 7, 2, 2, 'F');
@@ -1048,17 +1102,24 @@ async function doUpload() {
     setStep('s1','done');
     setProg(10);
 
-    // Generuj PDF
+    // Generuj PDF pre firmu (s technikmi)
     setStep('s2','active');
-    const pdfBuffer = await generatePDF(zakaznik, klima, photoKeys, technici, podpisZakaznik, podpisTechnik);
-    const pdfB64 = arrayBufferToBase64(pdfBuffer);
+    const pdfFirmaBuffer = await generatePDF(zakaznik, klima, photoKeys, technici, podpisZakaznik, podpisTechnik, true);
+    const pdfFirmaB64 = arrayBufferToBase64(pdfFirmaBuffer);
+
+    // Generuj PDF pre zákazníka (bez technikov)
+    const pdfZakaznikBuffer = await generatePDF(zakaznik, klima, photoKeys, technici, podpisZakaznik, podpisTechnik, false);
+    const pdfZakaznikB64 = arrayBufferToBase64(pdfZakaznikBuffer);
     setStep('s2','done');
     setProg(25);
 
-    // Nahraj PDF
+    // Nahraj firemný PDF
     setStep('s3','active');
-    const rPdf = await apiCall({type:'foto', zakaznik, nazov:'protokol.pdf', mime:'application/pdf', obsah:pdfB64});
+    const rPdf = await apiCall({type:'foto', zakaznik, nazov:'protokol_firma.pdf', mime:'application/pdf', obsah:pdfFirmaB64});
     if (!rPdf.ok) throw new Error(rPdf.error||'Chyba nahrávania PDF');
+
+    // Nahraj zákaznícky PDF
+    const rPdf2 = await apiCall({type:'foto', zakaznik, nazov:'protokol_zakaznik.pdf', mime:'application/pdf', obsah:pdfZakaznikB64});
     setStep('s3','done');
     setProg(40);
 
@@ -1078,7 +1139,7 @@ async function doUpload() {
     const emailStepId = 's'+(4+photoKeys.length);
     setStep(emailStepId,'active');
     try {
-      await apiCall({type:'email', zakaznik, klima, technici});
+      await apiCall({type:'email', zakaznik, klima, technici, pdfZakaznikB64});
       setStep(emailStepId,'done');
     } catch(e) {
       setStep(emailStepId,'done'); // Email chyba nie je fatálna
@@ -1101,7 +1162,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxnz5B8-65ADaBJ61nleIk_52M4-rS1QcMpxLvqlkX7YGocSy3fHk0bOpvMAJX0Lerg7w/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxVqLfo4ULx1ueR4biPg1eePGafTkCF1JyRVXj5K9jBCKwBKpDSYBn1zhK9oNuP1qR2Ag/exec';
   const r = await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload),headers:{'Content-Type':'text/plain'}});
   return r.json();
 }
@@ -1348,13 +1409,16 @@ function val1() {
 }
 function val2() {
   const vyrobca = document.getElementById('vyrobca')?.value || '';
-  const model = document.getElementById('model')?.value?.trim() || '';
   const chladivo = document.getElementById('chladivo')?.value || '';
   if (!vyrobca) { showToast('⚠️ Vyberte výrobcu'); return false; }
-  if (!model)   { showToast('⚠️ Zadajte model'); return false; }
   if (!chladivo){ showToast('⚠️ Vyberte typ chladiva'); return false; }
-  if (typSystem === 'multisplit' && !document.getElementById('multisplit-pocet').value) {
-    showToast('⚠️ Vyberte počet vnútorných jednotiek'); return false;
+  if (typSystem === 'multisplit') {
+    if (!document.getElementById('multisplit-pocet').value) {
+      showToast('⚠️ Vyberte počet vnútorných jednotiek'); return false;
+    }
+    if (!document.getElementById('multisplit-vonkajsie').value) {
+      showToast('⚠️ Vyberte počet vonkajších jednotiek'); return false;
+    }
   }
   return true;
 }
