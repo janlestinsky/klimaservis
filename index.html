@@ -1072,12 +1072,16 @@ async function doUpload() {
     setStep('s1','done');
     setProg(10);
 
+    // Získaj logo a pečiatku
+    const logoB64 = document.querySelector('header img')?.src || null;
+    const peciatkaB64 = PECIATKA_B64 || null;
+
     // Generuj PDF na serveri (plná slovenčina)
     setStep('s2','active');
-    const rPdfFirma = await apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, showTechnici: true, nazov:'protokol_firma.pdf'});
+    const rPdfFirma = await apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, logoB64, peciatkaB64, showTechnici: true, nazov:'protokol_firma.pdf'});
     if (!rPdfFirma.ok) throw new Error(rPdfFirma.error||'Chyba generovania PDF');
-    const rPdfZakaznik = await apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, showTechnici: false, nazov:'protokol_zakaznik.pdf'});
-    const pdfZakaznikB64 = null; // PDF je už na Drive, email bez prílohy
+    const rPdfZakaznik = await apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, logoB64, peciatkaB64, showTechnici: false, nazov:'protokol_zakaznik.pdf'});
+    const pdfZakaznikB64 = null;
     setStep('s2','done');
     setStep('s3','done');
     setProg(40);
@@ -1121,7 +1125,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbykhEr06QW8n9cm-yjDambgkReZuGvpYl8AjyqfsOMTSoaVdfKSOYsCEQcwreV9tOjyCQ/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwVFGouE7z2hhFqZWKZh6535f1A1qB12-Fwp-2MDU666phQbnId5q5n2h3C1wJDgrjkrw/exec';
   const formData = new URLSearchParams();
   formData.append('data', JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {method:'POST', body: formData});
