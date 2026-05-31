@@ -1162,7 +1162,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJ1NSElW07TwCJ3-85VYMbHyEiXwQsjWFdomzLtkGj90GoVt5j4Lpxj2-M6zX0s53SYQ/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxFA89oKRqc_eOV2cS8Od824r78wjQZo5kp0gXtXameCS-jSbWudtrd4l294GnHVpOQCQ/exec';
   const r = await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload),headers:{'Content-Type':'text/plain'}});
   return r.json();
 }
