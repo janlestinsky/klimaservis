@@ -720,7 +720,7 @@ function handleTypSelect(selectId, inyId, hiddenId) {
 }
 
 function getUnitData(prefix, index, hasTlaky) {
-  const p = prefix + '_' + index;
+  const p = index === '' ? prefix : prefix + '_' + index;
   const data = {
     typ: document.getElementById(p+'_typ')?.value || '',
     model: document.getElementById(p+'_model')?.value || '',
@@ -849,242 +849,166 @@ async function generatePDF(zakaznik, klima, photoKeys, technici, podpisZakaznik,
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const W = 210; const margin = 18;
+  const dark  = [13, 61, 82];
+  const gray  = [90, 122, 136];
+  const light = [240, 247, 250];
+  const orange= [232, 80, 10];
 
-  const dark   = [13, 61, 82];
-  const gray   = [90, 122, 136];
-  const light  = [240, 247, 250];
-  const orange = [232, 80, 10];
-
-  // Header – biely s logom a tmavomodrý pruh dole
-  doc.setFillColor(255, 255, 255);
-  doc.rect(0, 0, W, 30, 'F');
-
-  // Logo – správne proporcie
+  // ── HLAVIČKA ──
+  doc.setFillColor(255,255,255);
+  doc.rect(0,0,W,30,'F');
   try {
     const logoB64 = document.querySelector('header img')?.src;
-    if (logoB64) {
-      // Logo 562x90 pomer = 6.24:1, výška 14mm => šírka ~87mm – príliš veľké, dáme výšku 12mm
-      doc.addImage(logoB64, 'JPEG', margin, 9, 75, 12, '', 'MEDIUM');
-    }
+    if (logoB64) doc.addImage(logoB64,'JPEG',margin,9,75,12,'','MEDIUM');
   } catch(e) {
-    doc.setTextColor(...dark);
-    doc.setFontSize(18);
-    doc.setFont('helvetica','bold');
+    doc.setTextColor(...dark); doc.setFontSize(18); doc.setFont('helvetica','bold');
     doc.text('ELWORK', margin, 20);
   }
-
-  // Nadpis vpravo
-  doc.setTextColor(...gray);
-  doc.setFontSize(8);
-  doc.setFont('helvetica','normal');
-  doc.text('Montážny protokol – klimatizácia', W - margin, 13, {align:'right'});
+  doc.setTextColor(...gray); doc.setFontSize(8); doc.setFont('helvetica','normal');
+  doc.text('Montazny protokol – klimatizacia', W-margin, 13, {align:'right'});
   doc.setTextColor(...dark);
-  doc.setFontSize(8);
-  doc.text(zakaznik.datum, W - margin, 21, {align:'right'});
-
-  // Tenká linka dole pod hlavičkou
-  doc.setDrawColor(...dark);
-  doc.setLineWidth(0.5);
-  doc.line(margin, 28, W - margin, 28);
-
+  doc.text(zakaznik.datum, W-margin, 21, {align:'right'});
+  doc.setDrawColor(...dark); doc.setLineWidth(0.5);
+  doc.line(margin, 28, W-margin, 28);
   let y = 36;
 
-  // Sekcia zákazník
-  doc.setFillColor(...light);
-  doc.roundedRect(margin, y, W - margin*2, 7, 2, 2, 'F');
-  doc.setTextColor(...orange);
-  doc.setFontSize(9);
-  doc.setFont('helvetica','bold');
-  doc.text('ZÁKAZNÍK', margin+4, y+5);
-  y += 11;
-
-  const zRows = [
-    ['Meno a priezvisko', `${zakaznik.meno} ${zakaznik.priezvisko}`],
-    ['Adresa', zakaznik.adresa],
-    ['Telefón', zakaznik.telefon],
-    ['Email', zakaznik.email || '–'],
-  ];
-  zRows.forEach(([k,v]) => {
-    doc.setTextColor(...gray); doc.setFontSize(8); doc.setFont('helvetica','normal');
-    doc.text(k, margin+2, y);
-    doc.setTextColor(...dark); doc.setFont('helvetica','bold');
-    doc.text(v, margin+52, y);
-    y += 6;
-  });
-
-  y += 4;
-
-  // Sekcia klimatizácia
-  doc.setFillColor(...light);
-  doc.roundedRect(margin, y, W - margin*2, 7, 2, 2, 'F');
-  doc.setTextColor(...dark);
-  doc.setFontSize(9);
-  doc.setFont('helvetica','bold');
-  doc.text('KLIMATIZACIA', margin+4, y+5);
-  y += 11;
+  const addSection = (title) => {
+    if (y > 265) { doc.addPage(); y = 20; }
+    doc.setFillColor(...light);
+    doc.roundedRect(margin, y, W-margin*2, 7, 2, 2, 'F');
+    doc.setTextColor(...orange); doc.setFontSize(9); doc.setFont('helvetica','bold');
+    doc.text(title, margin+4, y+5);
+    y += 11;
+  };
 
   const addRow = (label, value) => {
-    if (y > 270) { doc.addPage(); y = 20; }
+    if (y > 275) { doc.addPage(); y = 20; }
     doc.setTextColor(...gray); doc.setFontSize(8); doc.setFont('helvetica','normal');
     doc.text(label, margin+2, y);
     doc.setTextColor(...dark); doc.setFont('helvetica','bold');
     const val = String(value || '–');
-    const lines = doc.splitTextToSize(val, W - margin*2 - 54);
+    const lines = doc.splitTextToSize(val, W-margin*2-54);
     doc.text(lines, margin+52, y);
-    y += Math.max(6, lines.length * 5);
+    y += Math.max(6, lines.length*5);
   };
 
-  const typSystemText = klima.typSystem === 'multisplit'
-    ? `Multisplit (${klima.vonkajsie_pocet||'?'} vonk. / ${klima.tlaky?.length||0} vnut.)`
-    : 'Split';
+  const addSubHeader = (title) => {
+    if (y > 270) { doc.addPage(); y = 20; }
+    doc.setFillColor(220, 235, 242);
+    doc.roundedRect(margin, y, W-margin*2, 6, 1, 1, 'F');
+    doc.setTextColor(...dark); doc.setFontSize(8); doc.setFont('helvetica','bold');
+    doc.text(title, margin+3, y+4.5);
+    y += 9;
+  };
 
+  // ── ZÁKAZNÍK ──
+  addSection('ZAKAZNIK');
+  addRow('Meno a priezvisko', zakaznik.meno + ' ' + zakaznik.priezvisko);
+  addRow('Adresa', zakaznik.adresa);
+  addRow('Telefon', zakaznik.telefon);
+  addRow('Email', zakaznik.email || '–');
+  y += 4;
+
+  // ── TECHNICI (len firemný) ──
+  if (showTechnici && technici && technici.length > 0) {
+    addSection('TECHNICI');
+    doc.setTextColor(...dark); doc.setFontSize(9); doc.setFont('helvetica','normal');
+    const techLines = doc.splitTextToSize(technici.join(', '), W-margin*2-4);
+    doc.text(techLines, margin+2, y);
+    y += techLines.length * 6 + 4;
+  }
+
+  // ── KLIMATIZÁCIA ──
+  addSection('KLIMATIZACIA');
+  const typSystemText = klima.typSystem === 'multisplit'
+    ? 'Multisplit (' + (klima.vonkajsie_pocet||'?') + ' vonk. / ' + (klima.tlaky?.length||0) + ' vnut.)'
+    : 'Split';
   addRow('Typ systemu', typSystemText);
   addRow('Vyrobca', klima.vyrobca);
   addRow('Typ chladiva', klima.chladivo);
-  addRow('Doplnene celkom', klima.chladivo_celkom ? klima.chladivo_celkom + ' g' : '–');
+  addRow('Doplnene chladivo celkom', klima.chladivo_celkom ? klima.chladivo_celkom + ' g' : '–');
   addRow('Datum montaze', klima.datum_montaze || zakaznik.datum);
+  y += 3;
 
-  // Vnútorné jednotky
+  // ── VNÚTORNÉ JEDNOTKY ──
   if (klima.tlaky && klima.tlaky.length > 0) {
     klima.tlaky.forEach(t => {
-      y += 3;
-      if (y > 270) { doc.addPage(); y = 20; }
-      doc.setFillColor(230, 240, 245);
-      doc.roundedRect(margin, y, W - margin*2, 6, 1, 1, 'F');
-      doc.setTextColor(...dark);
-      doc.setFontSize(8);
-      doc.setFont('helvetica','bold');
-      doc.text(t.jednotka || 'Vnutorna jednotka', margin+3, y+4.5);
-      y += 9;
-      if (t.typ) addRow('  Typ', t.typ);
+      addSubHeader((t.jednotka || 'Vnutorna jednotka').replace(/[áäčďéíľĺňóôŕšťúýžÁÄČĎÉÍĽĹŇÓÔŔŠŤÚÝŽ]/g, c => ({á:'a',ä:'a',č:'c',ď:'d',é:'e',í:'i',ľ:'l',ĺ:'l',ň:'n',ó:'o',ô:'o',ŕ:'r',š:'s',ť:'t',ú:'u',ý:'y',ž:'z',Á:'A',Ä:'A',Č:'C',Ď:'D',É:'E',Í:'I',Ľ:'L',Ĺ:'L',Ň:'N',Ó:'O',Ô:'O',Ŕ:'R',Š:'S',Ť:'T',Ú:'U',Ý:'Y',Ž:'Z'}[c]||c)));
+      if (t.typ)  addRow('  Typ jednotky', t.typ);
       if (t.model) addRow('  Model', t.model);
-      if (t.serial) addRow('  Seriove c.', t.serial);
-      addRow('  Kurenie', t.kurenie ? (t.kurenie + (t.kurenie !== 'Nemerané' ? ' bar' : '')) : '–');
-      addRow('  Chladenie', t.chladenie ? (t.chladenie + (t.chladenie !== 'Nemerané' ? ' bar' : '')) : '–');
-      if (t.chladivo_g) addRow('  Doplnene chladivo', t.chladivo_g + ' g');
-      if (t.potrubie) addRow('  Dlzka CU potrubia', t.potrubie + ' m');
+      if (t.serial) addRow('  Seriove cislo', t.serial);
+      addRow('  Tlak kurenie', t.kurenie ? (t.kurenie + (t.kurenie !== 'Nemerane' && t.kurenie !== 'Nemerané' ? ' bar' : '')) : '–');
+      addRow('  Tlak chladenie', t.chladenie ? (t.chladenie + (t.chladenie !== 'Nemerane' && t.chladenie !== 'Nemerané' ? ' bar' : '')) : '–');
+      addRow('  Doplnene chladivo', t.chladivo_g ? t.chladivo_g + ' g' : '–');
+      addRow('  Dlzka CU potrubia', t.potrubie ? t.potrubie + ' m' : '–');
     });
   }
+  y += 3;
 
-  // Vonkajšie jednotky
+  // ── VONKAJŠIE JEDNOTKY ──
   if (klima.vonkajsie && klima.vonkajsie.length > 0) {
     klima.vonkajsie.forEach(v => {
-      y += 3;
-      if (y > 270) { doc.addPage(); y = 20; }
-      doc.setFillColor(230, 240, 245);
-      doc.roundedRect(margin, y, W - margin*2, 6, 1, 1, 'F');
-      doc.setTextColor(...dark);
-      doc.setFontSize(8);
-      doc.setFont('helvetica','bold');
-      doc.text(v.jednotka || 'Vonkajsia jednotka', margin+3, y+4.5);
-      y += 9;
+      addSubHeader((v.jednotka || 'Vonkajsia jednotka').replace(/[áäčďéíľĺňóôŕšťúýžÁÄČĎÉÍĽĹŇÓÔŔŠŤÚÝŽ]/g, c => ({á:'a',ä:'a',č:'c',ď:'d',é:'e',í:'i',ľ:'l',ĺ:'l',ň:'n',ó:'o',ô:'o',ŕ:'r',š:'s',ť:'t',ú:'u',ý:'y',ž:'z',Á:'A',Ä:'A',Č:'C',Ď:'D',É:'E',Í:'I',Ľ:'L',Ĺ:'L',Ň:'N',Ó:'O',Ô:'O',Ŕ:'R',Š:'S',Ť:'T',Ú:'U',Ý:'Y',Ž:'Z'}[c]||c)));
       if (v.model) addRow('  Model', v.model);
-      if (v.serial) addRow('  Seriove c.', v.serial);
+      if (v.serial) addRow('  Seriove cislo', v.serial);
     });
   }
+  y += 3;
 
-  // Poznámky
+  // ── POZNÁMKY ──
   if (klima.poznamky) {
-    y += 3;
-    addRow('Poznamky', klima.poznamky);
+    addSection('POZNAMKY');
+    doc.setTextColor(...dark); doc.setFontSize(8); doc.setFont('helvetica','normal');
+    const lines = doc.splitTextToSize(klima.poznamky, W-margin*2-4);
+    doc.text(lines, margin+2, y);
+    y += lines.length * 5 + 4;
   }
 
-  y += 6;
-
-  // Fotky
+  // ── FOTKY ──
   if (photoKeys.length > 0) {
-    doc.setFillColor(...light);
-    doc.roundedRect(margin, y, W - margin*2, 7, 2, 2, 'F');
-    doc.setTextColor(...orange);
-    doc.setFontSize(9);
-    doc.setFont('helvetica','bold');
-    doc.text('FOTOGRAFIE Z MONTÁŽE', margin+4, y+5);
-    y += 11;
-
-    const colW = (W - margin*2 - 8) / 2;
+    addSection('FOTOGRAFIE Z MONTAZE');
+    const colW = (W-margin*2-8)/2;
     const imgH = 55;
     let col = 0;
-
     for (const k of photoKeys) {
       try {
         const dataUrl = await fileToDataUrl(photos[k].file);
-        const x = margin + col * (colW + 8);
-        doc.addImage(dataUrl, 'JPEG', x, y, colW, imgH, '', 'MEDIUM');
-        // Popis pod fotkou
-        doc.setFillColor(0,0,0);
+        const x = margin + col*(colW+8);
+        if (y + imgH > 280) { doc.addPage(); y = 20; col = 0; }
+        doc.addImage(dataUrl,'JPEG',x,y,colW,imgH,'','MEDIUM');
         doc.setFillColor(...dark);
-        doc.rect(x, y + imgH - 7, colW, 7, 'F');
-        doc.setTextColor(255,255,255);
-        doc.setFontSize(7);
-        doc.setFont('helvetica','normal');
-        doc.text(photos[k].label, x + colW/2, y + imgH - 2.5, {align:'center'});
+        doc.rect(x, y+imgH-7, colW, 7, 'F');
+        doc.setTextColor(255,255,255); doc.setFontSize(7); doc.setFont('helvetica','normal');
+        doc.text(photos[k].label, x+colW/2, y+imgH-2.5, {align:'center'});
         col++;
-        if (col >= 2) { col = 0; y += imgH + 10; }
+        if (col >= 2) { col=0; y+=imgH+10; }
       } catch(e) {}
     }
-    if (col > 0) y += imgH + 10;
+    if (col > 0) y += imgH+10;
   }
 
-  // Podpisy
+  // ── PODPISY ──
   if (y > 220) { doc.addPage(); y = 20; }
-  y += 6;
-  doc.setFillColor(...light);
-  doc.roundedRect(margin, y, W - margin*2, 7, 2, 2, 'F');
-  doc.setTextColor(...orange);
-  doc.setFontSize(9);
-  doc.setFont('helvetica','bold');
-  doc.text('PODPISY', margin+4, y+5);
-  y += 11;
-
-  const sigW = (W - margin*2 - 8) / 2;
+  y += 4;
+  addSection('PODPISY');
+  const sigW = (W-margin*2-8)/2;
   const sigH = 40;
-
-  // Zákazník
   doc.setTextColor(...gray); doc.setFontSize(7); doc.setFont('helvetica','normal');
   doc.text('Podpis zakaznika:', margin, y);
-  doc.text('Peciatka ELWORK:', margin + sigW + 8, y);
+  doc.text('Peciatka ELWORK:', margin+sigW+8, y);
   y += 4;
-
-  // Podpis zákazníka
-  if (podpisZakaznik) {
-    doc.addImage(podpisZakaznik, 'PNG', margin, y, sigW, sigH);
-  }
+  if (podpisZakaznik) doc.addImage(podpisZakaznik,'PNG',margin,y,sigW,sigH);
   doc.rect(margin, y, sigW, sigH);
-
-  // Pečiatka
-  try {
-    doc.addImage(PECIATKA_B64, 'JPEG', margin + sigW + 8, y, sigW, sigH, '', 'MEDIUM');
-  } catch(e) {}
-
-  y += sigH + 4;
+  try { doc.addImage(PECIATKA_B64,'JPEG',margin+sigW+8,y,sigW,sigH,'','MEDIUM'); } catch(e){}
+  y += sigH+4;
   doc.setTextColor(...gray); doc.setFontSize(7);
-  doc.text(`${zakaznik.meno} ${zakaznik.priezvisko}`, margin, y);
-  y += 10;
+  doc.text(zakaznik.meno+' '+zakaznik.priezvisko, margin, y);
 
-  // Technici – len pre firemný protokol
-  if (showTechnici && technici && technici.length > 0) {
-    if (y > 260) { doc.addPage(); y = 20; }
-    doc.setFillColor(...light);
-    doc.roundedRect(margin, y, W - margin*2, 7, 2, 2, 'F');
-    doc.setTextColor(...orange);
-    doc.setFontSize(9);
-    doc.setFont('helvetica','bold');
-    doc.text('TECHNICI', margin+4, y+5);
-    y += 11;
-    doc.setTextColor(...dark);
-    doc.setFontSize(9);
-    doc.setFont('helvetica','normal');
-    doc.text(technici.join(', '), margin+2, y);
-    y += 8;
-  }
-
-  // Footer
+  // ── FOOTER ──
   doc.setFillColor(...dark);
-  doc.rect(0, 287, W, 10, 'F');
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(7);
-  doc.setFont('helvetica','normal');
-  doc.text('ELWORK – Montážny protokol', margin, 293);
+  doc.rect(0,287,W,10,'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(7); doc.setFont('helvetica','normal');
+  doc.text('ELWORK – Montazny protokol', margin, 293);
   doc.text(zakaznik.datum, W-margin, 293, {align:'right'});
 
   return doc.output('arraybuffer');
