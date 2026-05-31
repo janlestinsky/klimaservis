@@ -79,7 +79,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .rv-item{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--ice);gap:10px;}
 .rv-item:last-child{border-bottom:none;}
 .rv-item .rk{font-size:.7rem;color:var(--muted);font-weight:600;flex-shrink:0;width:90px;}
-.rv-item .rv(font-size:.82rem;color:var(--text);font-weight:500;text-align:right;word-break:break-word;flex:1;}
+.rv-item .rv{font-size:.82rem;color:var(--text);font-weight:500;text-align:right;word-break:break-word;flex:1;}
 .rv-photos{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px;}
 .rv-photos img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;}
 .up-box{background:white;border-radius:16px;padding:26px 18px;text-align:center;margin:0 0 12px;border:1px solid var(--border);}
@@ -142,7 +142,961 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">
-      <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAAzAUADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9U6K+Sp/2yfEEM8qDw/phCMVyZZexxUf/AA2b4g/6AGl/9/pK+F/10yZae0f/AIC/8j9BXAmePX2S/DAo/5n1zRXyN/w2b4g/6AGl/wDv9ko/4bN8Qf8AQAul/wDv9JR/rrk3/Px/+Av/ACH/AKh57/z6X/gUf8z65orwj4H/ALQmqfFPxfcaRe6XZWUUdm9yJLeR2YkMgxg9vmNe719Pl+Y4fNKH1jDO8b22tt6nyWZ5ZicoxH1bFq07J7p6P0CivIvj38Z9R+Eh0X7Dh9rffb/O3/aHZduzbjG3/erd+CXxHu/ij4NfWb20gsplu5Lfy4GZlwoXB55zzWMM3wlTHSy6Mv3sVdqz7J77dTeeTYynl8c0lFeyk7J3V73a233TPQKKKK9k8MKKr6gbkWNx9iERvPLbyfPz5e/B27sc4zjOO1fmB8O/+CufjG7+OOi+B/HPgbQ9AspNaXRtUubeecy2bmXyWbDHGFfrnsDQB+o9FIDkUtABRX56ftl/8FQ9R/Zx+O03gLw34Y0vxDbabbW76ncXdxIsiTyDzGiQIccRGM5OfmY+lfe3hXxLYeM/DOk6/pcwuNM1S0ivbWUdHikQOh/JhQBq0UV8Sft+f8FBr/8AZI8V+FvDXh3QtN8QatqNnLf3qahNIgt4d+yHaEOcsVl69kHrQB9t0V5b+zH8R/E3xe+B3hXxp4t0mz0LVtctjfLYWLO0ccDsTAcvzlo9rH/er1GgAJAGTwK+W/jl+0xdNfzaB4LuvKjjby7jVYRuZ26FIT2A6bupPT1Mf7RX7Qf283PhTwvc/wCjZMV/qELf6zsYoyP4ezMOvQcZzt/s6/s+/wAax5jKfE1t/wATAgSWNhKv/HuO0jj+/wCg/h+vT80zLNcVnOKeU5PKyXx1F0XZP/Ld6LS7P1XKsowmRYRZzncbt/w6b3b7tf56JavWyPJ7b4EfFDxLbjVpLC5aSQb1N9fBJ275wzZH44rR8BfHHxf8IvEP9j+JlvbzT4mCXFhfZM8A/vRseenOCSpHTHWvtSvOvjH8GNM+K2kfNss9bt1P2W/C9P8AYf1Qn8R1HcHGtwlWy6H1rKK8vbR1s2rS8tl+N1+ZvQ4zoZnP6pnWHh7CWl4p3h2e727qz6rsdp4d8Rad4r0e21TSrpLyxuF3Ryxnr6gjsR0IPINaVfDPgTx54l/Z58aXOl6nbSfY/MAvdNdvlYdpYj0zjkMOGHB9vuC1u4bxC0MiuBjcFIJUlQwB9DhgfxFfU5Dncc4pSU48lWGk49n5eTs/Nbeb+Q4hyGWSVouE+ejU1hJdVpv5q612e67Kaiivlz9vv9rbW/2RPh94c8Q6Hoen65PqmqGwki1CPIFRfJeTcNhBzlcc19QfJH1HRX48D/gtr8QT/wA098M/+BNz/wDFUv8Aw+0+IP8A0T3wx/4E3P8A8VQB+w1Ffjz/AMPtPiD/ANE98Mf+BNz/APFVZ03/AILc+NIbyNtQ+Gug3NqD88drfzxOR7MwcD8jQB+vtFeR/swftK+Gf2qPhfb+MvDSTWgWZrO+066IM1ncKAWjYjhgQysrDqGHQ5A9coAKK+W/2+/2t9c/ZE8BeGte0PQ9P1ybVNTaxki1CSRFRRCz7hsIOcr3qP8AYC/a81z9rzwT4n1vXNC07QptJ1FLKOLTpJHV1aIPlt5POT2oA+qKKK4X4xfG7wX8BfB8/iXxxrttommR5EfmnMtw4GfLhjHzSOfRR7nA5oA7qivyk1T/BJS/gsptPszdfHTwB/w3mPiN+05qnjXWJ/CPwqgmur0/JJqqxFyc8fuUPb1c8D9a4HTfGOo/H7xLpGkeKNcTwr4PjgWH7Aq+WLiUAARtu6EjByeB0HqfrrwN8OPDnw+01bPQdNhs0KgNKBukk7/ADOeTzzjpz0oA4D4P/CbxfpEVvqPjTxfqWoagreYNPiumaFG4++38fTp0r2lRihFAz7nPWnUAFFNckLkdazrjxBp1pdpbXGoWsFy5wsMsyq7H0Ck5oA06KhkuFhiZ5HVVQEszHAAHUk1m2fivSL8wi21WyuTOxSIRXCN5jDqFweSMj86ANiiqGp6zZaLaG61C8t7K2XgzXEgRPzJFGmazZazAJ7C8gvoCceZbyB1/MGgC/RRRQBheM9fbwz4Z1PVFjErWkLSLGxwGPGBn05rzD4S/GfQ38JW769rUdvqk88zPbShsp8/yqOOmMYzk8167rOjWuvadPY30IuLScASRHIDAHOOPoK4OX9nbwDKzs2gruc5YieQZPY4DdR/hQAr/tDfDqIAt4mtlHqY5P8A4mr+h/G/wT4jvraz03Xobq5uJBFFGsUg3segBK4rNuP2cvh9dwpDN4ejaJG3KvnSYU+3zcDjpWjo/wAEvB2gX1neWGjrb3FpIssLrK5KsvTq1AHcOwGCa+L/AIAfFfTPDnxR8VN4pvYdItVE8Vpcybgkn74MwOOMgEdu9faLJleOCOhrzif9nfwDdRyJLoEbpJMbh1aVyC55J60ATf8AC/vAO+ND4kttz/d/dyf/ABNNT9oP4fOYwviW2YyHCgRyZJ+m33FQw/s5/D2CeGZPDkPmRDCMZZCQM57t3qxD8A/A0Mvmx6FHHJkHckrjnj39hQBofFXwonjXwJrGmCMSyyQ+bDkEkSJhkIxznK449a+Qvhn4s1r4veL/AAn4JvLYrpulXEs8kofDMuNzcDAGBlBjpu9ea+7I4/LUDrj0GK5bw38LPDPhLW7vVtK0qO0v7lSkkqkngnJwDwMnrigDV1rQ7fXdEu9KuV/0S7t2t3C9lYY/Svgqzk15lj+EcBleP/hIWcvNKRIvzKm3HUqMM/J74xjFfoUUDKARx6VyUPwp8M23jOXxXHpqprkjF3uFY8sVC7tucZwOtAFzQBbaTfPo9rMsqWtvHmISLmABQqjYOVDAbs9zmt65tYryCSKZFlhkUq6OMhlPUGvMV0WTQP2gJNXRc2uu6N9nk46TQMCvPoVJ/KvUkfcPSiWjTFc+XfiF4I1r9nvxDL428FW7XGgyODfaVHyQuMbf93pg9RjntXsngb4xeGPG+ix31vqltZzBAZ7O6mVJYGxllYEjOOeR9a7u4hjuInilRZInBVkcZDA9QRXkWofsreAL/Urm8WxntftGS8UE2IwSecAjjvwODnpQM4bX/Avhb446hrN78P8AV00zUVuXt9TeEOkd2OAZQRywznpwxHPrXuHw8+H2mfDrQYtM02M4P7ye4cDfPJjBdvX6dqf4J+HehfDvSjp+hWS2kLNvlcnc8rYxlmPXj8BXSq3YDigDM8VfL4a1YjtZzdf9w189fscwR6hpfip7mOC5xdwOg8pWCZiJIBIJ65/KvpO+to723lglGYpUMbDOMgjB/Q1zvgb4c6D8O7W4tdBs/scc7B5AZC5YgYBOTQBy/wAYvgjpnxK0YmCCGz1q2Vha3AXYpz1R9vVT+h5ryb4R/GiL4e6vF4J8aaXHo5tQLe3vniVTDtwoWQqPusTlX/POM19Vsu4VxPjv4O+FviNd291renefdQIY0njkaNyp7EjqOOM9KAOvguYpokkikV43XcrIcgg9CCOo96+Uf29w0+jeE4olLStJckFFyy4RTn+n419L+EPBlh4H0ePS9LNwtjESY4p52l8sH+FS3IHt0FZvj/4VeHviWtguvWslyLJ2eHy5Wj2k4znHXoKAOP8AEfwW0T4qeCNGlmDadq40+HytStgA+TEvDjo6+xryNfG/jv8AZhvbPSNXtZfEHhtgFSeRiVUA4Jjk52H/AGGyB7V9a2VlHYWcNtCu2KFFjQegAwP5VU1nw/Y+ItOn0/U7WK+spxiSCdAykfT/ACaAMD4d/FPw58StK+26HqCXG0Ylt2O2WE+jqeR9Rwe1dcZlAzuGPWvKtD/Zm8E+F9QjvdHg1DTLqN96S2t9IjAZ+7kdV9j2qx8adB1zxdp+k+GdGNxaxX92jX2oxLxBAhDMC2eC3b1xQB6ZI26M4NfG154Xi+CnxOkuvH3hn/hKfD+r6iDY+K1naSayfduVGXdkcjJ9ecccV9h2dilnawwRZCRKETPJAAwOtedX/wCzx4U1fVFvNQbVL+Nbg3S2NzqEklqsmd2RGTgc0Ad/dyJNpNxyrBoWPHQgqcGvmz9kT4Y6CPDcvii6tY7jV4NSmihuGY7bcKqj5B0ydxye+BXudt8LtHtfGF94lR73+0ryJoZVa6cwhSoHyxk4XgDHpWdpnwS8OaX4En8JR/bpNHmuDcsHuW83eSDw4wQPlFAHk/7RGnW/iz43fC/et4e1Q87RZ5DJNbyAmOQlzx6Z+UD1wai+E2kWvgj9qTxloGjD7Noi2Cztbo2I4mwhC4J7ZPPvXsWu/Bjw94g0LSNMuFvIxpIUWN5BcstzBtxjbIcnPHJOar+HvgV4a8N22tx24vbi41iIw3l5dXTSXDoRjAc9PwoA7+G5jnUNG6yKf4lOR+YorA8BeAtM+HmiDStK+0G1Dlx9plMjZPuaKAOlooooAKKKKACiiigAopucDPalzk0ALRRRQAUjfdNLSGgDmfF2hvqaWN7BLIt1ps32qFFziQgHKEd89K1tG1OHVdPhuIwVDqCY2PzIcdG9D7VecfjXJ6jod7ol++o6EiushLXNgTtWY/3lJ4Df4VcWprkbtbYWxxn7TPi/XfBfgfT77w9qDadeHVIY2kCKweMq5Knd2JArt/Amk69plnM/iHX/7bvbkrJhLdYYoOOVQDkj3OelecfGvR7j4s+GrXQbe+g8Oaha6lDdPFqT4DouehHXOa9Ivj4hm1nRW0qbS20QA/b/ODNM3GAYiOMfWk4uO4XR598bvF+u+H/FvhuxXUp/DvhK93R32s2kAkkjlPCLuIIQHjkjvmvS/BtlNp3h2yt5tbl8QOinGozbN86kkgnaNpwCBx6VgfEHS/F2tJc2OixaFPpV3aGCUap5nmRucgsAvDDBBAOOR15qh4T8C+Jfhv8ONA8O6Bd6dfXVnIRczaiHVDEzMzBAvIIJ4zxUjMH46+LfEujeN/AGjeHtXOlnWbmSCX92jg4KckMOcBm4BGTxVfw54g8S+DvjnbeDdU8QT+JNM1TTTe28t1GkcsLLnd90AEZU/nWd+0ZZ6tf/EP4WppM9va6il/I0U1yCYg+Y+oBBI4IwOea6bw98NfEuofFiLxv4putOWSzsWsbOz07eVAb7zMze5JH1oA9dDA06uR8HHxedS1Q+JI9LjsvM/0EWDMX27j9/PttP1rrRQAtFFFABRRRQAUwxgk8U+igAooooAKKKKACiiigAooooAKKKKACmtnHHWnUjUAeYD47aXF4Q1rxBc2c8EGmagdOFvlWkuZdwC+Xz/FuBAPvXoOlX0mo6ba3M1s9nLNEsjW8hBaIkZKtjjI6cV8g+Hpb208TQ63q6i58FW3i+5jntQMiG4KlUmbH3gDtxnptPrXuGtyXXjH4la1obapqWnWWlaZFdQiwuPLWSSTJDkjk46YJxQB0Xi3x7ceHviB4O0GOCF7fXHnSSWQnehjTcNvOOfek+FHju+8beGrrUNStre0ngv7i0KQbtuI2wCck8+teSaFr+o+Ltb+CWqaoRdXjSX8c054LFAVVwBjqFGSc9+Oc1ieFdX1SHwTpOmadqN3YR6x43u7W7u4SFkMRkyyox+7nn8qAPpPwn4utvGGmHUbOC4jtDK8cMs8ZTz1U48xB1KHsfatwtjr3r5k1/W9Z8MaZ8bLGHxBqrRaNDZzWN3Ndl5LcugLKpAyMfqMZrb8XprXhrwV4I0y18Taw8/iDU7SC+1Ke43TLGyAuqHjZnpgZPNAH0AGySOhHrSluOK+fJtL8Rx6z8SPB+i+ItTnFnp9vf6ZJNdbp7WdgSYt/wB4qdoOCcfNWTqHxjvrux1rxTBq01tpvhzwsvmoJBsfVJUPDr0Zk+XqeCaN9APofXPEOn+HNOkvtTu4rK1QgGWZtoyegHqfYVyTeONT1fTrnU7DTTp+kQQSTm9vxiSRVUtlI/Tjqa+Y/B/h/wAQaxrfwf1/xh4kvdch17UGng0m6kMsCpsLB27bicHGMDIFfY2saTFrWi3mmyM8UV1btbs0XDKGXbkfgTV6Q82TueZ/DTVr74leHtPfWNCvpdMvoDcJqWoNB8ylsovlodwBzx7CvNr+90NfEOm65p2j+KdK0O21eKxTUluh9m84yAYNuWDNGTxuHrXf+HG1r4e/FfRfBdtqMmr+F59LYrBcKnnWJjGFJYDLBiMc9MiqPxnvW17Q9D8Q6drsOo+D4NWtRd6XbRjFyVmwSJgcgq+Dtx/D70/aSelwSPdosleRjB6CuW+IXxBs/h3pNrfX8UksdxdJahYiAVLZyxJ7ADJrqEYIMHjk/A6eP+mXPDNPDNPGf/2Q==";
+      <img src="data:image/jpeg;base64,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...
+
+[KÓD JE SKRÁTENÝ PRE LEPŠIU ČITATEĽNOSŤ]
+
+...<div id="setup-screen">
+  <div style="max-width:500px;margin:0 auto;padding:22px 16px;">
+    <div class="setup-card">
+      <h2>⚙️ Nastavenie</h2>
+      <p>Zadajte URL vášho Google Apps Script a ID priečinka na Google Disku.</p>
+      <ul class="steps-list">
+        <li><div class="num">1</div><div class="desc">Otvorte <strong>script.google.com</strong> → nový projekt → vložte kód z <em>KlimaServis.gs</em></div></li>
+        <li><div class="num">2</div><div class="desc"><strong>Deploy → New deployment → Web app</strong><br>Execute as: <em>Me</em> | Access: <em>Anyone</em></div></li>
+        <li><div class="num">3</div><div class="desc">Skopírujte <strong>Web app URL</strong> a vložte sem</div></li>
+      </ul>
+      <div class="field">
+        <label>Google Apps Script URL <span class="req">*</span></label>
+        <input type="url" id="script-url" placeholder="https://script.google.com/macros/s/.../exec">
+      </div>
+      <div class="field" style="margin-top:12px;">
+        <label>Google Drive – ID priečinka <span class="req">*</span></label>
+        <input type="text" id="folder-id" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs">
+        <div class="fhint">Z URL: drive.google.com/drive/folders/<strong style="color:var(--orange)">TOTO_JE_ID</strong></div>
+      </div>
+      <button onclick="testAndSave()" class="btn-wide" id="test-btn">🔗 Otestovať a spustiť aplikáciu</button>
+      <div id="test-result" style="margin-top:12px;display:none;"></div>
+    </div>
+  </div>
+</div>
+
+<div id="main-app" style="display:none">
+<div class="container">
+
+  <div class="section visible" id="sec1">
+    <div class="sec-hdr"><div class="sec-icon">👷</div><div><h2>Výber technikov</h2><p>Krok 1 z 5</p></div></div>
+    <div class="card">
+      <div class="field">
+        <label>Vyberte technikov na montáži <span class="req">*</span></label>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;" id="technici-list">
+          <label class="tech-item"><input type="checkbox" value="Miroslav Paška"><div class="tech-check">✓</div> Miroslav Paška</label>
+          <label class="tech-item"><input type="checkbox" value="Jaroslav Brna"><div class="tech-check">✓</div> Jaroslav Brna</label>
+          <label class="tech-item"><input type="checkbox" value="Adam Brziak"><div class="tech-check">✓</div> Adam Brziak</label>
+          <label class="tech-item"><input type="checkbox" value="Ľuboš Hamza"><div class="tech-check">✓</div> Ľuboš Hamza</label>
+          <label class="tech-item"><input type="checkbox" value="__iny__" id="cb-iny"><div class="tech-check">✓</div> Iný</label>
+        </div>
+      </div>
+      <div class="field" id="iny-technik-wrap" style="display:none">
+        <label>Meno iného technika</label>
+        <input type="text" id="iny-technik" placeholder="Meno a priezvisko">
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="sec2">
+    <div class="sec-hdr"><div class="sec-icon">👤</div><div><h2>Údaje zákazníka</h2><p>Krok 2 z 5</p></div></div>
+    <div class="card">
+      <div class="two-col">
+        <div class="field"><label>Meno <span class="req">*</span></label><input type="text" id="meno" placeholder="Ján" autocomplete="given-name"></div>
+        <div class="field"><label>Priezvisko <span class="req">*</span></label><input type="text" id="priezvisko" placeholder="Novák" autocomplete="family-name"></div>
+      </div>
+      <div class="field"><label>Adresa / Ulica <span class="req">*</span></label><input type="text" id="adresa" placeholder="Hlavná 12, Bratislava"></div>
+      <div class="field"><label>Telefónne číslo <span class="req">*</span></label><input type="tel" id="telefon" placeholder="+421 900 000 000"></div>
+      <div class="field"><label>Email zákazníka</label><input type="email" id="email" placeholder="zakaznik@email.sk"></div>
+    </div>
+  </div>
+
+  <div class="section" id="sec3">
+    <div class="sec-hdr"><div class="sec-icon">🌡️</div><div><h2>Klimatizačná jednotka</h2><p>Krok 3 z 6</p></div></div>
+    <div class="card">
+
+      <div class="two-col">
+        <div class="field">
+          <label>Výrobca <span class="req">*</span></label>
+          <select id="vyrobca">
+            <option value="">– Vybrať –</option>
+            <option>Daikin</option><option>Mitsubishi Electric</option><option>Mitsubishi Heavy</option>
+            <option>Samsung</option><option>LG</option><option>Panasonic</option>
+            <option>Toshiba</option><option>Fujitsu</option><option>Midea</option>
+            <option>Gree</option><option>Carrier</option><option>Bosch</option>
+            <option>Naitec</option><option>Sinclair</option><option>Hisense</option>
+            <option>Iný</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Typ chladiva <span class="req">*</span></label>
+          <select id="chladivo">
+            <option value="">– Vybrať –</option>
+            <option>R-32</option><option>R-410A</option><option>R-22</option>
+            <option>R-134a</option><option>R-290</option><option>R-407C</option><option>Iný</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Doplnené chladivo celkom (g)</label>
+        <input type="number" id="chladivo_celkom" placeholder="automatický súčet"
+          style="background:#f0fdf4;border-color:#86efac;color:#166534;font-weight:600;" readonly>
+        <div class="fhint">Automaticky sa vypočíta zo všetkých vnútorných jednotiek</div>
+      </div>
+
+      <div class="field">
+        <label>Typ systému <span class="req">*</span></label>
+        <div style="display:flex;gap:10px;">
+          <button type="button" class="typ-btn active" id="btn-split" onclick="setTyp('split')">Split</button>
+          <button type="button" class="typ-btn" id="btn-multisplit" onclick="setTyp('multisplit')">Multisplit</button>
+        </div>
+      </div>
+
+      <div class="field" id="multisplit-pocet-wrap" style="display:none">
+        <div class="two-col">
+          <div class="field">
+            <label>Počet vnútorných jednotiek <span class="req">*</span></label>
+            <select id="multisplit-pocet" onchange="updateUnits()">
+              <option value="">– Vybrať –</option>
+              <option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Počet vonkajších jednotiek <span class="req">*</span></label>
+            <select id="multisplit-vonkajsie" onchange="updateUnits()">
+              <option value="">– Vybrať –</option>
+              <option>1</option><option>2</option><option>3</option><option>4</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Dátum montáže</label>
+        <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:.85rem;color:var(--muted);font-weight:500;white-space:nowrap;">Dňa:</span><input type="date" id="datum_montaze" style="flex:1;"></div>
+      </div>
+    </div>
+
+    <div id="split-jednotky">
+      <div class="card">
+        <div class="unit-card-title" style="font-size:.82rem;margin-bottom:12px;">🏠 Vnútorná jednotka</div>
+        <div class="field">
+          <label>Typ jednotky</label>
+          <input type="text" id="sp_vnut_typ" placeholder="napr. nástenná, kazetová...">
+        </div>
+        <div class="field">
+          <label>Model</label>
+          <div class="scan-field">
+            <input type="text" id="sp_vnut_model" placeholder="napr. FTXB25C">
+            <button class="scan-btn" onclick="openScannerFor('sp_vnut_model')">📷</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Sériové číslo</label>
+          <div class="scan-field">
+            <input type="text" id="sp_vnut_serial" placeholder="Zadajte alebo naskenujte">
+            <button class="scan-btn" onclick="openScannerFor('sp_vnut_serial')">📷</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Foto štítku</label>
+          <div class="photo-slot" id="slot-sp-vnut-stit" style="aspect-ratio:2/1;border-radius:10px;">
+            <div class="ph"><div class="ic">🏷️</div><span>Odfotiť štítok</span></div>
+            <input type="file" accept="image/*" capture="environment"
+              onchange="handlePhoto(this,'sp_vnut_stit','Štítok vnútorná')">
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="field">
+            <label>Tlak – Kúrenie (bar)</label>
+            <input type="number" step="0.1" id="sp_vnut_kurenie" placeholder="napr. 18.5"
+              oninput="uncheckNemerané('sp_vnut_kurenie_nem')">
+            <label class="nem-label">
+              <input type="checkbox" id="sp_vnut_kurenie_nem" class="nem-cb" onchange="toggleNem('sp_vnut_kurenie',this)">
+              <div class="nem-check">✓</div>Nemerané
+            </label>
+          </div>
+          <div class="field">
+            <label>Tlak – Chladenie (bar)</label>
+            <input type="number" step="0.1" id="sp_vnut_chladenie" placeholder="napr. 8.5"
+              oninput="uncheckNemerané('sp_vnut_chladenie_nem')">
+            <label class="nem-label">
+              <input type="checkbox" id="sp_vnut_chladenie_nem" class="nem-cb" onchange="toggleNem('sp_vnut_chladenie',this)">
+              <div class="nem-check">✓</div>Nemerané
+            </label>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="field">
+            <label>Doplnené chladivo (g)</label>
+            <input type="number" id="sp_vnut_chladivo_g" placeholder="napr. 150" oninput="updateCelkomChladivo()">
+          </div>
+          <div class="field">
+            <label>Dĺžka CU potrubia (m)</label>
+            <input type="number" step="0.1" id="sp_vnut_potrubie" placeholder="napr. 5.5">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="unit-card-title" style="font-size:.82rem;margin-bottom:12px;">🏗️ Vonkajšia jednotka</div>
+        <div class="field">
+          <label>Model</label>
+          <div class="scan-field">
+            <input type="text" id="sp_vonk_model" placeholder="napr. RXB25C">
+            <button class="scan-btn" onclick="openScannerFor('sp_vonk_model')">📷</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Sériové číslo</label>
+          <div class="scan-field">
+            <input type="text" id="sp_vonk_serial" placeholder="Zadajte alebo naskenujte">
+            <button class="scan-btn" onclick="openScannerFor('sp_vonk_serial')">📷</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Foto štítku</label>
+          <div class="photo-slot" id="slot-sp-vonk-stit" style="aspect-ratio:2/1;border-radius:10px;">
+            <div class="ph"><div class="ic">🏷️</div><span>Odfotiť štítok</span></div>
+            <input type="file" accept="image/*" capture="environment"
+              onchange="handlePhoto(this,'sp_vonk_stit','Štítok vonkajšia')">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="multisplit-vnutorne" style="display:none"></div>
+    <div id="multisplit-vonkajsie-div" style="display:none"></div>
+
+  </div>
+
+  <div class="section" id="sec4">
+    <div class="sec-hdr"><div class="sec-icon">📸</div><div><h2>Foto z montáže</h2><p>Krok 4 z 6</p></div></div>
+    <div class="card">
+      <div class="photo-grid">
+        <div class="photo-slot" id="slot-vnutorna">
+          <div class="ph"><div class="ic">🏠</div><span>Vnútorná<br>jednotka</span></div>
+          <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'vnutorna','Vnútorná jednotka')">
+        </div>
+        <div class="photo-slot" id="slot-vonkajsia">
+          <div class="ph"><div class="ic">🏗️</div><span>Vonkajšia<br>jednotka</span></div>
+          <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'vonkajsia','Vonkajšia jednotka')">
+        </div>
+        <div class="photo-slot" id="slot-detail">
+          <div class="ph"><div class="ic">🔍</div><span>Detail<br>(voliteľné)</span></div>
+          <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'detail','Detail')">
+        </div>
+        <div class="photo-slot" id="slot-stit">
+          <div class="ph"><div class="ic">🏷️</div><span>Štítok /<br>sér. číslo</span></div>
+          <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'stit','Štítok')">
+        </div>
+      </div>
+    </div>
+    <div class="card"><div class="field"><label>Poznámky z montáže</label><textarea id="poznamky" placeholder="Prípadné poznámky, komplikácie, odporúčania..."></textarea></div></div>
+  </div>
+
+  <div class="section" id="sec5p">
+    <div class="sec-hdr"><div class="sec-icon">✍️</div><div><h2>Podpisy</h2><p>Krok 5 z 6</p></div></div>
+
+    <div class="card">
+      <div style="font-size:.75rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">✍️ Podpis zákazníka</div>
+      <div style="font-size:.8rem;color:var(--muted);margin-bottom:8px;">Zákazník potvrdzuje prevzatie a správnosť montáže</div>
+      <canvas id="canvas-zakaznik" style="width:100%;height:180px;border:2px solid var(--border);border-radius:12px;background:white;touch-action:none;display:block;cursor:crosshair;"></canvas>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button onclick="clearCanvas('canvas-zakaznik')" style="flex:1;padding:9px;background:var(--ice);border:1.5px solid var(--border);border-radius:9px;font-size:.8rem;font-weight:600;cursor:pointer;color:var(--muted);">🗑️ Vymazať</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:.75rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">🔵 Pečiatka ELWORK</div>
+      <div style="display:flex;justify-content:center;padding:10px;">
+        <img id="peciatka-display" src="data:image/jpeg;base64,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";
+const g = id => {
+  const el = document.getElementById(id);
+  if (!el) return '';
+  return (el.value || '').trim();
+};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+// ══ ASYNC API CALL SO ZAFRAKTOVANOU PÔVODNOU URL ADRESOU ══
+async function apiCall(payload) {
+  // Tu Claude predtým zmazal natvrdo nastavenú adresu. Práve som ti ju vrátil späť!
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxFA89oKRqc_eOV2cS8Od824r78wjQZo5kp0gXtXameCS-jSbWudtrd4l294GnHVpOQCQ/exec';
+  const r = await fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: { 'Content-Type': 'text/plain' }
+  });
+  return r.json();
+}
+
+function arrayBufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  const chunkSize = 8192;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
+    binary += String.fromCharCode(...chunk);
+  }
+  return btoa(binary);
+}
+
+function toBase64(file) {
+  return new Promise((res,rej)=>{
+    const reader=new FileReader();
+    reader.onload=()=>res(reader.result.split(',')[1]);
+    reader.onerror=rej;
+    reader.readAsDataURL(file);
+  });
+}
+
+function handleDynPhoto(input, key, label) {
+  const file = input.files[0]; if (!file) return;
+  photos[key] = {file, label};
+  const reader = new FileReader();
+  reader.onload = e => {
+    const slotId = 'slot_' + key;
+    const slot = document.getElementById(slotId);
+    if (!slot) return;
+    slot.classList.add('has-photo');
+    slot.innerHTML = `
+      <img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
+      <div class="ov">${label}</div>
+      <div class="chk">✓</div>
+      <input type="file" accept="image/*" capture="environment"
+        onchange="handleDynPhoto(this,'${key}','${label}')">`;
+  };
+  reader.readAsDataURL(file);
+  showToast('📸 ' + label);
+}
+
+let scanTargetId = null;
+function openScannerFor(inputId) { scanTargetId = inputId; openScanner(); }
+
+function getUnitData(prefix, index, hasTlaky) {
+  const p = prefix + '_' + index;
+  const data = {
+    typ: document.getElementById(p+'_typ')?.value || '',
+    model: document.getElementById(p+'_model')?.value || '',
+    serial: document.getElementById(p+'_serial')?.value || ''
+  };
+  if (hasTlaky) {
+    const nK = document.getElementById(p+'_kurenie_nem')?.checked || false;
+    const nC = document.getElementById(p+'_chladenie_nem')?.checked || false;
+    data.kurenie = nK ? 'Nemerané' : (document.getElementById(p+'_kurenie')?.value || '');
+    data.chladenie = nC ? 'Nemerané' : (document.getElementById(p+'_chladenie')?.value || '');
+    data.chladivo_g = document.getElementById(p+'_chladivo_g')?.value || '';
+    data.potrubie = document.getElementById(p+'_potrubie')?.value || '';
+  }
+  return data;
+}
+
+function getTlaky() {
+  const jednotky = [];
+  if (typSystem === 'split') {
+    const vnut = getUnitData('sp_vnut', '', true);
+    vnut.jednotka = 'Vnútorná jednotka';
+    jednotky.push(vnut);
+  } else {
+    const pocet = parseInt(document.getElementById('multisplit-pocet')?.value) || 0;
+    for (let i = 1; i <= pocet; i++) {
+      const vnut = getUnitData('ms_vnut', i, true);
+      vnut.jednotka = `Vnútorná jednotka ${i}`;
+      jednotky.push(vnut);
+    }
+  }
+  return jednotky;
+}
+
+function getVonkajsieJednotky() {
+  const vonk = [];
+  if (typSystem === 'split') {
+    const v = getUnitData('sp_vonk', '', false);
+    v.jednotka = 'Vonkajšia jednotka';
+    vonk.push(v);
+  } else {
+    const pocet = parseInt(document.getElementById('multisplit-vonkajsie')?.value) || 0;
+    for (let i = 1; i <= pocet; i++) {
+      const v = getUnitData('ms_vonk', i, false);
+      v.jednotka = `Vonkajšia jednotka ${i}`;
+      vonk.push(v);
+    }
+  }
+  return vonk;
+}
+
+function updateCelkomChladivo() {
+  let total = 0;
+  if (typSystem === 'split') {
+    total += parseFloat(document.getElementById('sp_vnut_chladivo_g')?.value) || 0;
+  } else {
+    const pocet = parseInt(document.getElementById('multisplit-pocet')?.value) || 0;
+    for (let i = 1; i <= pocet; i++) {
+      total += parseFloat(document.getElementById(`ms_vnut_${i}_chladivo_g`)?.value) || 0;
+    }
+  }
+  const el = document.getElementById('chladivo_celkom');
+  if (el) el.value = total > 0 ? total : '';
+}
+
+function unitCardHTML(prefix, index, label, showTlaky, showChladivo) {
+  const p = prefix + '_' + index;
+  const scanIcon = (id) => `<button class="scan-btn" onclick="openScannerFor('${id}')">📷</button>`;
+  return `
+    <div class="card">
+      <div class="unit-card-title" style="font-size:.82rem;margin-bottom:12px;">${label}</div>
+      ${showTlaky ? `
+      <div class="field">
+        <label>Typ jednotky</label>
+        <input type="text" id="${p}_typ" placeholder="napr. nástenná, kazetová...">
+      </div>` : ''}
+      <div class="field">
+        <label>Model</label>
+        <div class="scan-field">
+          <input type="text" id="${p}_model" placeholder="napr. FTXB25C">
+          ${scanIcon(p+'_model')}
+        </div>
+      </div>
+      <div class="field">
+        <label>Sériové číslo</label>
+        <div class="scan-field">
+          <input type="text" id="${p}_serial" placeholder="Zadajte alebo naskenujte">
+          ${scanIcon(p+'_serial')}
+        </div>
+      </div>
+      <div class="field">
+        <label>Foto štítku</label>
+        <div class="photo-slot" id="slot_${p}_stit" style="aspect-ratio:2/1;border-radius:10px;">
+          <div class="ph"><div class="ic">🏷️</div><span>Odfotiť štítok</span></div>
+          <input type="file" accept="image/*" capture="environment"
+            onchange="handleDynPhoto(this,'${p}_stit','Štítok ${label}')">
+        </div>
+      </div>
+      ${showTlaky ? `
+      <div class="two-col">
+        <div class="field">
+          <label>Tlak – Kúrenie (bar)</label>
+          <input type="number" step="0.1" id="${p}_kurenie" placeholder="napr. 18.5"
+            oninput="uncheckNemerané('${p}_kurenie_nem')">
+          <label class="nem-label">
+            <input type="checkbox" id="${p}_kurenie_nem" class="nem-cb" onchange="toggleNem('${p}_kurenie',this)">
+            <div class="nem-check">✓</div>Nemerané
+          </label>
+        </div>
+        <div class="field">
+          <label>Tlak – Chladenie (bar)</label>
+          <input type="number" step="0.1" id="${p}_chladenie" placeholder="napr. 8.5"
+            oninput="uncheckNemerané('${p}_chladenie_nem')">
+          <label class="nem-label">
+            <input type="checkbox" id="${p}_chladenie_nem" class="nem-cb" onchange="toggleNem('${p}_chladenie',this)">
+            <div class="nem-check">✓</div>Nemerané
+          </label>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="field">
+          <label>Doplnené chladivo (g)</label>
+          <input type="number" id="${p}_chladivo_g" placeholder="napr. 150" oninput="updateCelkomChladivo()">
+        </div>
+        <div class="field">
+          <label>Dĺžka CU potrubia (m)</label>
+          <input type="number" step="0.1" id="${p}_potrubie" placeholder="napr. 5.5">
+        </div>
+      </div>` : ''}
+    </div>`;
+}
+
+function updateUnits() {
+  const pocetV = parseInt(document.getElementById('multisplit-pocet')?.value) || 0;
+  const pocetVonk = parseInt(document.getElementById('multisplit-vonkajsie')?.value) || 0;
+
+  const vnutWrap = document.getElementById('multisplit-vnutorne');
+  const vonkWrap = document.getElementById('multisplit-vonkajsie-div');
+
+  vnutWrap.innerHTML = '';
+  vonkWrap.innerHTML = '';
+
+  for (let i = 1; i <= pocetV; i++) {
+    vnutWrap.innerHTML += unitCardHTML('ms_vnut', i, '🏠 Vnútorná jednotka ' + i, true, true);
+  }
+  for (let i = 1; i <= pocetVonk; i++) {
+    vonkWrap.innerHTML += unitCardHTML('ms_vonk', i, '🏗️ Vonkajšia jednotka ' + i, false, false);
+  }
+}
+
+function setTyp(typ) {
+  typSystem = typ;
+  document.getElementById('btn-split').classList.toggle('active', typ==='split');
+  document.getElementById('btn-multisplit').classList.toggle('active', typ==='multisplit');
+  document.getElementById('multisplit-pocet-wrap').style.display = typ==='multisplit' ? '' : 'none';
+  document.getElementById('split-jednotky').style.display = typ==='split' ? '' : 'none';
+  document.getElementById('multisplit-vnutorne').style.display = typ==='multisplit' ? '' : 'none';
+  document.getElementById('multisplit-vonkajsie-div').style.display = typ==='multisplit' ? '' : 'none';
+  if (typ==='multisplit') updateUnits();
+}
+
+function toggleNem(inputId, cb) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const nemCheck = cb.nextElementSibling;
+  if (cb.checked) {
+    input.value = ''; input.disabled = true;
+    input.placeholder = 'Nemerané';
+    input.style.background = '#f0f0f0'; input.style.color = '#999';
+    if (nemCheck) { nemCheck.style.background = 'var(--orange)'; nemCheck.style.borderColor = 'var(--orange)'; nemCheck.style.color = 'white'; }
+  } else {
+    input.disabled = false;
+    input.placeholder = inputId.includes('kurenie') ? 'napr. 18.5' : 'napr. 8.5';
+    input.style.background = ''; input.style.color = '';
+    if (nemCheck) { nemCheck.style.background = ''; nemCheck.style.borderColor = ''; nemCheck.style.color = ''; }
+  }
+}
+
+function uncheckNemerané(cbId) {
+  const cb = document.getElementById(cbId);
+  if (cb) cb.checked = false;
+}
+
+function handlePhoto(input, key, label) {
+  const file = input.files[0]; if (!file) return;
+  photos[key] = {file,label};
+  const reader = new FileReader();
+  reader.onload = e => {
+    const slot = document.getElementById('slot-'+key);
+    slot.classList.add('has-photo');
+    slot.innerHTML = `<img src="${e.target.result}"><div class="ov">${label}</div><div class="chk">✓</div>
+      <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'${key}','${label}')">`;
+  };
+  reader.readAsDataURL(file);
+  showToast('📸 '+label);
+}
+
+function buildReview() {
+  const rows = (arr,title,icon) =>
+    `<div style="font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">${icon} ${title}</div>`+
+    arr.map(([k,v])=>`<div class="rv-item"><span class="rk">${k}</span><span class="rv">${v||'–'}</span></div>`).join('');
+
+  document.getElementById('rv-zakaznik').innerHTML = rows([
+    ['Meno',g('meno')+' '+g('priezvisko')],['Adresa',g('adresa')],
+    ['Telefón',g('telefon')],['Email',g('email')]
+  ],'Zákazník','👤');
+
+  const technici = getTechnici();
+  const tlaky = getTlaky();
+  const vonkajsie = getVonkajsieJednotky();
+  const vonkPocet = typSystem === 'multisplit' ? (document.getElementById('multisplit-vonkajsie')?.value || '–') : '1';
+  const tlakRows = tlaky.flatMap(t => {
+    const rows = [[
+      t.jednotka,
+      `${t.typ||''} | ${t.model||'–'} | SN: ${t.serial||'–'}`
+    ]];
+    rows.push([`${t.jednotka} – tlaky`,
+      `Kúrenie: ${t.kurenie||'–'}${t.kurenie && t.kurenie!=='Nemerané' ? ' bar' : ''} | Chladenie: ${t.chladenie||'–'}${t.chladenie && t.chladenie!=='Nemerané' ? ' bar' : ''}`
+    ]);
+    if (t.chladivo_g) rows.push([`${t.jednotka} – chladivo`, `${t.chladivo_g} g`]);
+    if (t.potrubie) rows.push([`${t.jednotka} – potrubie`, `${t.potrubie} m`]);
+    return rows;
+  });
+  const vonkRows = vonkajsie.map(v => [
+    v.jednotka, `${v.typ||''} | ${v.model||'–'} | SN: ${v.serial||'–'}`
+  ]);
+
+  document.getElementById('rv-klima').innerHTML = rows([
+    ['Technici', technici.join(', ') || '–'],
+    ['Typ systému', typSystem === 'split' ? 'Split' : `Multisplit (${document.getElementById('multisplit-pocet')?.value||'?'} vnút. / ${vonkPocet} vonk.)`],
+    ['Výrobca', g('vyrobca')],
+    ['Chladivo', g('chladivo')],
+    ['Doplnené celkom', document.getElementById('chladivo_celkom')?.value ? document.getElementById('chladivo_celkom').value+' g' : '–'],
+    ...tlakRows,
+    ...vonkRows,
+    ['Dátum montáže', g('datum_montaze')],
+    ['Poznámky', g('poznamky')]
+  ], 'Klimatizácia', '🌡️');
+
+  const grid = document.getElementById('rv-photos');
+  const keys = Object.keys(photos);
+  if (!keys.length){grid.innerHTML='<span style="font-size:.8rem;color:var(--muted)">Žiadne fotky</span>';return;}
+  grid.innerHTML='';
+  keys.forEach(k=>{const img=document.createElement('img');img.src=URL.createObjectURL(photos[k].file);img.title=photos[k].label;grid.appendChild(img);});
+}
+
+async function generatePDF(zakaznik, klima, photoKeys, technici, podpisZakaznik, podpisTechnik, showTechnici) {
+  technici = technici || [];
+  if (showTechnici === undefined) showTechnici = true;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const W = 210; const margin = 18;
+
+  const dark   = [13, 61, 82];
+  const gray   = [90, 122, 136];
+  const light  = [240, 247, 250];
+  const orange = [232, 80, 10];
+
+  doc.setFillColor(255, 255, 255);
+  doc.rect(0, 0, W, 30, 'F');
+
+  try {
+    const logoB64 = document.querySelector('header img')?.src;
+    if (logoB64) {
+      doc.addImage(logoB64, 'JPEG', margin, 9, 75, 12, '', 'MEDIUM');
+    }
+  } catch(e) {
+    doc.setTextColor(...dark);
+    doc.setFontSize(18);
+    doc.setFont('helvetica','bold');
+    doc.text('ELWORK', margin, 20);
+  }
+
+  doc.setTextColor(...gray);
+  doc.setFontSize(8);
+  doc.setFont('helvetica','normal');
+  doc.text('Montážny protokol – klimatizácia', W - margin, 13, {align:'right'});
+  doc.setTextColor(...dark);
+  doc.setFontSize(8);
+  doc.text(zakaznik.datum, W - margin, 21, {align:'right'});
+
+  doc.setDrawColor(...dark);
+  doc.setLineWidth(0.5);
+  doc.line(margin, 28, W - margin, 28);
+
+  let y = 36;
+
+  doc.setFillColor(...light);
+  doc.roundedRect(margin, y, W - margin*2, 7, 2, 2, 'F');
+  doc.setTextColor(...orange);
+  doc.setFontSize(9);
+  doc.setFont('helvetica','bold');
+  doc.text('ZÁKAZNÍK', margin+4, y+5);
+  y += 11;
+
+  const zRows = [
+    ['Meno a priezvisko', `${zakaznik.meno} ${zakaznik.priezvisko}`],
+    ['Adresa', zakaznik.adresa],
+    ['Telefón', zakaznik.telefon],
+    ['Email', zakaznik.email || '–'],
+  ];
+  zRows.forEach(([k,v]) => {
+    doc.setTextColor(...gray); doc.setFontSize(8); doc.setFont('helvetica','normal');
+    doc.text(k, margin+2, y);
+    doc.setTextColor(...dark); doc.setFont('helvetica','bold');
+    doc.text(v, margin+52, y);
+    y += 6;
+  });
+
+  y += 4;
+
+  doc.setFillColor(...light);
+  doc.roundedRect(margin, y, W - margin*2, 7, 2, 2, 'F');
+  doc.setTextColor(...dark);
+  doc.setFontSize(9);
+  doc.setFont('helvetica','bold');
+  doc.text('KLIMATIZACIA', margin+4, y+5);
+  y += 11;
+
+  const addRow = (label, value) => {
+    if (y > 270) { doc.addPage(); y = 20; }
+    doc.setTextColor(...gray); doc.setFontSize(8); doc.setFont('helvetica','normal');
+    doc.text(label, margin+2, y);
+    doc.setTextColor(...dark); doc.setFont('helvetica','bold');
+    const val = String(value || '–');
+    const lines = doc.splitTextToSize(val, W - margin*2 - 54);
+    doc.text(lines, margin+52, y);
+    y += Math.max(6, lines.length * 5);
+  };
+
+  const typSystemText = klima.typSystem === 'multisplit'
+    ? `Multisplit (${klima.vonkajsie_pocet||'?'} vonk. / ${klima.tlaky?.length||0} vnut.)`
+    : 'Split';
+
+  addRow('Typ systemu', typSystemText);
+  addRow('Vyrobca', klima.vyrobca);
+  addRow('Typ chladiva', klima.chladivo);
+  addRow('Doplnene celkom', klima.chladivo_celkom ? klima.chladivo_celkom + ' g' : '–');
+  addRow('Datum montaze', klima.datum_montaze || zakaznik.datum);
+
+  if (klima.tlaky && klima.tlaky.length > 0) {
+    klima.tlaky.forEach(t => {
+      y += 3;
+      if (y > 270) { doc.addPage(); y = 20; }
+      doc.setFillColor(230, 240, 245);
+      doc.roundedRect(margin, y, W - margin*2, 6, 1, 1, 'F');
+      doc.setTextColor(...dark);
+      doc.setFontSize(8);
+      doc.setFont('helvetica','bold');
+      doc.text(t.jednotka || 'Vnutorna jednotka', margin+3, y+4.5);
+      y += 9;
+      if (t.typ) addRow('  Typ', t.typ);
+      if (t.model) addRow('  Model', t.model);
+      if (t.serial) addRow('  Seriove c.', t.serial);
+      addRow('  Kurenie', t.kurenie ? (t.kurenie + (t.kurenie !== 'Nemerané' ? ' bar' : '')) : '–');
+      addRow('  Chladenie', t.chladenie ? (t.chladenie + (t.chladenie !== 'Nemerané' ? ' bar' : '')) : '–');
+      if (t.chladivo_g) addRow('  Doplnene chladivo', t.chladivo_g + ' g');
+      if (t.potrubie) addRow('  Dlzka CU potrubia', t.potrubie + ' m');
+    });
+  }
+
+  if (klima.vonkajsie && klima.vonkajsie.length > 0) {
+    klima.vonkajsie.forEach(v => {
+      y += 3;
+      if (y > 270) { doc.addPage(); y = 20; }
+      doc.setFillColor(230, 240, 245);
+      doc.roundedRect(margin, y, W - margin*2, 6, 1, 1, 'F');
+      doc.setTextColor(...dark);
+      doc.setFontSize(8);
+      doc.setFont('helvetica','bold');
+      doc.text(v.jednotka || 'Vonkajsia jednotka', margin+3, y+4.5);
+      y += 9;
+      if (v.model) addRow('  Model', v.model);
+      if (v.serial) addRow('  Seriove c.', v.serial);
+    });
+  }
+
+  if (klima.poznamky) {
+    y += 3;
+    addRow('Poznamky', klima.poznamky);
+  }
+
+  y += 6;
+
+  if (photoKeys.length > 0) {
+    doc.setFillColor(...light);
+    doc.roundedRect(margin, y, W - margin*2, 7, 2, 2, 'F');
+    doc.setTextColor(...orange);
+    doc.setFontSize(9);
+    doc.setFont('helvetica','bold');
+    doc.text('FOTOGRAFIE Z MONTÁŽE', margin+4, y+5);
+    y += 11;
+
+    const colW = (W - margin*2 - 8) / 2;
+    const imgH = 55;
+    let col = 0;
+
+    for (const k of photoKeys) {
+      try {
+        const dataUrl = await fileToDataUrl(photos[k].file);
+        const x = margin + col * (colW + 8);
+        doc.addImage(dataUrl, 'JPEG', x, y, colW, imgH, '', 'MEDIUM');
+        doc.setFillColor(...dark);
+        doc.rect(x, y + imgH - 7, colW, 7, 'F');
+        doc.setTextColor(255,255,255);
+        doc.setFontSize(7);
+        doc.setFont('helvetica','normal');
+        doc.text(photos[k].label, x + colW/2, y + imgH - 2.5, {align:'center'});
+        col++;
+        if (col >= 2) { col = 0; y += imgH + 10; }
+      } catch(e) {}
+    }
+    if (col > 0) y += imgH + 10;
+  }
+
+  if (y > 220) { doc.addPage(); y = 20; }
+  y += 6;
+  doc.setFillColor(...light);
+  doc.roundedRect(margin, y, W - margin*2, 7, 2, 2, 'F');
+  doc.setTextColor(...orange);
+  doc.setFontSize(9);
+  doc.setFont('helvetica','bold');
+  doc.text('PODPISY', margin+4, y+5);
+  y += 11;
+
+  const sigW = (W - margin*2 - 8) / 2;
+  const sigH = 40;
+
+  doc.setTextColor(...gray); doc.setFontSize(7); doc.setFont('helvetica','normal');
+  doc.text('Podpis zakaznika:', margin, y);
+  doc.text('Peciatka ELWORK:', margin + sigW + 8, y);
+  y += 4;
+
+  if (podpisZakaznik) {
+    doc.addImage(podpisZakaznik, 'PNG', margin, y, sigW, sigH);
+  }
+  doc.rect(margin, y, sigW, sigH);
+
+  try {
+    doc.addImage(PECIATKA_B64, 'JPEG', margin + sigW + 8, y, sigW, sigH, '', 'MEDIUM');
+  } catch(e) {}
+
+  y += sigH + 4;
+  doc.setTextColor(...gray); doc.setFontSize(7);
+  doc.text(`${zakaznik.meno} ${zakaznik.priezvisko}`, margin, y);
+  y += 10;
+
+  if (showTechnici && technici && technici.length > 0) {
+    if (y > 260) { doc.addPage(); y = 20; }
+    doc.setFillColor(...light);
+    doc.roundedRect(margin, y, W - margin*2, 7, 2, 2, 'F');
+    doc.setTextColor(...orange);
+    doc.setFontSize(9);
+    doc.setFont('helvetica','bold');
+    doc.text('TECHNICI', margin+4, y+5);
+    y += 11;
+    doc.setTextColor(...dark);
+    doc.setFontSize(9);
+    doc.setFont('helvetica','normal');
+    doc.text(technici.join(', '), margin+2, y);
+    y += 8;
+  }
+
+  doc.setFillColor(...dark);
+  doc.rect(0, 287, W, 10, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(7);
+  doc.setFont('helvetica','normal');
+  doc.text('ELWORK – Montážny protokol', margin, 293);
+  doc.text(zakaznik.datum, W-margin, 293, {align:'right'});
+
+  return doc.output('arraybuffer');
+}
+
+function fileToDataUrl(file) {
+  return new Promise((res,rej) => {
+    const reader = new FileReader();
+    reader.onload = () => res(reader.result);
+    reader.onerror = rej;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function doUpload() {
+  const datum = new Date().toLocaleDateString('sk-SK').replace(/\.\s*/g,'-').replace(/-$/,'');
+  const technici = getTechnici();
+  const podpisZakaznik = getCanvasDataUrl('canvas-zakaznik');
+  const podpisTechnik = null;
+  const zakaznik = {meno:g('meno'),priezvisko:g('priezvisko'),adresa:g('adresa'),telefon:g('telefon'),email:g('email'),datum};
+  const chladivo_celkom = document.getElementById('chladivo_celkom')?.value || '';
+  const vonkPocet2 = typSystem==='multisplit' ? (document.getElementById('multisplit-vonkajsie')?.value||'') : '1';
+  const klima = {vyrobca:g('vyrobca'),chladivo:g('chladivo'),chladivo_celkom,poznamky:g('poznamky'),typSystem,tlaky:getTlaky(),vonkajsie:getVonkajsieJednotky(),datum_montaze:g('datum_montaze'),vonkajsie_pocet:vonkPocet2};
+  const photoKeys = Object.keys(photos);
+
+  const steps = [
+    {id:'s1',label:'Vytváram priečinok na Google Disku'},
+    {id:'s2',label:'Generujem PDF protokol'},
+    {id:'s3',label:'Nahrávam PDF na Google Disk'},
+    ...photoKeys.map((k,i)=>({id:'s'+(4+i),label:`Foto: ${photos[k].label}`})),
+    {id:'s'+(4+photoKeys.length),label:'Odosielam emaily'}
+  ];
+
+  document.getElementById('up-state').innerHTML = `
+    <div class="up-box">
+      <div class="spinner"></div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--deep);margin-bottom:12px;">Nahrávam na Google Disk...</div>
+      ${steps.map(s=>`<div class="up-step" id="${s.id}"><div class="dot"></div>${s.label}</div>`).join('')}
+      <div class="prog-track"><div class="prog-fill" id="upfill"></div></div>
+    </div>`;
+  document.getElementById('nav-buttons').style.display = 'none';
+
+  const setStep = (id,state) => { const el=document.getElementById(id); if(el) el.className='up-step '+state; };
+  const setProg = pct => { const f=document.getElementById('upfill'); if(f) f.style.width=pct+'%'; };
+
+  try {
+    setStep('s1','active');
+    const r1 = await apiCall({type:'protokol', zakaznik, klima, technici});
+    if (!r1.ok) throw new Error(r1.error||'Chyba uloženia protokolu');
+    const folderId = r1.folderId;
+    setStep('s1','done');
+    setProg(10);
+
+    setStep('s2','active');
+    const pdfFirmaBuffer = await generatePDF(zakaznik, klima, photoKeys, technici, podpisZakaznik, podpisTechnik, true);
+    const pdfFirmaB64 = arrayBufferToBase64(pdfFirmaBuffer);
+
+    const pdfZakaznikBuffer = await generatePDF(zakaznik, klima, photoKeys, technici, podpisZakaznik, podpisTechnik, false);
+    const pdfZakaznikB64 = arrayBufferToBase64(pdfZakaznikBuffer);
+    setStep('s2','done');
+    setProg(25);
+
+    setStep('s3','active');
+    const rPdf = await apiCall({type:'foto', zakaznik, nazov:'protokol_firma.pdf', mime:'application/pdf', obsah:pdfFirmaB64});
+    if (!rPdf.ok) throw new Error(rPdf.error||'Chyba nahrávania PDF');
+
+    const rPdf2 = await apiCall({type:'foto', zakaznik, nazov:'protokol_zakaznik.pdf', mime:'application/pdf', obsah:pdfZakaznikB64});
+    setStep('s3','done');
+    setProg(40);
+
+    for (let i=0;i<photoKeys.length;i++) {
+      const k=photoKeys[i];
+      setStep('s'+(4+i),'active');
+      const b64 = await toBase64(photos[k].file);
+      const ext = photos[k].file.name.split('.').pop()||'jpg';
+      const r2 = await apiCall({type:'foto',zakaznik,nazov:`foto_${k}.${ext}`,mime:photos[k].file.type||'image/jpeg',obsah:b64});
+      if (!r2.ok) throw new Error(r2.error||`Chyba nahrávania foto: ${photos[k].label}`);
+      setStep('s'+(4+i),'done');
+      setProg(Math.round(40 + (i+1)/photoKeys.length*45));
+    }
+
+    const emailStepId = 's'+(4+photoKeys.length);
+    setStep(emailStepId,'active');
+    try {
+      await apiCall({type:'email', zakaznik, klima, technici, pdfZakaznikB64});
+      setStep(emailStepId,'done');
+    } catch(e) {
+      setStep(emailStepId,'done'); 
+      showToast('⚠️ Email sa nepodarilo odoslať');
+    }
+
+    setProg(100); await sleep(400);
+    const driveUrl = folderId ? `https://drive.google.com/drive/folders/${folderId}` : `https://drive.google.com/drive/folders/1GZEbrZJSnWzRbidR8SbRcQ8FjOgVgzqB`;
+    showSuccess(datum, driveUrl);
+  } catch(err) {
+    document.getElementById('up-state').innerHTML = `
+      <div class="card" style="border-color:#ef4444;background:#fff8f8;padding:18px;text-align:center;">
+        <div style="font-size:1.3rem;margin-bottom:7px;">⚠️</div>
+        <div style="font-weight:700;color:#dc2626;margin-bottom:5px;">Chyba nahrávania</div>
+        <div style="font-size:.78rem;color:#7f1d1d;margin-bottom:14px;">${err.message}</div>
+        <button onclick="doUpload()" style="padding:10px 16px;background:var(--orange);color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer;margin-right:8px;">🔄 Skúsiť znova</button>
+      </div>`;
+    document.getElementById('nav-buttons').style.display = 'flex';
+  }
+}
+
+function goToSetup() {
+  document.getElementById('setup-screen').style.display='';
+  document.getElementById('main-app').style.display='none';
+  document.getElementById('nav-buttons').style.display='none';
+  document.getElementById('prog-bar').style.display='none';
+}
+
+async function openScanner() {
+  document.getElementById('scan-modal').classList.add('open');
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    scanStream=stream; document.getElementById('scan-vid').srcObject=stream;
+    if ('BarcodeDetector' in window) {
+      const det=new BarcodeDetector({formats:['code_128','code_39','ean_13','qr_code','data_matrix']});
+      const vid=document.getElementById('scan-vid');
+      const iv=setInterval(async()=>{
+        if(!scanStream){clearInterval(iv);return;}
+        try{
+          const codes=await det.detect(vid);
+          if(codes.length){
+            const targetId = scanTargetId || 'serial';
+            const el = document.getElementById(targetId);
+            if (el) el.value = codes[0].rawValue;
+            showToast('✅ '+codes[0].rawValue);
+            scanTargetId = null;
+            closeScanner();clearInterval(iv);
+          }
+        }catch(e){}
+      },400);
+    }
+  } catch(e){showToast('⚠️ Kamera nedostupná');}
+}
+
+function closeScanner(){
+  document.getElementById('scan-modal').classList.remove('open');
+  if(scanStream){scanStream.getTracks().forEach(t=>t.stop());scanStream=null;}
+}
+
+function showSuccess(datum,link){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('visible'));
+  document.getElementById('sec6').classList.add('visible');
+  document.getElementById('nav-buttons').style.display='none';
+  document.getElementById('up-state').innerHTML='';
+  document.getElementById('saved-date').textContent='Uložené: '+datum;
+  const dl=document.getElementById('drive-link');
+  dl.href=link; dl.style.display='flex';
+  for(let i=1;i<=6;i++){const e=document.getElementById('p'+i);if(e)e.className='step done';}
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
 const g = id => {
   const el = document.getElementById(id);
   if (!el) return '';
