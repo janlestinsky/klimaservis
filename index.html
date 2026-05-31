@@ -1121,7 +1121,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgrD4MS4BXW0HVRhJMtyZj2Pky8C1BdRXluFfD4kSkE1FzXSItjoiKRQncKb_lhGLRzw/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbykhEr06QW8n9cm-yjDambgkReZuGvpYl8AjyqfsOMTSoaVdfKSOYsCEQcwreV9tOjyCQ/exec';
   const formData = new URLSearchParams();
   formData.append('data', JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {method:'POST', body: formData});
