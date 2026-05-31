@@ -312,7 +312,16 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
         <div class="unit-card-title" style="font-size:.82rem;margin-bottom:12px;">🏠 Vnútorná jednotka</div>
         <div class="field">
           <label>Typ jednotky</label>
-          <input type="text" id="sp_vnut_typ" placeholder="napr. nástenná, kazetová...">
+          <select id="sp_vnut_typ_select" onchange="handleTypSelect('sp_vnut_typ_select','sp_vnut_typ_iny','sp_vnut_typ')">
+            <option value="">– Vybrať –</option>
+            <option value="Nástenná">Nástenná</option>
+            <option value="Kazetová">Kazetová</option>
+            <option value="Kanálová">Kanálová</option>
+            <option value="Podstropnoparapetná">Podstropnoparapetná</option>
+            <option value="Iná">Iná</option>
+          </select>
+          <input type="hidden" id="sp_vnut_typ" value="">
+          <input type="text" id="sp_vnut_typ_iny" placeholder="Zadajte typ..." style="display:none;margin-top:6px;">
         </div>
         <div class="field">
           <label>Model</label>
@@ -559,7 +568,7 @@ function toggleNemeraneState(typ, i) {
 function updateCelkomChladivo() {
   let total = 0;
   if (typSystem === 'split') {
-    total += parseFloat(document.getElementById('sp_vnut__chladivo_g')?.value) || 0;
+    total += parseFloat(document.getElementById('sp_vnut_chladivo_g')?.value) || 0;
   } else {
     const pocet = parseInt(document.getElementById('multisplit-pocet')?.value) || 0;
     for (let i = 1; i <= pocet; i++) {
@@ -579,7 +588,16 @@ function unitCardHTML(prefix, index, label, showTlaky, showChladivo) {
       ${showTlaky ? `
       <div class="field">
         <label>Typ jednotky</label>
-        <input type="text" id="${p}_typ" placeholder="napr. nástenná, kazetová...">
+        <select id="${p}_typ_select" onchange="handleTypSelect('${p}_typ_select','${p}_typ_iny','${p}_typ')">
+          <option value="">– Vybrať –</option>
+          <option value="Nástenná">Nástenná</option>
+          <option value="Kazetová">Kazetová</option>
+          <option value="Kanálová">Kanálová</option>
+          <option value="Podstropnoparapetná">Podstropnoparapetná</option>
+          <option value="Iná">Iná</option>
+        </select>
+        <input type="hidden" id="${p}_typ" value="">
+        <input type="text" id="${p}_typ_iny" placeholder="Zadajte typ..." style="display:none;margin-top:6px;">
       </div>` : ''}
       <div class="field">
         <label>Model</label>
@@ -680,6 +698,26 @@ function handleDynPhoto(input, key, label) {
 
 let scanTargetId = null;
 function openScannerFor(inputId) { scanTargetId = inputId; openScanner(); }
+
+function handleTypSelect(selectId, inyId, hiddenId) {
+  const val = document.getElementById(selectId)?.value || '';
+  const inyInput = document.getElementById(inyId);
+  const hidden = document.getElementById(hiddenId);
+  if (val === 'Iná') {
+    if (inyInput) inyInput.style.display = '';
+    if (hidden) hidden.value = inyInput?.value || '';
+  } else {
+    if (inyInput) { inyInput.style.display = 'none'; inyInput.value = ''; }
+    if (hidden) hidden.value = val;
+  }
+  // Update hidden on iny input change
+  if (inyInput && !inyInput._bound) {
+    inyInput._bound = true;
+    inyInput.addEventListener('input', () => {
+      if (hidden) hidden.value = inyInput.value;
+    });
+  }
+}
 
 function getUnitData(prefix, index, hasTlaky) {
   const p = prefix + '_' + index;
