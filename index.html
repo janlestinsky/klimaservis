@@ -1040,7 +1040,7 @@ async function doUpload() {
   const zakaznik = {meno:g('meno'),priezvisko:g('priezvisko'),adresa:g('adresa'),telefon:g('telefon'),email:g('email'),datum};
   const chladivo_celkom = document.getElementById('chladivo_celkom')?.value || '';
   const vonkPocet2 = typSystem==='multisplit' ? (document.getElementById('multisplit-vonkajsie')?.value||'') : '1';
-  const klima = {vyrobca:g('vyrobca'),chladivo:g('chladivo'),chladivo_celkom,poznamky:g('poznamky'),typSystem,tlaky:getTlaky(),vonkajsie:getVonkajsieJednotky(),datum_montaze:g('datum_montaze'),vonkajsie_pocet:vonkPocet2};
+  const klima = {vyrobca:g('vyrobca'),chladivo:g('chladivo'),chladivo_celkom,poznamky:g('poznamky'),typSystem,tlaky:getTlaky(),vonkajsie:getVonkajsieJednotky(),datum_montaze:(g('datum_montaze') ? g('datum_montaze').split('-').reverse().join('.') : ''),vonkajsie_pocet:vonkPocet2};
   const photoKeys = Object.keys(photos);
 
   const steps = [
@@ -1236,7 +1236,7 @@ async function downloadPDFLocal() {
   const zakaznik = {meno:g('meno'),priezvisko:g('priezvisko'),adresa:g('adresa'),telefon:g('telefon'),email:g('email'),datum};
   const chladivo_celkom = document.getElementById('chladivo_celkom')?.value || '';
   const vonkPocet2 = typSystem==='multisplit' ? (document.getElementById('multisplit-vonkajsie')?.value||'') : '1';
-  const klima = {vyrobca:g('vyrobca'),chladivo:g('chladivo'),chladivo_celkom,poznamky:g('poznamky'),typSystem,tlaky:getTlaky(),vonkajsie:getVonkajsieJednotky(),datum_montaze:g('datum_montaze'),vonkajsie_pocet:vonkPocet2};
+  const klima = {vyrobca:g('vyrobca'),chladivo:g('chladivo'),chladivo_celkom,poznamky:g('poznamky'),typSystem,tlaky:getTlaky(),vonkajsie:getVonkajsieJednotky(),datum_montaze:(g('datum_montaze') ? g('datum_montaze').split('-').reverse().join('.') : ''),vonkajsie_pocet:vonkPocet2};
   showToast('⏳ Generujem PDF...');
   const pdfBuffer = await generatePDF(zakaznik, klima, Object.keys(photos), technici);
   const blob = new Blob([pdfBuffer], {type:'application/pdf'});
