@@ -134,6 +134,29 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .nem-check{width:18px;height:18px;border:2px solid var(--border);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:.75rem;}
 input[type=checkbox].nem-cb{display:none;}
 input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border-color:var(--orange);color:white;}
+/* VÝBER REŽIMU */
+#rezim-screen{max-width:500px;margin:0 auto;padding:30px 16px;display:none;}
+.rezim-btn{width:100%;padding:22px 20px;border:2px solid var(--border);border-radius:18px;background:white;cursor:pointer;display:flex;align-items:center;gap:16px;margin-bottom:14px;transition:all .2s;text-align:left;}
+.rezim-btn:hover{border-color:var(--orange);background:rgba(232,80,10,.04);}
+.rezim-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;}
+.rezim-icon.montaz{background:linear-gradient(135deg,var(--orange),#ff8c42);}
+.rezim-icon.servis{background:linear-gradient(135deg,var(--cold),var(--accent));}
+.rezim-title{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:700;color:var(--deep);}
+.rezim-sub{font-size:.78rem;color:var(--muted);margin-top:2px;}
+/* SERVIS */
+#servis-app{display:none;}
+.chk-group{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.chk-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--ice);font-size:.82rem;cursor:pointer;}
+.chk-row:last-child{border-bottom:none;}
+.chk-row input[type=checkbox]{display:none;}
+.chk-box{width:20px;height:20px;border:2px solid var(--border);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.75rem;transition:all .2s;}
+.chk-row:has(input:checked) .chk-box{background:var(--orange);border-color:var(--orange);color:white;}
+.chk-row:has(input:checked){color:var(--deep);font-weight:600;}
+.sub-title{font-size:.75rem;font-weight:700;color:var(--deep);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;background:var(--ice);border-radius:8px;margin-bottom:4px;}
+.search-result{padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;margin-bottom:7px;background:#fafdff;transition:all .2s;}
+.search-result:hover{border-color:var(--orange);background:rgba(232,80,10,.04);}
+.search-result .sr-name{font-size:.92rem;font-weight:700;color:var(--deep);}
+.search-result .sr-info{font-size:.75rem;color:var(--muted);margin-top:2px;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
@@ -195,6 +218,191 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
 </div>
 
 <!-- MAIN APP -->
+<!-- VÝBER REŽIMU -->
+<div id="rezim-screen">
+  <div style="text-align:center;padding:10px 0 24px;">
+    <div style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:var(--deep);">Čo chcete vykonať?</div>
+    <div style="font-size:.8rem;color:var(--muted);margin-top:4px;">Vyberte typ protokolu</div>
+  </div>
+  <button class="rezim-btn" onclick="spustiMontaz()">
+    <div class="rezim-icon montaz">🔧</div>
+    <div>
+      <div class="rezim-title">Montážny protokol</div>
+      <div class="rezim-sub">Nová inštalácia klimatizácie</div>
+    </div>
+  </button>
+  <button class="rezim-btn" onclick="spustiServis()">
+    <div class="rezim-icon servis">🔍</div>
+    <div>
+      <div class="rezim-title">Servisná prehliadka</div>
+      <div class="rezim-sub">Ročný servis existujúceho zákazníka</div>
+    </div>
+  </button>
+</div>
+
+<!-- SERVIS APP -->
+<div id="servis-app">
+<div class="container">
+
+  <!-- SERVIS KROK 1 – VYHĽADANIE ZÁKAZNÍKA -->
+  <div class="section visible" id="sv1">
+    <div class="sec-hdr"><div class="sec-icon" style="background:linear-gradient(135deg,var(--cold),var(--accent));">🔍</div><div><h2>Vyhľadanie zákazníka</h2><p>Zadajte meno alebo adresu</p></div></div>
+    <div class="card">
+      <div class="field">
+        <label>Meno / Priezvisko / Adresa</label>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="servis-search" placeholder="napr. Novák alebo Hlavná..." oninput="searchZakaznik()">
+          <button onclick="searchZakaznik()" style="padding:0 16px;background:linear-gradient(135deg,var(--cold),var(--accent));color:white;border:none;border-radius:10px;font-size:1rem;cursor:pointer;flex-shrink:0;">🔍</button>
+        </div>
+      </div>
+      <div id="search-results" style="margin-top:10px;"></div>
+    </div>
+    <div class="card" id="servis-zakaznik-card" style="display:none">
+      <div style="font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">✅ Vybraný zákazník</div>
+      <div id="servis-zakaznik-info"></div>
+    </div>
+  </div>
+
+  <!-- SERVIS KROK 2 – ÚDAJE SERVISU -->
+  <div class="section" id="sv2">
+    <div class="sec-hdr"><div class="sec-icon" style="background:linear-gradient(135deg,var(--cold),var(--accent));">📋</div><div><h2>Údaje servisu</h2><p>Krok 2 z 4</p></div></div>
+    <div class="card">
+      <div class="two-col">
+        <div class="field"><label>Dátum servisu</label>
+          <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:.85rem;color:var(--muted);font-weight:500;white-space:nowrap;">Dňa:</span><input type="date" id="servis-datum" style="flex:1;"></div>
+        </div>
+        <div class="field"><label>Servisný technik</label>
+          <input type="text" id="servis-technik" placeholder="Meno technika">
+        </div>
+      </div>
+      <div class="field">
+        <label>Model zariadenia / Počet ks</label>
+        <div id="servis-modely" style="font-size:.85rem;color:var(--deep);padding:8px;background:var(--ice);border-radius:8px;min-height:36px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVIS KROK 3 – CHECKBOXY -->
+  <div class="section" id="sv3">
+    <div class="sec-hdr"><div class="sec-icon" style="background:linear-gradient(135deg,var(--cold),var(--accent));">✅</div><div><h2>Servisný protokol</h2><p>Krok 3 z 4</p></div></div>
+
+    <!-- VONKAJŠIA JEDNOTKA -->
+    <div class="card">
+      <div class="unit-card-title">🏗️ Servis a údržba vonkajšej jednotky</div>
+      <div class="sub-title">Ventilátor</div>
+      <div class="chk-group">
+        <label class="chk-row"><input type="checkbox" id="sc_v1"><div class="chk-box">✓</div>Kontrola zanesenia, poškodenia, pevnosti</label>
+        <label class="chk-row"><input type="checkbox" id="sc_v2"><div class="chk-box">✓</div>Kontrola vyváženosti</label>
+        <label class="chk-row"><input type="checkbox" id="sc_v3"><div class="chk-box">✓</div>Kontrola hlučnosti a zakrytia</label>
+        <label class="chk-row"><input type="checkbox" id="sc_v4"><div class="chk-box">✓</div>Správny zmysel otáčania ventilátora</label>
+      </div>
+      <div class="sub-title" style="margin-top:10px;">Kondenzátor</div>
+      <div class="chk-group">
+        <label class="chk-row"><input type="checkbox" id="sc_k1"><div class="chk-box">✓</div>Kontrola zanesenia, poškodenia, pevnosti</label>
+        <label class="chk-row"><input type="checkbox" id="sc_k2"><div class="chk-box">✓</div>Ošetrenie lamiel</label>
+        <label class="chk-row"><input type="checkbox" id="sc_k3"><div class="chk-box">✓</div>Čistenie</label>
+      </div>
+      <div class="sub-title" style="margin-top:10px;">Kompresor</div>
+      <div class="chk-group">
+        <label class="chk-row"><input type="checkbox" id="sc_ko1"><div class="chk-box">✓</div>Kontrola sacieho a výtlačného tlaku</label>
+        <label class="chk-row"><input type="checkbox" id="sc_ko2"><div class="chk-box">✓</div>Kontrola vyhrevania kompresora</label>
+        <label class="chk-row"><input type="checkbox" id="sc_ko3"><div class="chk-box">✓</div>Kontrola pružného uloženia kompresora</label>
+      </div>
+      <div class="sub-title" style="margin-top:10px;">Teleso jednotky</div>
+      <div class="chk-group">
+        <label class="chk-row"><input type="checkbox" id="sc_t1"><div class="chk-box">✓</div>Kontrola uloženia jednotky</label>
+        <label class="chk-row"><input type="checkbox" id="sc_t2"><div class="chk-box">✓</div>Čistenie kondenzačnej vane</label>
+        <label class="chk-row"><input type="checkbox" id="sc_t3"><div class="chk-box">✓</div>Kontrola resp. dotiahnutie spojov</label>
+      </div>
+    </div>
+
+    <!-- VNÚTORNÁ JEDNOTKA -->
+    <div class="card">
+      <div class="unit-card-title">🏠 Servis a údržba vnútornej jednotky</div>
+      <div class="sub-title">Ventilátor</div>
+      <div class="chk-group">
+        <label class="chk-row"><input type="checkbox" id="sc_vv1"><div class="chk-box">✓</div>Kontrola zanesenia, poškodenia, pevnosti</label>
+        <label class="chk-row"><input type="checkbox" id="sc_vv2"><div class="chk-box">✓</div>Kontrola hlučnosti a zakrytia</label>
+        <label class="chk-row"><input type="checkbox" id="sc_vv3"><div class="chk-box">✓</div>Správny zmysel otáčania ventilátora</label>
+      </div>
+      <div class="sub-title" style="margin-top:10px;">Výparník</div>
+      <div class="chk-group">
+        <label class="chk-row"><input type="checkbox" id="sc_vp1"><div class="chk-box">✓</div>Kontrola zanesenia, poškodenia, pevnosti</label>
+        <label class="chk-row"><input type="checkbox" id="sc_vp2"><div class="chk-box">✓</div>Vyčistenie filtračnej dosky</label>
+        <label class="chk-row"><input type="checkbox" id="sc_vp3"><div class="chk-box">✓</div>Čistenie</label>
+      </div>
+      <div class="sub-title" style="margin-top:10px;">Riadiaci panel – ovládač</div>
+      <div class="chk-group">
+        <label class="chk-row"><input type="checkbox" id="sc_rp1"><div class="chk-box">✓</div>Diagnostická kontrola riadiaceho panelu formou test.</label>
+        <label class="chk-row"><input type="checkbox" id="sc_rp2"><div class="chk-box">✓</div>Kontrola funkčnosti</label>
+      </div>
+      <div class="sub-title" style="margin-top:10px;">Teleso jednotky</div>
+      <div class="chk-group">
+        <label class="chk-row"><input type="checkbox" id="sc_tj1"><div class="chk-box">✓</div>Kontrola výfukových klapiek</label>
+        <label class="chk-row"><input type="checkbox" id="sc_tj2"><div class="chk-box">✓</div>Kontrola odvodu kondenzátu – prečistenie</label>
+      </div>
+    </div>
+
+    <!-- ROZVODY + REGULÁCIA -->
+    <div class="card">
+      <div class="unit-card-title">⚡ Rozvody a regulácia</div>
+      <div class="sub-title">Rozvody</div>
+      <div class="chk-group">
+        <label class="chk-row"><input type="checkbox" id="sc_r1"><div class="chk-box">✓</div>Kontrola uloženia rozvodov a oprava izolácie</label>
+        <label class="chk-row"><input type="checkbox" id="sc_r2"><div class="chk-box">✓</div>Kontrola a dotiahnutie spojov pri napojení na jednotku</label>
+      </div>
+      <div class="sub-title" style="margin-top:10px;">Regulácia, silnoprúd</div>
+      <div class="chk-group">
+        <label class="chk-row"><input type="checkbox" id="sc_rs1"><div class="chk-box">✓</div>Kontrola elektrického zapojenia a dotiahnutie</label>
+        <label class="chk-row"><input type="checkbox" id="sc_rs2"><div class="chk-box">✓</div>Kontrola istiacích, spínacích a ovládacích prvkov</label>
+      </div>
+    </div>
+
+    <!-- POZNÁMKY -->
+    <div class="card">
+      <div class="field"><label>Poznámky k servisu</label>
+        <textarea id="servis-poznamky" placeholder="Prípadné závady, odporúčania..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVIS KROK 4 – PODPIS -->
+  <div class="section" id="sv4">
+    <div class="sec-hdr"><div class="sec-icon" style="background:linear-gradient(135deg,var(--cold),var(--accent));">✍️</div><div><h2>Podpisy</h2><p>Krok 4 z 4</p></div></div>
+    <div class="card">
+      <div style="font-size:.75rem;font-weight:700;color:var(--cold);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">✍️ Podpis zákazníka</div>
+      <canvas id="canvas-servis-zakaznik" style="width:100%;height:180px;border:2px solid var(--border);border-radius:12px;background:white;touch-action:none;display:block;cursor:crosshair;"></canvas>
+      <button onclick="clearCanvas('canvas-servis-zakaznik')" style="flex:1;padding:9px;background:var(--ice);border:1.5px solid var(--border);border-radius:9px;font-size:.8rem;font-weight:600;cursor:pointer;color:var(--muted);margin-top:8px;width:100%;">🗑️ Vymazať</button>
+    </div>
+    <div class="card">
+      <div style="font-size:.75rem;font-weight:700;color:var(--cold);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">🔵 Pečiatka ELWORK</div>
+      <div style="display:flex;justify-content:center;padding:10px;">
+        <img src="" id="peciatka-servis" style="max-height:120px;max-width:220px;object-fit:contain;">
+      </div>
+    </div>
+    <div id="servis-up-state"></div>
+  </div>
+
+  <!-- SERVIS SUCCESS -->
+  <div class="section" id="sv5">
+    <div class="suc-screen">
+      <div class="suc-icon">✓</div>
+      <h2>Servis uložený!</h2>
+      <p>Servisný protokol bol úspešne nahratý na Google Disk.</p>
+      <p style="margin-top:7px;font-size:.76rem;" id="servis-saved-date"></p>
+    </div>
+    <a id="servis-drive-link" href="#" target="_blank" class="drive-card">
+      <div class="dc-icon">📂</div>
+      <div><div class="dc-label">Otvoriť priečinok na Google Disku</div><div class="dc-sub">Kliknite pre zobrazenie súborov</div></div>
+    </a>
+    <div style="padding:0 16px 16px;">
+      <button class="btn-wide" onclick="resetServis()">➕ Nový servis</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
 <div id="main-app" style="display:none">
 <div class="container">
 
@@ -1125,7 +1333,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz3uV4TAZGF1kRRVkwOv96qvXvHwgqSi9jlqTMYrbfbn_z2aOHS3YLs2SDlhHnhCOYsBw/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzkzdARIdqao4n3aZ2SisT-z4ufBszTYD9YW1wFqUFPnlVlJxswulZ8Y3sA260nKBHVcA/exec';
   const formData = new URLSearchParams();
   formData.append('data', JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {method:'POST', body: formData});
@@ -1444,16 +1652,8 @@ function checkLogin() {
   if (pass === 'elwork') {
     document.getElementById('login-screen').style.display = 'none';
     sessionStorage.setItem('klima_auth', '1');
-    // Skryť setup, zobraziť app rovno
     document.getElementById('setup-screen').style.display = 'none';
-    document.getElementById('main-app').style.display = '';
-    document.getElementById('nav-buttons').style.display = 'flex';
-    document.getElementById('prog-bar').style.display = 'flex';
-    currentStep = 1; showStep(1);
-    // Nastav dátum
-    const today = new Date().toISOString().split('T')[0];
-    const dm = document.getElementById('datum_montaze');
-    if (dm) dm.value = today;
+    zobrazRezim();
   } else {
     err.style.display = 'block';
     document.getElementById('login-pass').value = '';
@@ -1477,6 +1677,229 @@ window.addEventListener('load', () => {
   const dm = document.getElementById('datum_montaze');
   if (dm) dm.value = today;
 });
+
+// ══ REŽIM VÝBER ══
+let servisZakaznik = null;
+let servisStep = 1;
+
+function zobrazRezim() {
+  document.getElementById('main-app').style.display = 'none';
+  document.getElementById('servis-app').style.display = 'none';
+  document.getElementById('nav-buttons').style.display = 'none';
+  document.getElementById('prog-bar').style.display = 'none';
+  document.getElementById('rezim-screen').style.display = 'block';
+  // Nastav pečiatku
+  const ps = document.getElementById('peciatka-servis');
+  if (ps) ps.src = PECIATKA_B64;
+}
+
+function spustiMontaz() {
+  document.getElementById('rezim-screen').style.display = 'none';
+  document.getElementById('main-app').style.display = '';
+  document.getElementById('nav-buttons').style.display = 'flex';
+  document.getElementById('prog-bar').style.display = 'flex';
+  currentStep = 1; showStep(1);
+  const today = new Date().toISOString().split('T')[0];
+  const dm = document.getElementById('datum_montaze');
+  if (dm) dm.value = today;
+}
+
+function spustiServis() {
+  document.getElementById('rezim-screen').style.display = 'none';
+  document.getElementById('servis-app').style.display = '';
+  document.getElementById('nav-buttons').style.display = 'flex';
+  document.getElementById('prog-bar').style.display = 'none';
+  servisStep = 1;
+  showServisStep(1);
+  const today = new Date().toISOString().split('T')[0];
+  const ds = document.getElementById('servis-datum');
+  if (ds) ds.value = today;
+}
+
+// ══ SERVIS NAVIGÁCIA ══
+function showServisStep(n) {
+  document.querySelectorAll('#servis-app .section').forEach(s => s.classList.remove('visible'));
+  const secId = 'sv' + n;
+  document.getElementById(secId)?.classList.add('visible');
+  const btnBack = document.getElementById('btn-back');
+  const btnNext = document.getElementById('btn-next');
+  btnBack.style.display = n > 1 && n < 5 ? 'block' : 'none';
+  if (n === 4) {
+    btnNext.textContent = '📤 Nahrať servis';
+    btnNext.className = 'btn btn-success';
+    initCanvas('canvas-servis-zakaznik');
+  } else if (n === 5) {
+    document.getElementById('nav-buttons').style.display = 'none';
+    return;
+  } else {
+    btnNext.textContent = 'Ďalej →';
+    btnNext.className = 'btn btn-primary';
+  }
+  document.getElementById('nav-buttons').style.display = 'flex';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goNextServis() {
+  if (servisStep === 1) {
+    if (!servisZakaznik) { showToast('⚠️ Vyberte zákazníka'); return; }
+  }
+  if (servisStep === 4) { doServisUpload(); return; }
+  servisStep++;
+  showServisStep(servisStep);
+}
+
+function goBackServis() {
+  if (servisStep > 1) { servisStep--; showServisStep(servisStep); }
+  else { zobrazRezim(); }
+}
+
+// ══ VYHĽADÁVANIE ZÁKAZNÍKA ══
+async function searchZakaznik() {
+  const query = document.getElementById('servis-search').value.trim().toLowerCase();
+  const resultsDiv = document.getElementById('search-results');
+  if (query.length < 2) { resultsDiv.innerHTML = ''; return; }
+
+  resultsDiv.innerHTML = '<div style="font-size:.8rem;color:var(--muted);padding:8px;">Hľadám...</div>';
+
+  try {
+    const r = await apiCall({type: 'hladaj', query});
+    if (!r.ok || !r.zakaznici || r.zakaznici.length === 0) {
+      resultsDiv.innerHTML = '<div style="font-size:.8rem;color:var(--muted);padding:8px;">Žiadny zákazník nenájdený</div>';
+      return;
+    }
+    resultsDiv.innerHTML = r.zakaznici.map((z, i) => `
+      <div class="search-result" onclick="vyberZakaznika(${i})">
+        <div class="sr-name">${z.meno} ${z.priezvisko}</div>
+        <div class="sr-info">${z.adresa} · ${z.telefon}</div>
+        <div class="sr-info" style="margin-top:2px;color:var(--orange);">${z.modely || ''}</div>
+      </div>
+    `).join('');
+    window._searchResults = r.zakaznici;
+  } catch(e) {
+    resultsDiv.innerHTML = '<div style="font-size:.8rem;color:#dc2626;padding:8px;">Chyba vyhľadávania</div>';
+  }
+}
+
+function vyberZakaznika(i) {
+  servisZakaznik = window._searchResults[i];
+  document.getElementById('search-results').innerHTML = '';
+  document.getElementById('servis-search').value = servisZakaznik.meno + ' ' + servisZakaznik.priezvisko;
+
+  // Zobraz info
+  const card = document.getElementById('servis-zakaznik-card');
+  card.style.display = '';
+  document.getElementById('servis-zakaznik-info').innerHTML = `
+    <div class="rv-item"><span class="rk">Meno</span><span class="rv">${servisZakaznik.meno} ${servisZakaznik.priezvisko}</span></div>
+    <div class="rv-item"><span class="rk">Adresa</span><span class="rv">${servisZakaznik.adresa}</span></div>
+    <div class="rv-item"><span class="rk">Telefón</span><span class="rv">${servisZakaznik.telefon}</span></div>
+    <div class="rv-item"><span class="rk">Email</span><span class="rv">${servisZakaznik.email || '–'}</span></div>
+    <div class="rv-item"><span class="rk">Klimatizácia</span><span class="rv">${servisZakaznik.modely || '–'}</span></div>
+  `;
+
+  // Nastav modely v kroku 2
+  setTimeout(() => {
+    const modDiv = document.getElementById('servis-modely');
+    if (modDiv) modDiv.innerHTML = servisZakaznik.modely || '–';
+  }, 100);
+}
+
+// ══ SERVIS UPLOAD ══
+async function doServisUpload() {
+  const datum = document.getElementById('servis-datum').value;
+  const datumFmt = datum ? datum.split('-').reverse().join('.') : new Date().toLocaleDateString('sk-SK');
+  const technik = document.getElementById('servis-technik').value || '';
+  const poznamky = document.getElementById('servis-poznamky').value || '';
+  const podpis = getCanvasDataUrl('canvas-servis-zakaznik');
+  const logoB64 = document.querySelector('header img')?.src || null;
+  const peciatkaB64 = PECIATKA_B64 || null;
+
+  // Zober všetky checkboxy
+  const checkboxy = {};
+  ['v1','v2','v3','v4','k1','k2','k3','ko1','ko2','ko3','t1','t2','t3',
+   'vv1','vv2','vv3','vp1','vp2','vp3','rp1','rp2','tj1','tj2','r1','r2','rs1','rs2'
+  ].forEach(id => {
+    checkboxy[id] = document.getElementById('sc_'+id)?.checked || false;
+  });
+
+  document.getElementById('servis-up-state').innerHTML = `
+    <div class="up-box">
+      <div class="spinner"></div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--deep);margin-bottom:12px;">Nahrávam servisný protokol...</div>
+      <div class="up-step active" id="sus1"><div class="dot"></div>Generujem PDF protokol</div>
+      <div class="up-step" id="sus2"><div class="dot"></div>Ukladám na Google Disk</div>
+      <div class="prog-track"><div class="prog-fill" id="susfill"></div></div>
+    </div>`;
+  document.getElementById('nav-buttons').style.display = 'none';
+
+  const setS = (id,st) => { const el=document.getElementById(id); if(el) el.className='up-step '+st; };
+  const setP = p => { const f=document.getElementById('susfill'); if(f) f.style.width=p+'%'; };
+
+  try {
+    setS('sus1','active');
+    const r = await apiCall({
+      type: 'servis',
+      zakaznik: servisZakaznik,
+      datum: datumFmt,
+      technik,
+      poznamky,
+      checkboxy,
+      podpisZakaznik: podpis,
+      logoB64,
+      peciatkaB64
+    });
+    if (!r.ok) throw new Error(r.error || 'Chyba');
+    setS('sus1','done'); setP(60);
+    setS('sus2','done'); setP(100);
+
+    await sleep(400);
+    document.querySelectorAll('#servis-app .section').forEach(s => s.classList.remove('visible'));
+    document.getElementById('sv5').classList.add('visible');
+    document.getElementById('nav-buttons').style.display = 'none';
+    document.getElementById('servis-saved-date').textContent = 'Uložené: ' + datumFmt;
+    const dl = document.getElementById('servis-drive-link');
+    if (dl && r.folderId) dl.href = 'https://drive.google.com/drive/folders/' + r.folderId;
+
+    // Aktualizuj Excel so servisom
+    await apiCall({type: 'servis_excel', zakaznik: servisZakaznik, datum: datumFmt});
+
+  } catch(err) {
+    document.getElementById('servis-up-state').innerHTML = `
+      <div class="card" style="border-color:#ef4444;background:#fff8f8;padding:18px;text-align:center;">
+        <div style="font-size:1.3rem;margin-bottom:7px;">⚠️</div>
+        <div style="font-weight:700;color:#dc2626;margin-bottom:5px;">Chyba nahrávania</div>
+        <div style="font-size:.78rem;color:#7f1d1d;">${err.message}</div>
+        <button onclick="doServisUpload()" style="padding:10px 16px;background:var(--orange);color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer;margin-top:12px;">🔄 Skúsiť znova</button>
+      </div>`;
+    document.getElementById('nav-buttons').style.display = 'flex';
+  }
+}
+
+function resetServis() {
+  servisZakaznik = null;
+  servisStep = 1;
+  document.getElementById('servis-search').value = '';
+  document.getElementById('search-results').innerHTML = '';
+  document.getElementById('servis-zakaznik-card').style.display = 'none';
+  document.getElementById('servis-technik').value = '';
+  document.getElementById('servis-poznamky').value = '';
+  document.getElementById('servis-up-state').innerHTML = '';
+  // Reset checkboxy
+  document.querySelectorAll('#servis-app input[type=checkbox]').forEach(cb => cb.checked = false);
+  clearCanvas('canvas-servis-zakaznik');
+  zobrazRezim();
+}
+
+// Override goNext/goBack pre servis
+const _origGoNext = goNext;
+const _origGoBack = goBack;
+function goNext() {
+  if (document.getElementById('servis-app').style.display !== 'none') { goNextServis(); return; }
+  _origGoNext();
+}
+function goBack() {
+  if (document.getElementById('servis-app').style.display !== 'none') { goBackServis(); return; }
+  _origGoBack();
+}
 </script>
 </body>
 </html>
