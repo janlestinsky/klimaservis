@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>KlimaServis – Montážny protokol</title>
+<title>Servisný portál ELWORK</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{--ice:#e8f4f8;--frost:#c2dde8;--cold:#1a6b8a;--deep:#0d3d52;--accent:#00c2e0;--warm:#ff6b35;--success:#22c55e;--bg:#f0f7fa;--card:#ffffff;--text:#0d2b38;--muted:#5a7a88;--border:#c2dde8;--orange:#E8500A;}
@@ -145,6 +145,8 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
 .rezim-sub{font-size:.78rem;color:var(--muted);margin-top:2px;}
 /* SERVIS */
 #servis-app{display:none;}
+#alarm-montaz-app{display:none;}
+#alarm-servis-app{display:none;}
 .chk-group{display:grid;grid-template-columns:1fr 1fr;gap:0;}
 .chk-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--ice);font-size:.82rem;cursor:pointer;}
 .chk-row:last-child{border-bottom:none;}
@@ -169,7 +171,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
     <div class="login-logo">
       <img src="data:image/jpeg;base64,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" alt="Elwork">
     </div>
-    <h2>Montážny protokol</h2>
+    <h2>Servisný portál ELWORK</h2>
     <p>Zadajte heslo pre prístup do aplikácie</p>
     <input type="password" class="login-input" id="login-pass" placeholder="••••••" onkeydown="if(event.key==='Enter') checkLogin()">
     <button class="login-btn" onclick="checkLogin()">Prihlásiť sa →</button>
@@ -238,6 +240,143 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
       <div class="rezim-sub">Ročný servis existujúceho zákazníka</div>
     </div>
   </button>
+  <button class="rezim-btn" onclick="spustiMontazAlarm()">
+    <div class="rezim-icon" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">🚨</div>
+    <div>
+      <div class="rezim-title">Montáž alarmu</div>
+      <div class="rezim-sub">Nová inštalácia zabezpečovacieho systému</div>
+    </div>
+  </button>
+  <button class="rezim-btn" onclick="spustiServisAlarm()">
+    <div class="rezim-icon" style="background:linear-gradient(135deg,#0891b2,#22d3ee);">🛡️</div>
+    <div>
+      <div class="rezim-title">Servisná prehliadka alarmu</div>
+      <div class="rezim-sub">Ročný servis zabezpečovacieho systému</div>
+    </div>
+  </button>
+</div>
+
+<!-- ALARM MONTAZ APP -->
+<div id="alarm-montaz-app">
+<div class="container">
+  <div class="section visible" id="am1">
+    <div class="sec-hdr"><div class="sec-icon" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">🚨</div><div><h2>Montáž alarmu</h2><p>Údaje zákazníka a inštalácie</p></div></div>
+    <div class="card">
+      <div class="two-col">
+        <div class="field"><label>Meno <span class="req">*</span></label><input type="text" id="am-meno" placeholder="Ján"></div>
+        <div class="field"><label>Priezvisko <span class="req">*</span></label><input type="text" id="am-priezvisko" placeholder="Novák"></div>
+      </div>
+      <div class="field"><label>Adresa <span class="req">*</span></label><input type="text" id="am-adresa" placeholder="Hlavná 12, Bratislava"></div>
+      <div class="field"><label>Telefón <span class="req">*</span></label><input type="tel" id="am-telefon" placeholder="+421 900 000 000"></div>
+      <div class="field"><label>Email</label><input type="email" id="am-email" placeholder="zakaznik@email.sk"></div>
+      <div class="field"><label>Typ alarmu</label>
+        <select id="am-typ">
+          <option value="">– Vybrať –</option>
+          <option>JA-101K-LAN</option>
+          <option>JA-103K</option>
+          <option>JA-103KRY</option>
+          <option>JA-106K</option>
+          <option>JA-107KR</option>
+          <option>Iný</option>
+        </select>
+      </div>
+      <div class="field" id="am-typ-iny-wrap" style="display:none">
+        <label>Zadajte typ alarmu</label>
+        <input type="text" id="am-typ-iny" placeholder="napr. JA-100K">
+      </div>
+      <div class="field"><label>Dátum montáže</label>
+        <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:.85rem;color:var(--muted);font-weight:500;white-space:nowrap;">Dňa:</span><input type="date" id="am-datum" style="flex:1;"></div>
+      </div>
+      <div class="field"><label>Poznámky</label><textarea id="am-poznamky" placeholder="Počet senzorov, detaily inštalácie..."></textarea></div>
+    </div>
+    <div id="am-up-state"></div>
+    <div style="display:flex;gap:10px;padding:0 16px 90px;">
+      <button class="btn btn-secondary" onclick="zobrazRezim()" style="flex:1;padding:13px;border:none;border-radius:11px;font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;">← Späť</button>
+      <button class="btn" onclick="ulozAlarmMontaz()" style="flex:2;padding:13px;border:none;border-radius:11px;font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:white;">📤 Uložiť montáž</button>
+    </div>
+  </div>
+
+  <div class="section" id="am2">
+    <div class="suc-screen">
+      <div class="suc-icon">✓</div>
+      <h2>Montáž alarmu uložená!</h2>
+      <p>Zákazník bol pridaný do evidencie.</p>
+    </div>
+    <div style="padding:0 16px 16px;">
+      <button class="btn-wide" onclick="resetAlarmMontaz()">➕ Nová montáž alarmu</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ALARM SERVIS APP -->
+<div id="alarm-servis-app">
+<div class="container">
+  <div class="section visible" id="as1">
+    <div class="sec-hdr"><div class="sec-icon" style="background:linear-gradient(135deg,#0891b2,#22d3ee);">🛡️</div><div><h2>Servisná prehliadka alarmu</h2><p>Vyhľadajte zákazníka</p></div></div>
+    <div class="card">
+      <div class="field">
+        <label>Meno / Priezvisko / Adresa</label>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="as-search" placeholder="napr. Novák alebo Hlavná..." oninput="searchAlarmZakaznik()">
+          <button onclick="searchAlarmZakaznik()" style="padding:0 16px;background:linear-gradient(135deg,#0891b2,#22d3ee);color:white;border:none;border-radius:10px;font-size:1rem;cursor:pointer;flex-shrink:0;">🔍</button>
+        </div>
+      </div>
+      <div id="as-search-results" style="margin-top:10px;"></div>
+    </div>
+    <div class="card" id="as-zakaznik-card" style="display:none">
+      <div style="font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">✅ Vybraný zákazník</div>
+      <div id="as-zakaznik-info"></div>
+    </div>
+    <div class="card" id="as-novy-card" style="display:none">
+      <div style="font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">➕ Nový zákazník (bez predchádzajúcej montáže)</div>
+      <div class="two-col">
+        <div class="field"><label>Meno <span class="req">*</span></label><input type="text" id="as-nz-meno" placeholder="Ján"></div>
+        <div class="field"><label>Priezvisko <span class="req">*</span></label><input type="text" id="as-nz-priezvisko" placeholder="Novák"></div>
+      </div>
+      <div class="field"><label>Adresa <span class="req">*</span></label><input type="text" id="as-nz-adresa" placeholder="Hlavná 12, Bratislava"></div>
+      <div class="field"><label>Telefón <span class="req">*</span></label><input type="tel" id="as-nz-telefon" placeholder="+421 900 000 000"></div>
+      <div class="field"><label>Email</label><input type="email" id="as-nz-email" placeholder="zakaznik@email.sk"></div>
+      <div class="field"><label>Typ alarmu</label><input type="text" id="as-nz-typ" placeholder="napr. JA-103K"></div>
+      <button class="btn-wide" onclick="potvrdNovehoAlarmZakaznika()" style="margin-top:8px;">✅ Potvrdiť údaje</button>
+    </div>
+    <button onclick="toggleNovyAlarmZakaznik()" id="btn-novy-alarm-zakaznik" style="width:100%;padding:13px;background:var(--ice);border:1.5px dashed var(--border);border-radius:12px;color:var(--cold);font-weight:600;font-size:.88rem;cursor:pointer;margin-top:4px;">➕ Zadať nového zákazníka (bez predchádzajúcej montáže)</button>
+    <div style="padding:16px 16px 90px;">
+      <button class="btn btn-secondary" onclick="zobrazRezim()" style="width:100%;padding:13px;border:none;border-radius:11px;font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;">← Späť</button>
+    </div>
+  </div>
+
+  <div class="section" id="as2">
+    <div class="sec-hdr"><div class="sec-icon" style="background:linear-gradient(135deg,#0891b2,#22d3ee);">📋</div><div><h2>Údaje servisu</h2><p>Krok 2 z 2</p></div></div>
+    <div class="card">
+      <div class="field"><label>Dátum servisu</label>
+        <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:.85rem;color:var(--muted);font-weight:500;white-space:nowrap;">Dňa:</span><input type="date" id="as-datum" style="flex:1;"></div>
+      </div>
+      <div class="field"><label>Servisný technik</label><input type="text" id="as-technik" placeholder="Meno technika"></div>
+      <div class="field"><label>Typ alarmu</label>
+        <div id="as-typ-info" style="font-size:.85rem;color:var(--deep);padding:8px;background:var(--ice);border-radius:8px;min-height:36px;"></div>
+      </div>
+      <div class="field"><label>Poznámky k servisu</label><textarea id="as-poznamky" placeholder="Stav batérií, senzorov, prípadné závady..."></textarea></div>
+    </div>
+    <div id="as-up-state"></div>
+    <div style="display:flex;gap:10px;padding:0 16px 90px;">
+      <button class="btn btn-secondary" onclick="document.querySelectorAll('#alarm-servis-app .section').forEach(s=>s.classList.remove('visible'));document.getElementById('as1').classList.add('visible');" style="flex:1;padding:13px;border:none;border-radius:11px;font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;">← Späť</button>
+      <button class="btn" onclick="ulozAlarmServis()" style="flex:2;padding:13px;border:none;border-radius:11px;font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#0891b2,#22d3ee);color:white;">📤 Uložiť servis</button>
+    </div>
+  </div>
+
+  <div class="section" id="as3">
+    <div class="suc-screen">
+      <div class="suc-icon">✓</div>
+      <h2>Servis alarmu uložený!</h2>
+      <p>Dátum servisu bol zaznamenaný.</p>
+      <p style="margin-top:7px;font-size:.76rem;" id="as-saved-date"></p>
+    </div>
+    <div style="padding:0 16px 16px;">
+      <button class="btn-wide" onclick="resetAlarmServis()">➕ Nový servis alarmu</button>
+    </div>
+  </div>
+</div>
 </div>
 
 <!-- SERVIS APP -->
@@ -261,6 +400,19 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
       <div style="font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">✅ Vybraný zákazník</div>
       <div id="servis-zakaznik-info"></div>
     </div>
+    <div class="card" id="novy-zakaznik-card" style="display:none">
+      <div style="font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">➕ Nový zákazník (bez predchádzajúcej montáže)</div>
+      <div class="two-col">
+        <div class="field"><label>Meno <span class="req">*</span></label><input type="text" id="nz-meno" placeholder="Ján"></div>
+        <div class="field"><label>Priezvisko <span class="req">*</span></label><input type="text" id="nz-priezvisko" placeholder="Novák"></div>
+      </div>
+      <div class="field"><label>Adresa <span class="req">*</span></label><input type="text" id="nz-adresa" placeholder="Hlavná 12, Bratislava"></div>
+      <div class="field"><label>Telefón <span class="req">*</span></label><input type="tel" id="nz-telefon" placeholder="+421 900 000 000"></div>
+      <div class="field"><label>Email</label><input type="email" id="nz-email" placeholder="zakaznik@email.sk"></div>
+      <div class="field"><label>Typ klimatizácie / Model</label><input type="text" id="nz-model" placeholder="napr. Daikin FTXB25C"></div>
+      <button class="btn-wide" onclick="potvrdNovehoZakaznika()" style="margin-top:8px;">✅ Potvrdiť údaje</button>
+    </div>
+    <button onclick="toggleNovyZakaznik()" id="btn-novy-zakaznik" style="width:100%;padding:13px;background:var(--ice);border:1.5px dashed var(--border);border-radius:12px;color:var(--cold);font-weight:600;font-size:.88rem;cursor:pointer;margin-top:4px;">➕ Zadať nového zákazníka (bez predchádzajúcej montáže)</button>
   </div>
 
   <!-- SERVIS KROK 2 – ÚDAJE SERVISU -->
@@ -1333,7 +1485,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzkzdARIdqao4n3aZ2SisT-z4ufBszTYD9YW1wFqUFPnlVlJxswulZ8Y3sA260nKBHVcA/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxFSFaAKHM86f6C0irSYElEl5xbOXKr6x51khsAORnLNYcawPzrAV92NXC5SQLIlzOgRg/exec';
   const formData = new URLSearchParams();
   formData.append('data', JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {method:'POST', body: formData});
@@ -1554,7 +1706,7 @@ function showStep(n) {
   document.getElementById(secId)?.classList.add('visible');
   const btnBack = document.getElementById('btn-back');
   const btnNext = document.getElementById('btn-next');
-  btnBack.style.display = (n > 1 && n < 7) ? 'block' : 'none';
+  btnBack.style.display = (n < 7) ? 'block' : 'none';
   if (n === 6) {
     buildReview();
     btnNext.textContent = '📤 Nahrať na Google Disk';
@@ -1582,7 +1734,7 @@ function goNext() {
   if (currentStep===6) { doUpload(); return; }
   currentStep++; showStep(currentStep);
 }
-function goBack() { if(currentStep>1){currentStep--;showStep(currentStep);} }
+function goBack() { if(currentStep>1){currentStep--;showStep(currentStep);} else { zobrazRezim(); } }
 
 function val0() {
   const t = getTechnici();
@@ -1685,6 +1837,8 @@ let servisStep = 1;
 function zobrazRezim() {
   document.getElementById('main-app').style.display = 'none';
   document.getElementById('servis-app').style.display = 'none';
+  document.getElementById('alarm-montaz-app').style.display = 'none';
+  document.getElementById('alarm-servis-app').style.display = 'none';
   document.getElementById('nav-buttons').style.display = 'none';
   document.getElementById('prog-bar').style.display = 'none';
   document.getElementById('rezim-screen').style.display = 'block';
@@ -1716,6 +1870,234 @@ function spustiServis() {
   if (ds) ds.value = today;
 }
 
+function spustiMontazAlarm() {
+  document.getElementById('rezim-screen').style.display = 'none';
+  document.getElementById('alarm-montaz-app').style.display = '';
+  document.getElementById('nav-buttons').style.display = 'none';
+  document.getElementById('prog-bar').style.display = 'none';
+  const today = new Date().toISOString().split('T')[0];
+  const dm = document.getElementById('am-datum');
+  if (dm) dm.value = today;
+  document.querySelectorAll('#alarm-montaz-app .section').forEach(s => s.classList.remove('visible'));
+  document.getElementById('am1').classList.add('visible');
+}
+
+function spustiServisAlarm() {
+  document.getElementById('rezim-screen').style.display = 'none';
+  document.getElementById('alarm-servis-app').style.display = '';
+  document.getElementById('nav-buttons').style.display = 'none';
+  document.getElementById('prog-bar').style.display = 'none';
+  alarmServisZakaznik = null;
+  document.querySelectorAll('#alarm-servis-app .section').forEach(s => s.classList.remove('visible'));
+  document.getElementById('as1').classList.add('visible');
+}
+
+// ══ ALARM TYP SELECT ══
+document.addEventListener('DOMContentLoaded', () => {
+  const amTyp = document.getElementById('am-typ');
+  if (amTyp) amTyp.addEventListener('change', function() {
+    document.getElementById('am-typ-iny-wrap').style.display = this.value === 'Iný' ? '' : 'none';
+  });
+});
+
+// ══ ALARM MONTÁŽ ══
+async function ulozAlarmMontaz() {
+  const meno = document.getElementById('am-meno').value.trim();
+  const priezvisko = document.getElementById('am-priezvisko').value.trim();
+  const adresa = document.getElementById('am-adresa').value.trim();
+  const telefon = document.getElementById('am-telefon').value.trim();
+  const email = document.getElementById('am-email').value.trim();
+  let typ = document.getElementById('am-typ').value;
+  if (typ === 'Iný') typ = document.getElementById('am-typ-iny').value.trim();
+  const datum = document.getElementById('am-datum').value;
+  const datumFmt = datum ? datum.split('-').reverse().join('.') : new Date().toLocaleDateString('sk-SK');
+  const poznamky = document.getElementById('am-poznamky').value.trim();
+
+  if (!meno || !priezvisko || !adresa || !telefon) {
+    showToast('⚠️ Vyplňte všetky povinné polia');
+    return;
+  }
+
+  document.getElementById('am-up-state').innerHTML = `
+    <div class="up-box">
+      <div class="spinner"></div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--deep);">Ukladám montáž alarmu...</div>
+    </div>`;
+
+  try {
+    const r = await apiCall({
+      type: 'alarm_montaz',
+      zakaznik: { meno, priezvisko, adresa, telefon, email, typ, datum: datumFmt, poznamky }
+    });
+    if (!r.ok) throw new Error(r.error || 'Chyba');
+    document.getElementById('am-up-state').innerHTML = '';
+    document.querySelectorAll('#alarm-montaz-app .section').forEach(s => s.classList.remove('visible'));
+    document.getElementById('am2').classList.add('visible');
+  } catch(err) {
+    document.getElementById('am-up-state').innerHTML = `
+      <div class="card" style="border-color:#ef4444;background:#fff8f8;padding:18px;text-align:center;">
+        <div style="font-weight:700;color:#dc2626;">Chyba: ${err.message}</div>
+        <button onclick="ulozAlarmMontaz()" style="padding:10px 16px;background:#7c3aed;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer;margin-top:12px;">🔄 Skúsiť znova</button>
+      </div>`;
+  }
+}
+
+function resetAlarmMontaz() {
+  ['am-meno','am-priezvisko','am-adresa','am-telefon','am-email','am-typ-iny','am-poznamky'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('am-typ').value = '';
+  document.getElementById('am-typ-iny-wrap').style.display = 'none';
+  document.getElementById('am-up-state').innerHTML = '';
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('am-datum').value = today;
+  zobrazRezim();
+}
+
+// ══ ALARM SERVIS ══
+let alarmServisZakaznik = null;
+
+async function searchAlarmZakaznik() {
+  const query = document.getElementById('as-search').value.trim().toLowerCase();
+  const resultsDiv = document.getElementById('as-search-results');
+  if (query.length < 2) { resultsDiv.innerHTML = ''; return; }
+  resultsDiv.innerHTML = '<div style="font-size:.8rem;color:var(--muted);padding:8px;">Hľadám...</div>';
+  try {
+    const r = await apiCall({type: 'hladaj_alarm', query});
+    if (!r.ok || !r.zakaznici || r.zakaznici.length === 0) {
+      resultsDiv.innerHTML = '<div style="font-size:.8rem;color:var(--muted);padding:8px;">Žiadny zákazník nenájdený</div>';
+      return;
+    }
+    resultsDiv.innerHTML = r.zakaznici.map((z, i) => `
+      <div class="search-result" onclick="vyberAlarmZakaznika(${i})">
+        <div class="sr-name">${z.meno} ${z.priezvisko}</div>
+        <div class="sr-info">${z.adresa} · ${z.telefon}</div>
+        <div class="sr-info" style="margin-top:2px;color:#0891b2;">${z.typ || ''}</div>
+      </div>
+    `).join('');
+    window._alarmSearchResults = r.zakaznici;
+  } catch(e) {
+    resultsDiv.innerHTML = '<div style="font-size:.8rem;color:#dc2626;padding:8px;">Chyba vyhľadávania</div>';
+  }
+}
+
+function vyberAlarmZakaznika(i) {
+  alarmServisZakaznik = window._alarmSearchResults[i];
+  document.getElementById('as-search-results').innerHTML = '';
+  document.getElementById('as-search').value = alarmServisZakaznik.meno + ' ' + alarmServisZakaznik.priezvisko;
+  const card = document.getElementById('as-zakaznik-card');
+  card.style.display = '';
+  document.getElementById('as-zakaznik-info').innerHTML = `
+    <div class="rv-item"><span class="rk">Meno</span><span class="rv">${alarmServisZakaznik.meno} ${alarmServisZakaznik.priezvisko}</span></div>
+    <div class="rv-item"><span class="rk">Adresa</span><span class="rv">${alarmServisZakaznik.adresa}</span></div>
+    <div class="rv-item"><span class="rk">Telefón</span><span class="rv">${alarmServisZakaznik.telefon}</span></div>
+    <div class="rv-item"><span class="rk">Email</span><span class="rv">${alarmServisZakaznik.email || '–'}</span></div>
+    <div class="rv-item"><span class="rk">Typ alarmu</span><span class="rv">${alarmServisZakaznik.typ || '–'}</span></div>
+  `;
+  goToAlarmServisStep2();
+}
+
+function toggleNovyAlarmZakaznik() {
+  const card = document.getElementById('as-novy-card');
+  const isOpen = card.style.display !== 'none';
+  card.style.display = isOpen ? 'none' : '';
+  document.getElementById('btn-novy-alarm-zakaznik').textContent = isOpen
+    ? '➕ Zadať nového zákazníka (bez predchádzajúcej montáže)'
+    : '✕ Zrušiť zadávanie nového zákazníka';
+  if (!isOpen) {
+    document.getElementById('as-search-results').innerHTML = '';
+    document.getElementById('as-zakaznik-card').style.display = 'none';
+  }
+}
+
+function potvrdNovehoAlarmZakaznika() {
+  const meno = document.getElementById('as-nz-meno').value.trim();
+  const priezvisko = document.getElementById('as-nz-priezvisko').value.trim();
+  const adresa = document.getElementById('as-nz-adresa').value.trim();
+  const telefon = document.getElementById('as-nz-telefon').value.trim();
+  const email = document.getElementById('as-nz-email').value.trim();
+  const typ = document.getElementById('as-nz-typ').value.trim();
+
+  if (!meno || !priezvisko || !adresa || !telefon) {
+    showToast('⚠️ Vyplňte všetky povinné polia');
+    return;
+  }
+
+  alarmServisZakaznik = { meno, priezvisko, adresa, telefon, email, typ };
+  const card = document.getElementById('as-zakaznik-card');
+  card.style.display = '';
+  document.getElementById('as-zakaznik-info').innerHTML = `
+    <div class="rv-item"><span class="rk">Meno</span><span class="rv">${meno} ${priezvisko}</span></div>
+    <div class="rv-item"><span class="rk">Adresa</span><span class="rv">${adresa}</span></div>
+    <div class="rv-item"><span class="rk">Telefón</span><span class="rv">${telefon}</span></div>
+    <div class="rv-item"><span class="rk">Email</span><span class="rv">${email || '–'}</span></div>
+    <div class="rv-item"><span class="rk">Typ alarmu</span><span class="rv">${typ || '–'}</span></div>
+  `;
+  document.getElementById('as-novy-card').style.display = 'none';
+  document.getElementById('btn-novy-alarm-zakaznik').textContent = '➕ Zadať nového zákazníka (bez predchádzajúcej montáže)';
+  showToast('✅ Zákazník potvrdený');
+  goToAlarmServisStep2();
+}
+
+function goToAlarmServisStep2() {
+  document.querySelectorAll('#alarm-servis-app .section').forEach(s => s.classList.remove('visible'));
+  document.getElementById('as2').classList.add('visible');
+  document.getElementById('as-typ-info').textContent = alarmServisZakaznik.typ || '–';
+  const today = new Date().toISOString().split('T')[0];
+  const ds = document.getElementById('as-datum');
+  if (ds) ds.value = today;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function ulozAlarmServis() {
+  if (!alarmServisZakaznik) { showToast('⚠️ Vyberte zákazníka'); return; }
+  const datum = document.getElementById('as-datum').value;
+  const datumFmt = datum ? datum.split('-').reverse().join('.') : new Date().toLocaleDateString('sk-SK');
+  const technik = document.getElementById('as-technik').value.trim();
+  const poznamky = document.getElementById('as-poznamky').value.trim();
+
+  document.getElementById('as-up-state').innerHTML = `
+    <div class="up-box">
+      <div class="spinner"></div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--deep);">Ukladám servis alarmu...</div>
+    </div>`;
+
+  try {
+    const r = await apiCall({
+      type: 'alarm_servis',
+      zakaznik: alarmServisZakaznik,
+      datum: datumFmt,
+      technik,
+      poznamky
+    });
+    if (!r.ok) throw new Error(r.error || 'Chyba');
+    document.getElementById('as-up-state').innerHTML = '';
+    document.querySelectorAll('#alarm-servis-app .section').forEach(s => s.classList.remove('visible'));
+    document.getElementById('as3').classList.add('visible');
+    document.getElementById('as-saved-date').textContent = 'Uložené: ' + datumFmt;
+  } catch(err) {
+    document.getElementById('as-up-state').innerHTML = `
+      <div class="card" style="border-color:#ef4444;background:#fff8f8;padding:18px;text-align:center;">
+        <div style="font-weight:700;color:#dc2626;">Chyba: ${err.message}</div>
+        <button onclick="ulozAlarmServis()" style="padding:10px 16px;background:#0891b2;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer;margin-top:12px;">🔄 Skúsiť znova</button>
+      </div>`;
+  }
+}
+
+function resetAlarmServis() {
+  alarmServisZakaznik = null;
+  document.getElementById('as-search').value = '';
+  document.getElementById('as-search-results').innerHTML = '';
+  document.getElementById('as-zakaznik-card').style.display = 'none';
+  document.getElementById('as-novy-card').style.display = 'none';
+  document.getElementById('btn-novy-alarm-zakaznik').textContent = '➕ Zadať nového zákazníka (bez predchádzajúcej montáže)';
+  ['as-nz-meno','as-nz-priezvisko','as-nz-adresa','as-nz-telefon','as-nz-email','as-nz-typ','as-technik','as-poznamky'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('as-up-state').innerHTML = '';
+  zobrazRezim();
+}
+
 // ══ SERVIS NAVIGÁCIA ══
 function showServisStep(n) {
   document.querySelectorAll('#servis-app .section').forEach(s => s.classList.remove('visible'));
@@ -1723,7 +2105,7 @@ function showServisStep(n) {
   document.getElementById(secId)?.classList.add('visible');
   const btnBack = document.getElementById('btn-back');
   const btnNext = document.getElementById('btn-next');
-  btnBack.style.display = n > 1 && n < 5 ? 'block' : 'none';
+  btnBack.style.display = n < 5 ? 'block' : 'none';
   if (n === 4) {
     btnNext.textContent = '📤 Nahrať servis';
     btnNext.className = 'btn btn-success';
@@ -1751,6 +2133,60 @@ function goNextServis() {
 function goBackServis() {
   if (servisStep > 1) { servisStep--; showServisStep(servisStep); }
   else { zobrazRezim(); }
+}
+
+// ══ NOVÝ ZÁKAZNÍK V SERVISE ══
+function toggleNovyZakaznik() {
+  const card = document.getElementById('novy-zakaznik-card');
+  const isOpen = card.style.display !== 'none';
+  card.style.display = isOpen ? 'none' : '';
+  document.getElementById('btn-novy-zakaznik').textContent = isOpen
+    ? '➕ Zadať nového zákazníka (bez predchádzajúcej montáže)'
+    : '✕ Zrušiť zadávanie nového zákazníka';
+  if (!isOpen) {
+    // Skry výsledky vyhľadávania
+    document.getElementById('search-results').innerHTML = '';
+    document.getElementById('servis-zakaznik-card').style.display = 'none';
+  }
+}
+
+function potvrdNovehoZakaznika() {
+  const meno = document.getElementById('nz-meno').value.trim();
+  const priezvisko = document.getElementById('nz-priezvisko').value.trim();
+  const adresa = document.getElementById('nz-adresa').value.trim();
+  const telefon = document.getElementById('nz-telefon').value.trim();
+  const email = document.getElementById('nz-email').value.trim();
+  const model = document.getElementById('nz-model').value.trim();
+
+  if (!meno || !priezvisko || !adresa || !telefon) {
+    showToast('⚠️ Vyplňte všetky povinné polia');
+    return;
+  }
+
+  servisZakaznik = { meno, priezvisko, adresa, telefon, email, modely: model };
+
+  // Zobraz potvrdenie
+  const card = document.getElementById('servis-zakaznik-card');
+  card.style.display = '';
+  document.getElementById('servis-zakaznik-info').innerHTML = `
+    <div class="rv-item"><span class="rk">Meno</span><span class="rv">${servisZakaznik.meno} ${servisZakaznik.priezvisko}</span></div>
+    <div class="rv-item"><span class="rk">Adresa</span><span class="rv">${servisZakaznik.adresa}</span></div>
+    <div class="rv-item"><span class="rk">Telefón</span><span class="rv">${servisZakaznik.telefon}</span></div>
+    <div class="rv-item"><span class="rk">Email</span><span class="rv">${servisZakaznik.email || '–'}</span></div>
+    <div class="rv-item"><span class="rk">Klimatizácia</span><span class="rv">${servisZakaznik.modely || '–'}</span></div>
+  `;
+
+  // Skry formulár nového zákazníka
+  document.getElementById('novy-zakaznik-card').style.display = 'none';
+  document.getElementById('btn-novy-zakaznik').textContent = '➕ Zadať nového zákazníka (bez predchádzajúcej montáže)';
+
+  // Nastav modely v kroku 2
+  setTimeout(() => {
+    const modDiv = document.getElementById('servis-modely');
+    if (modDiv) modDiv.innerHTML = servisZakaznik.modely || '–';
+  }, 100);
+
+  showToast('✅ Zákazník potvrdený');
 }
 
 // ══ VYHĽADÁVANIE ZÁKAZNÍKA ══
@@ -1880,6 +2316,11 @@ function resetServis() {
   document.getElementById('servis-search').value = '';
   document.getElementById('search-results').innerHTML = '';
   document.getElementById('servis-zakaznik-card').style.display = 'none';
+  document.getElementById('novy-zakaznik-card').style.display = 'none';
+  document.getElementById('btn-novy-zakaznik').textContent = '➕ Zadať nového zákazníka (bez predchádzajúcej montáže)';
+  ['nz-meno','nz-priezvisko','nz-adresa','nz-telefon','nz-email','nz-model'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
   document.getElementById('servis-technik').value = '';
   document.getElementById('servis-poznamky').value = '';
   document.getElementById('servis-up-state').innerHTML = '';
