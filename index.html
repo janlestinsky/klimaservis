@@ -1242,10 +1242,26 @@ function buildReview() {
     `<div style="font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">${icon} ${title}</div>`+
     arr.map(([k,v])=>`<div class="rv-item"><span class="rk">${k}</span><span class="rv">${v||'–'}</span></div>`).join('');
 
-  document.getElementById('rv-zakaznik').innerHTML = rows([
-    ['Meno',g('meno')+' '+g('priezvisko')],['Adresa',g('adresa')],
-    ['Telefón',g('telefon')],['Email',g('email')]
-  ],'Zákazník','👤');
+  const zakObj = buildZakaznikObject('', '');
+  const zakaznikRows = zakObj.isFirma
+    ? [
+        ['Firma', zakObj.priezvisko],
+        ['IČO', zakObj.ico || '–'],
+        ['DIČ', zakObj.dic || '–'],
+        ['IČ DPH', zakObj.icDph || '–'],
+        ['Kontakt', zakObj.kontakt || '–'],
+        ['Adresa', zakObj.adresa],
+        ['Telefón', zakObj.telefon],
+        ['Email', zakObj.email]
+      ]
+    : [
+        ['Meno', zakObj.meno + ' ' + zakObj.priezvisko],
+        ['Adresa', zakObj.adresa],
+        ['Telefón', zakObj.telefon],
+        ['Email', zakObj.email]
+      ];
+
+  document.getElementById('rv-zakaznik').innerHTML = rows(zakaznikRows, zakObj.isFirma ? 'Firma' : 'Zákazník', zakObj.isFirma ? '🏢' : '👤');
 
   const technici = getTechnici();
   const tlaky = getTlaky();
@@ -1568,7 +1584,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7XX7V2OJYcYhK-d6J-Q8yY7NLgBC-l7a4i6-6SFMzLw2ofd8HTLw7znpeqqEMVh9SRw/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz51HKyE5UhBDlUmkPbDr51nK6GQose2dj6fUNMbGnRc9iYya6xAlFCr77PcsYe6tEx/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
