@@ -1561,11 +1561,16 @@ async function doUpload() {
     const emailStepId = 's'+(4+photoKeys.length);
     setStep(emailStepId,'active');
     try {
-      await apiCall({type:'email', zakaznik, klima, technici, pdfZakaznikB64, pdfZakaznikDriveId: rPdfZakaznik.pdfId});
+      const emailResult = await apiCall({type:'email', zakaznik, klima, technici, pdfZakaznikB64, pdfZakaznikDriveId: rPdfZakaznik.pdfId});
+      if (!emailResult.ok) {
+        console.error('Email API chyba:', emailResult.error);
+        showToast('⚠️ Email chyba: ' + (emailResult.error || 'neznáma'));
+      }
       setStep(emailStepId,'done');
     } catch(e) {
+      console.error('Email exception:', e);
       setStep(emailStepId,'done'); // Email chyba nie je fatálna
-      showToast('⚠️ Email sa nepodarilo odoslať');
+      showToast('⚠️ Email sa nepodarilo odoslať: ' + e.message);
     }
 
     setProg(100); await sleep(400);
@@ -2078,7 +2083,7 @@ function vyberFirmu(prefix, i) {
 }
 
 function getFirmaData(prefix) {
-  const cb = document.getElementById(prefix + 'cb-firma') || document.getElementById('cb-firma');
+  const cb = document.getElementById(prefix + 'cb-firma');
   const isFirma = cb ? cb.checked : false;
   if (!isFirma) return null;
   return {
