@@ -271,7 +271,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
   <div class="section visible" id="am1">
     <div class="sec-hdr"><div class="sec-icon" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">🚨</div><div><h2>Montáž alarmu</h2><p>Údaje zákazníka a inštalácie</p></div></div>
     <div class="card">
-      <label class="firma-toggle" onclick="event.target.tagName!=='INPUT'&&document.getElementById('am-cb-firma').click()">
+      <label class="firma-toggle">
         <input type="checkbox" id="am-cb-firma" onchange="toggleFirma('am-', this.checked)">
         <div class="firma-check">✓</div> Inštalácia pre firmu
       </label>
@@ -282,7 +282,11 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
           <input type="text" id="am-ico" placeholder="napr. 12345678" oninput="lookupIco('am-', this.value)">
           <div class="ico-lookup-status" id="ico-status-am-"></div>
         </div>
-        <div class="field"><label>Názov firmy <span class="req">*</span></label><input type="text" id="am-firma-nazov" placeholder="Názov s.r.o."></div>
+        <div class="field"><label>Názov firmy <span class="req">*</span></label>
+          <input type="text" id="am-firma-nazov" placeholder="Názov s.r.o." oninput="lookupNazov('am-', this.value)">
+          <div class="ico-lookup-status" id="nazov-status-am-"></div>
+          <div id="nazov-results-am-" style="margin-top:6px;"></div>
+        </div>
         <div class="field"><label>Adresa firmy <span class="req">*</span></label><input type="text" id="am-firma-adresa" placeholder="Hlavná 12, Bratislava"></div>
         <div class="two-col">
           <div class="field"><label>DIČ</label><input type="text" id="am-firma-dic" placeholder="napr. 2020123456"></div>
@@ -616,7 +620,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
   <div class="section" id="sec2">
     <div class="sec-hdr"><div class="sec-icon">👤</div><div><h2>Údaje zákazníka</h2><p>Krok 2 z 5</p></div></div>
     <div class="card">
-      <label class="firma-toggle" onclick="event.target.tagName!=='INPUT'&&document.getElementById('cb-firma').click()">
+      <label class="firma-toggle">
         <input type="checkbox" id="cb-firma" onchange="toggleFirma('', this.checked)">
         <div class="firma-check">✓</div> Inštalácia pre firmu
       </label>
@@ -629,7 +633,11 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
           </div>
           <div class="ico-lookup-status" id="ico-status-"></div>
         </div>
-        <div class="field"><label>Názov firmy <span class="req">*</span></label><input type="text" id="firma-nazov" placeholder="Názov s.r.o."></div>
+        <div class="field"><label>Názov firmy <span class="req">*</span></label>
+          <input type="text" id="firma-nazov" placeholder="Názov s.r.o." oninput="lookupNazov('', this.value)">
+          <div class="ico-lookup-status" id="nazov-status-"></div>
+          <div id="nazov-results-" style="margin-top:6px;"></div>
+        </div>
         <div class="field"><label>Adresa firmy <span class="req">*</span></label><input type="text" id="firma-adresa" placeholder="Hlavná 12, Bratislava"></div>
         <div class="two-col">
           <div class="field"><label>DIČ</label><input type="text" id="firma-dic" placeholder="napr. 2020123456"></div>
@@ -1544,10 +1552,13 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwy5ZqT-zNl55Ivfwv6wz-3G3G2wQ21nDYDGnkP_6Ah2dPvPmlSHy_9Vtg-ou6DCYwtcQ/exec';
-  const formData = new URLSearchParams();
-  formData.append('data', JSON.stringify(payload));
-  const r = await fetch(SCRIPT_URL, {method:'POST', body: formData});
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzAhKhbMG9xj2DArqFmuNrlEKrAklQ7f_ZPNR29nquUNLCQcsSUXJrY_eSjjlrj7t281A/exec';
+  const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
+  const r = await fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+    body: body
+  });
   return r.json();
 }
 
@@ -1932,27 +1943,24 @@ async function lookupIco(prefix, ico) {
 
   icoLookupTimeout = setTimeout(async () => {
     try {
-      // RPO API - Register právnických osôb (verejné, bez API kľúča)
-      const r = await fetch(`https://api.statistics.sk/rpo/v1/search?identifiers=${ico}`);
-      const data = await r.json();
+      const r = await apiCall({ type: 'ico_lookup', ico });
 
-      if (data && data.results && data.results.length > 0) {
-        const firma = data.results[0];
-        const nazov = firma.name || '';
-        const addr = firma.formattedAddress || (firma.address ?
-          [firma.address.street, firma.address.buildingNumber, firma.address.municipality?.value].filter(Boolean).join(' ') : '');
-
+      if (r.ok && r.firma && r.firma.nazov) {
+        const firma = r.firma;
         const nazovEl = document.getElementById(prefix + 'firma-nazov');
         const adresaEl = document.getElementById(prefix + 'firma-adresa');
-        if (nazovEl && nazov) nazovEl.value = nazov;
-        if (adresaEl && addr) adresaEl.value = addr;
+        const dicEl = document.getElementById(prefix + 'firma-dic');
+        if (nazovEl && firma.nazov) nazovEl.value = firma.nazov;
+        if (adresaEl && firma.adresa) adresaEl.value = firma.adresa;
+        if (dicEl && firma.dic) dicEl.value = firma.dic;
 
-        if (statusEl) { statusEl.className = 'ico-lookup-status found'; statusEl.textContent = '✅ Firma nájdená: ' + nazov; }
+        if (statusEl) { statusEl.className = 'ico-lookup-status found'; statusEl.textContent = '✅ Firma nájdená: ' + firma.nazov; }
       } else {
         if (statusEl) { statusEl.className = 'ico-lookup-status notfound'; statusEl.textContent = '⚠️ Firma nenájdená — zadajte údaje manuálne'; }
       }
     } catch(e) {
-      if (statusEl) { statusEl.className = 'ico-lookup-status notfound'; statusEl.textContent = '⚠️ Vyhľadávanie zlyhalo — zadajte údaje manuálne'; }
+      console.error('lookupIco error:', e);
+      if (statusEl) { statusEl.className = 'ico-lookup-status notfound'; statusEl.textContent = '⚠️ Vyhľadávanie zlyhalo: ' + e.message; }
     }
   }, 600);
 }
@@ -1970,6 +1978,58 @@ function buildZakaznikObject(prefix, datum) {
     meno: g(prefix+'meno'), priezvisko: g(prefix+'priezvisko'), isFirma: false,
     adresa: g(prefix+'adresa'), telefon: g(prefix+'telefon'), email: g(prefix+'email'), datum
   };
+}
+
+let nazovLookupTimeout = null;
+async function lookupNazov(prefix, nazov) {
+  nazov = nazov.trim();
+  const statusEl = document.getElementById('nazov-status-' + prefix);
+  const resultsEl = document.getElementById('nazov-results-' + prefix);
+  if (nazovLookupTimeout) clearTimeout(nazovLookupTimeout);
+
+  if (nazov.length < 3) {
+    if (statusEl) { statusEl.className = 'ico-lookup-status'; statusEl.textContent = ''; }
+    if (resultsEl) resultsEl.innerHTML = '';
+    return;
+  }
+
+  if (statusEl) { statusEl.className = 'ico-lookup-status loading'; statusEl.textContent = '🔍 Hľadám firmy...'; }
+
+  nazovLookupTimeout = setTimeout(async () => {
+    try {
+      const r = await apiCall({ type: 'nazov_lookup', nazov });
+      if (r.ok && r.firmy && r.firmy.length > 0) {
+        if (statusEl) { statusEl.className = 'ico-lookup-status found'; statusEl.textContent = `✅ Nájdených ${r.firmy.length} firiem — vyberte:`; }
+        if (resultsEl) {
+          resultsEl.innerHTML = r.firmy.map((f, i) => `
+            <div class="search-result" onclick="vyberFirmu('${prefix}', ${i})" style="padding:8px 10px;margin-bottom:5px;">
+              <div class="sr-name" style="font-size:.85rem;">${f.nazov}</div>
+              <div class="sr-info">${f.adresa || ''}${f.ico ? ' · IČO: ' + f.ico : ''}</div>
+            </div>
+          `).join('');
+          window['_nazovResults' + prefix] = r.firmy;
+        }
+      } else {
+        if (statusEl) { statusEl.className = 'ico-lookup-status notfound'; statusEl.textContent = '⚠️ Žiadna firma nenájdená'; }
+        if (resultsEl) resultsEl.innerHTML = '';
+      }
+    } catch(e) {
+      if (statusEl) { statusEl.className = 'ico-lookup-status notfound'; statusEl.textContent = '⚠️ Vyhľadávanie zlyhalo'; }
+    }
+  }, 700);
+}
+
+function vyberFirmu(prefix, i) {
+  const f = window['_nazovResults' + prefix][i];
+  const nazovEl = document.getElementById(prefix + 'firma-nazov');
+  const adresaEl = document.getElementById(prefix + 'firma-adresa');
+  const icoEl = document.getElementById(prefix + 'ico');
+  if (nazovEl) nazovEl.value = f.nazov;
+  if (adresaEl && f.adresa) adresaEl.value = f.adresa;
+  if (icoEl && f.ico) icoEl.value = f.ico;
+  document.getElementById('nazov-results-' + prefix).innerHTML = '';
+  document.getElementById('nazov-status-' + prefix).textContent = '';
+  showToast('✅ Firma vybraná: ' + f.nazov);
 }
 
 function getFirmaData(prefix) {
