@@ -1819,15 +1819,8 @@ window.addEventListener('load', () => {
   if (sessionStorage.getItem('klima_auth') === '1') {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('setup-screen').style.display = 'none';
-    document.getElementById('main-app').style.display = '';
-    document.getElementById('nav-buttons').style.display = 'flex';
-    document.getElementById('prog-bar').style.display = 'flex';
-    currentStep = 1; showStep(1);
+    zobrazRezim();
   }
-  // Nastav dnešný dátum montáže
-  const today = new Date().toISOString().split('T')[0];
-  const dm = document.getElementById('datum_montaze');
-  if (dm) dm.value = today;
 });
 
 // ══ REŽIM VÝBER ══
