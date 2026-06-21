@@ -288,13 +288,21 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
           <div id="nazov-results-am-" style="margin-top:6px;"></div>
         </div>
         <div class="field"><label>Adresa firmy <span class="req">*</span></label><input type="text" id="am-firma-adresa" placeholder="Hlavná 12, Bratislava"></div>
-        <div class="two-col">
-          <div class="field"><label>DIČ</label><input type="text" id="am-firma-dic" placeholder="napr. 2020123456"></div>
-          <div class="field"><label>IČ DPH</label><input type="text" id="am-firma-icdph" placeholder="napr. SK2020123456"></div>
+
+        <label class="firma-toggle" style="margin-bottom:13px;">
+          <input type="checkbox" id="cb-bez-dic-am-" onchange="toggleBezDic('am-', this.checked)">
+          <div class="firma-check">✓</div> Nemá pridelené DIČ / IČ DPH
+        </label>
+
+        <div id="dic-fields-am-">
+          <div class="two-col">
+            <div class="field"><label>DIČ</label><input type="text" id="am-firma-dic" placeholder="napr. 2020123456"></div>
+            <div class="field"><label>IČ DPH</label><input type="text" id="am-firma-icdph" placeholder="napr. SK2020123456"></div>
+          </div>
         </div>
-        <div class="field"><label>Kontaktná osoba</label><input type="text" id="am-firma-kontakt" placeholder="Meno a priezvisko"></div>
+        <div class="field"><label>Kontaktná osoba <span class="req">*</span></label><input type="text" id="am-firma-kontakt" placeholder="Meno a priezvisko"></div>
         <div class="field"><label>Telefón <span class="req">*</span></label><input type="tel" id="am-firma-telefon" placeholder="+421 900 000 000"></div>
-        <div class="field"><label>Email</label><input type="email" id="am-firma-email" placeholder="firma@email.sk"></div>
+        <div class="field"><label>Email <span class="req">*</span></label><input type="email" id="am-firma-email" placeholder="firma@email.sk"></div>
       </div>
 
       <div id="fyzicka-fields-am-">
@@ -639,13 +647,21 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
           <div id="nazov-results-" style="margin-top:6px;"></div>
         </div>
         <div class="field"><label>Adresa firmy <span class="req">*</span></label><input type="text" id="firma-adresa" placeholder="Hlavná 12, Bratislava"></div>
-        <div class="two-col">
-          <div class="field"><label>DIČ</label><input type="text" id="firma-dic" placeholder="napr. 2020123456"></div>
-          <div class="field"><label>IČ DPH</label><input type="text" id="firma-icdph" placeholder="napr. SK2020123456"></div>
+
+        <label class="firma-toggle" style="margin-bottom:13px;">
+          <input type="checkbox" id="cb-bez-dic-" onchange="toggleBezDic('', this.checked)">
+          <div class="firma-check">✓</div> Nemá pridelené DIČ / IČ DPH
+        </label>
+
+        <div id="dic-fields-">
+          <div class="two-col">
+            <div class="field"><label>DIČ</label><input type="text" id="firma-dic" placeholder="napr. 2020123456"></div>
+            <div class="field"><label>IČ DPH</label><input type="text" id="firma-icdph" placeholder="napr. SK2020123456"></div>
+          </div>
         </div>
-        <div class="field"><label>Kontaktná osoba</label><input type="text" id="firma-kontakt" placeholder="Meno a priezvisko"></div>
+        <div class="field"><label>Kontaktná osoba <span class="req">*</span></label><input type="text" id="firma-kontakt" placeholder="Meno a priezvisko"></div>
         <div class="field"><label>Telefón <span class="req">*</span></label><input type="tel" id="firma-telefon" placeholder="+421 900 000 000"></div>
-        <div class="field"><label>Email</label><input type="email" id="firma-email" placeholder="firma@email.sk"></div>
+        <div class="field"><label>Email <span class="req">*</span></label><input type="email" id="firma-email" placeholder="firma@email.sk"></div>
       </div>
 
       <div id="fyzicka-fields-">
@@ -1814,7 +1830,7 @@ function val0() {
 function val1() {
   const firma = getFirmaData('');
   if (firma) {
-    if (!firma.nazov || !firma.adresa || !firma.telefon) {
+    if (!firma.nazov || !firma.adresa || !firma.telefon || !firma.kontakt || !firma.email) {
       showToast('⚠️ Vyplňte všetky povinné polia firmy');
       return false;
     }
@@ -1926,6 +1942,19 @@ function toggleFirma(prefix, checked) {
   const fyzickaDiv = document.getElementById('fyzicka-fields-' + prefix);
   if (firmaDiv) firmaDiv.style.display = checked ? '' : 'none';
   if (fyzickaDiv) fyzickaDiv.style.display = checked ? 'none' : '';
+}
+
+function toggleBezDic(prefix, checked) {
+  const dicDiv = document.getElementById('dic-fields-' + prefix);
+  if (dicDiv) {
+    dicDiv.style.display = checked ? 'none' : '';
+    if (checked) {
+      const dicEl = document.getElementById(prefix + 'firma-dic');
+      const icdphEl = document.getElementById(prefix + 'firma-icdph');
+      if (dicEl) dicEl.value = '';
+      if (icdphEl) icdphEl.value = '';
+    }
+  }
 }
 
 let icoLookupTimeout = null;
@@ -2108,7 +2137,7 @@ async function ulozAlarmMontaz() {
   let meno, priezvisko, adresa, telefon, email;
 
   if (firma) {
-    if (!firma.nazov || !firma.adresa || !firma.telefon) {
+    if (!firma.nazov || !firma.adresa || !firma.telefon || !firma.kontakt || !firma.email) {
       showToast('⚠️ Vyplňte všetky povinné polia firmy');
       return;
     }
