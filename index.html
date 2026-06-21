@@ -159,6 +159,15 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
 .search-result:hover{border-color:var(--orange);background:rgba(232,80,10,.04);}
 .search-result .sr-name{font-size:.92rem;font-weight:700;color:var(--deep);}
 .search-result .sr-info{font-size:.75rem;color:var(--muted);margin-top:2px;}
+.firma-toggle{display:flex;align-items:center;gap:10px;padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-size:.88rem;background:#fafdff;margin-bottom:13px;}
+.firma-toggle input{display:none;}
+.firma-check{width:20px;height:20px;border:2px solid var(--border);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.75rem;transition:all .2s;}
+.firma-toggle:has(input:checked) .firma-check{background:var(--orange);border-color:var(--orange);color:white;}
+.firma-toggle:has(input:checked){border-color:var(--orange);background:rgba(232,80,10,.05);font-weight:600;}
+.ico-lookup-status{font-size:.72rem;margin-top:4px;display:none;}
+.ico-lookup-status.loading{color:var(--muted);display:block;}
+.ico-lookup-status.found{color:var(--success);display:block;}
+.ico-lookup-status.notfound{color:#dc2626;display:block;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
@@ -262,6 +271,29 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
   <div class="section visible" id="am1">
     <div class="sec-hdr"><div class="sec-icon" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">🚨</div><div><h2>Montáž alarmu</h2><p>Údaje zákazníka a inštalácie</p></div></div>
     <div class="card">
+      <label class="firma-toggle" onclick="event.target.tagName!=='INPUT'&&document.getElementById('am-cb-firma').click()">
+        <input type="checkbox" id="am-cb-firma" onchange="toggleFirma('am-', this.checked)">
+        <div class="firma-check">✓</div> Inštalácia pre firmu
+      </label>
+
+      <div id="firma-fields-am-" style="display:none">
+        <div class="field">
+          <label>IČO</label>
+          <input type="text" id="am-ico" placeholder="napr. 12345678" oninput="lookupIco('am-', this.value)">
+          <div class="ico-lookup-status" id="ico-status-am-"></div>
+        </div>
+        <div class="field"><label>Názov firmy <span class="req">*</span></label><input type="text" id="am-firma-nazov" placeholder="Názov s.r.o."></div>
+        <div class="field"><label>Adresa firmy <span class="req">*</span></label><input type="text" id="am-firma-adresa" placeholder="Hlavná 12, Bratislava"></div>
+        <div class="two-col">
+          <div class="field"><label>DIČ</label><input type="text" id="am-firma-dic" placeholder="napr. 2020123456"></div>
+          <div class="field"><label>IČ DPH</label><input type="text" id="am-firma-icdph" placeholder="napr. SK2020123456"></div>
+        </div>
+        <div class="field"><label>Kontaktná osoba</label><input type="text" id="am-firma-kontakt" placeholder="Meno a priezvisko"></div>
+        <div class="field"><label>Telefón <span class="req">*</span></label><input type="tel" id="am-firma-telefon" placeholder="+421 900 000 000"></div>
+        <div class="field"><label>Email</label><input type="email" id="am-firma-email" placeholder="firma@email.sk"></div>
+      </div>
+
+      <div id="fyzicka-fields-am-">
       <div class="two-col">
         <div class="field"><label>Meno <span class="req">*</span></label><input type="text" id="am-meno" placeholder="Ján"></div>
         <div class="field"><label>Priezvisko <span class="req">*</span></label><input type="text" id="am-priezvisko" placeholder="Novák"></div>
@@ -269,6 +301,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
       <div class="field"><label>Adresa <span class="req">*</span></label><input type="text" id="am-adresa" placeholder="Hlavná 12, Bratislava"></div>
       <div class="field"><label>Telefón <span class="req">*</span></label><input type="tel" id="am-telefon" placeholder="+421 900 000 000"></div>
       <div class="field"><label>Email</label><input type="email" id="am-email" placeholder="zakaznik@email.sk"></div>
+      </div>
       <div class="field"><label>Typ alarmu</label>
         <select id="am-typ">
           <option value="">– Vybrať –</option>
@@ -583,6 +616,31 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
   <div class="section" id="sec2">
     <div class="sec-hdr"><div class="sec-icon">👤</div><div><h2>Údaje zákazníka</h2><p>Krok 2 z 5</p></div></div>
     <div class="card">
+      <label class="firma-toggle" onclick="event.target.tagName!=='INPUT'&&document.getElementById('cb-firma').click()">
+        <input type="checkbox" id="cb-firma" onchange="toggleFirma('', this.checked)">
+        <div class="firma-check">✓</div> Inštalácia pre firmu
+      </label>
+
+      <div id="firma-fields-" style="display:none">
+        <div class="field">
+          <label>IČO</label>
+          <div class="scan-field">
+            <input type="text" id="ico" placeholder="napr. 12345678" oninput="lookupIco('', this.value)">
+          </div>
+          <div class="ico-lookup-status" id="ico-status-"></div>
+        </div>
+        <div class="field"><label>Názov firmy <span class="req">*</span></label><input type="text" id="firma-nazov" placeholder="Názov s.r.o."></div>
+        <div class="field"><label>Adresa firmy <span class="req">*</span></label><input type="text" id="firma-adresa" placeholder="Hlavná 12, Bratislava"></div>
+        <div class="two-col">
+          <div class="field"><label>DIČ</label><input type="text" id="firma-dic" placeholder="napr. 2020123456"></div>
+          <div class="field"><label>IČ DPH</label><input type="text" id="firma-icdph" placeholder="napr. SK2020123456"></div>
+        </div>
+        <div class="field"><label>Kontaktná osoba</label><input type="text" id="firma-kontakt" placeholder="Meno a priezvisko"></div>
+        <div class="field"><label>Telefón <span class="req">*</span></label><input type="tel" id="firma-telefon" placeholder="+421 900 000 000"></div>
+        <div class="field"><label>Email</label><input type="email" id="firma-email" placeholder="firma@email.sk"></div>
+      </div>
+
+      <div id="fyzicka-fields-">
       <div class="two-col">
         <div class="field"><label>Meno <span class="req">*</span></label><input type="text" id="meno" placeholder="Ján" autocomplete="given-name"></div>
         <div class="field"><label>Priezvisko <span class="req">*</span></label><input type="text" id="priezvisko" placeholder="Novák" autocomplete="family-name"></div>
@@ -590,6 +648,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
       <div class="field"><label>Adresa / Ulica <span class="req">*</span></label><input type="text" id="adresa" placeholder="Hlavná 12, Bratislava"></div>
       <div class="field"><label>Telefónne číslo <span class="req">*</span></label><input type="tel" id="telefon" placeholder="+421 900 000 000"></div>
       <div class="field"><label>Email zákazníka</label><input type="email" id="email" placeholder="zakaznik@email.sk"></div>
+      </div>
     </div>
   </div>
 
@@ -1397,7 +1456,7 @@ async function doUpload() {
   const technici = getTechnici();
   const podpisZakaznik = getCanvasDataUrl('canvas-zakaznik');
   const podpisTechnik = getCanvasDataUrl('canvas-technik');
-  const zakaznik = {meno:g('meno'),priezvisko:g('priezvisko'),adresa:g('adresa'),telefon:g('telefon'),email:g('email'),datum};
+  const zakaznik = buildZakaznikObject('', datum);
   const chladivo_celkom = document.getElementById('chladivo_celkom')?.value || '';
   const vonkPocet2 = typSystem==='multisplit' ? (document.getElementById('multisplit-vonkajsie')?.value||'') : '1';
   const klima = {vyrobca:g('vyrobca'),chladivo:g('chladivo'),chladivo_celkom,poznamky:g('poznamky'),typSystem,tlaky:getTlaky(),vonkajsie:getVonkajsieJednotky(),datum_montaze:(g('datum_montaze') ? g('datum_montaze').split('-').reverse().join('.') : ''),vonkajsie_pocet:vonkPocet2};
@@ -1485,7 +1544,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxFSFaAKHM86f6C0irSYElEl5xbOXKr6x51khsAORnLNYcawPzrAV92NXC5SQLIlzOgRg/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwy5ZqT-zNl55Ivfwv6wz-3G3G2wQ21nDYDGnkP_6Ah2dPvPmlSHy_9Vtg-ou6DCYwtcQ/exec';
   const formData = new URLSearchParams();
   formData.append('data', JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {method:'POST', body: formData});
@@ -1593,7 +1652,7 @@ function showSuccess(datum,link){
 async function downloadPDFLocal() {
   const datum = new Date().toLocaleDateString('sk-SK', {day:'2-digit',month:'2-digit',year:'numeric'});
   const technici = getTechnici();
-  const zakaznik = {meno:g('meno'),priezvisko:g('priezvisko'),adresa:g('adresa'),telefon:g('telefon'),email:g('email'),datum};
+  const zakaznik = buildZakaznikObject('', datum);
   const chladivo_celkom = document.getElementById('chladivo_celkom')?.value || '';
   const vonkPocet2 = typSystem==='multisplit' ? (document.getElementById('multisplit-vonkajsie')?.value||'') : '1';
   const klima = {vyrobca:g('vyrobca'),chladivo:g('chladivo'),chladivo_celkom,poznamky:g('poznamky'),typSystem,tlaky:getTlaky(),vonkajsie:getVonkajsieJednotky(),datum_montaze:(g('datum_montaze') ? g('datum_montaze').split('-').reverse().join('.') : ''),vonkajsie_pocet:vonkPocet2};
@@ -1727,14 +1786,14 @@ function showStep(n) {
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function goNext() {
+function goNextMontaz() {
   if (currentStep===1 && !val0()) return;
   if (currentStep===2 && !val1()) return;
   if (currentStep===3 && !val2()) return;
   if (currentStep===6) { doUpload(); return; }
   currentStep++; showStep(currentStep);
 }
-function goBack() { if(currentStep>1){currentStep--;showStep(currentStep);} else { zobrazRezim(); } }
+function goBackMontaz() { if(currentStep>1){currentStep--;showStep(currentStep);} else { zobrazRezim(); } }
 
 function val0() {
   const t = getTechnici();
@@ -1742,8 +1801,16 @@ function val0() {
   return true;
 }
 function val1() {
-  for (const id of ['meno','priezvisko','adresa','telefon']) {
-    if (!g(id)) { showToast('⚠️ Vyplňte všetky povinné polia'); document.getElementById(id).focus(); return false; }
+  const firma = getFirmaData('');
+  if (firma) {
+    if (!firma.nazov || !firma.adresa || !firma.telefon) {
+      showToast('⚠️ Vyplňte všetky povinné polia firmy');
+      return false;
+    }
+  } else {
+    for (const id of ['meno','priezvisko','adresa','telefon']) {
+      if (!g(id)) { showToast('⚠️ Vyplňte všetky povinné polia'); document.getElementById(id).focus(); return false; }
+    }
   }
   return true;
 }
@@ -1764,7 +1831,8 @@ function val2() {
 }
 
 function resetApp(){
-  ['meno','priezvisko','adresa','telefon','email','chladivo','chladivo_celkom','poznamky'].forEach(id=>{const el=document.getElementById(id);if(el){el.value='';el.disabled=false;el.style.background='';el.style.color='';} });
+  ['meno','priezvisko','adresa','telefon','email','chladivo','chladivo_celkom','poznamky','ico','firma-nazov','firma-adresa','firma-dic','firma-icdph','firma-kontakt','firma-telefon','firma-email'].forEach(id=>{const el=document.getElementById(id);if(el){el.value='';el.disabled=false;el.style.background='';el.style.color='';} });
+  const cbFirma = document.getElementById('cb-firma'); if (cbFirma) { cbFirma.checked = false; toggleFirma('', false); }
   document.getElementById('vyrobca').value='';
   document.getElementById('model').value='';
   document.querySelectorAll('#technici-list input[type=checkbox]').forEach(cb=>cb.checked=false);
@@ -1840,6 +1908,87 @@ function zobrazRezim() {
   if (ps) ps.src = PECIATKA_B64;
 }
 
+
+// ══ FIRMA TOGGLE A IČO LOOKUP ══
+function toggleFirma(prefix, checked) {
+  const firmaDiv = document.getElementById('firma-fields-' + prefix);
+  const fyzickaDiv = document.getElementById('fyzicka-fields-' + prefix);
+  if (firmaDiv) firmaDiv.style.display = checked ? '' : 'none';
+  if (fyzickaDiv) fyzickaDiv.style.display = checked ? 'none' : '';
+}
+
+let icoLookupTimeout = null;
+async function lookupIco(prefix, ico) {
+  ico = ico.trim().replace(/\s/g, '');
+  const statusEl = document.getElementById('ico-status-' + prefix);
+  if (icoLookupTimeout) clearTimeout(icoLookupTimeout);
+
+  if (ico.length !== 8 || !/^\d{8}$/.test(ico)) {
+    if (statusEl) { statusEl.className = 'ico-lookup-status'; statusEl.textContent = ''; }
+    return;
+  }
+
+  if (statusEl) { statusEl.className = 'ico-lookup-status loading'; statusEl.textContent = '🔍 Vyhľadávam firmu...'; }
+
+  icoLookupTimeout = setTimeout(async () => {
+    try {
+      // RPO API - Register právnických osôb (verejné, bez API kľúča)
+      const r = await fetch(`https://api.statistics.sk/rpo/v1/search?identifiers=${ico}`);
+      const data = await r.json();
+
+      if (data && data.results && data.results.length > 0) {
+        const firma = data.results[0];
+        const nazov = firma.name || '';
+        const addr = firma.formattedAddress || (firma.address ?
+          [firma.address.street, firma.address.buildingNumber, firma.address.municipality?.value].filter(Boolean).join(' ') : '');
+
+        const nazovEl = document.getElementById(prefix + 'firma-nazov');
+        const adresaEl = document.getElementById(prefix + 'firma-adresa');
+        if (nazovEl && nazov) nazovEl.value = nazov;
+        if (adresaEl && addr) adresaEl.value = addr;
+
+        if (statusEl) { statusEl.className = 'ico-lookup-status found'; statusEl.textContent = '✅ Firma nájdená: ' + nazov; }
+      } else {
+        if (statusEl) { statusEl.className = 'ico-lookup-status notfound'; statusEl.textContent = '⚠️ Firma nenájdená — zadajte údaje manuálne'; }
+      }
+    } catch(e) {
+      if (statusEl) { statusEl.className = 'ico-lookup-status notfound'; statusEl.textContent = '⚠️ Vyhľadávanie zlyhalo — zadajte údaje manuálne'; }
+    }
+  }, 600);
+}
+
+function buildZakaznikObject(prefix, datum) {
+  const firma = getFirmaData(prefix);
+  if (firma) {
+    return {
+      meno: '', priezvisko: firma.nazov, isFirma: true,
+      ico: firma.ico, dic: firma.dic, icDph: firma.icDph, kontakt: firma.kontakt,
+      adresa: firma.adresa, telefon: firma.telefon, email: firma.email, datum
+    };
+  }
+  return {
+    meno: g(prefix+'meno'), priezvisko: g(prefix+'priezvisko'), isFirma: false,
+    adresa: g(prefix+'adresa'), telefon: g(prefix+'telefon'), email: g(prefix+'email'), datum
+  };
+}
+
+function getFirmaData(prefix) {
+  const cb = document.getElementById(prefix + 'cb-firma') || document.getElementById('cb-firma');
+  const isFirma = cb ? cb.checked : false;
+  if (!isFirma) return null;
+  return {
+    isFirma: true,
+    nazov: document.getElementById(prefix + 'firma-nazov')?.value.trim() || '',
+    adresa: document.getElementById(prefix + 'firma-adresa')?.value.trim() || '',
+    ico: document.getElementById(prefix + 'ico')?.value.trim() || '',
+    dic: document.getElementById(prefix + 'firma-dic')?.value.trim() || '',
+    icDph: document.getElementById(prefix + 'firma-icdph')?.value.trim() || '',
+    kontakt: document.getElementById(prefix + 'firma-kontakt')?.value.trim() || '',
+    telefon: document.getElementById(prefix + 'firma-telefon')?.value.trim() || '',
+    email: document.getElementById(prefix + 'firma-email')?.value.trim() || ''
+  };
+}
+
 function spustiMontaz() {
   document.getElementById('rezim-screen').style.display = 'none';
   document.getElementById('main-app').style.display = '';
@@ -1895,21 +2044,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ══ ALARM MONTÁŽ ══
 async function ulozAlarmMontaz() {
-  const meno = document.getElementById('am-meno').value.trim();
-  const priezvisko = document.getElementById('am-priezvisko').value.trim();
-  const adresa = document.getElementById('am-adresa').value.trim();
-  const telefon = document.getElementById('am-telefon').value.trim();
-  const email = document.getElementById('am-email').value.trim();
+  const firma = getFirmaData('am-');
+  let meno, priezvisko, adresa, telefon, email;
+
+  if (firma) {
+    if (!firma.nazov || !firma.adresa || !firma.telefon) {
+      showToast('⚠️ Vyplňte všetky povinné polia firmy');
+      return;
+    }
+    meno = '';
+    priezvisko = firma.nazov;
+    adresa = firma.adresa;
+    telefon = firma.telefon;
+    email = firma.email;
+  } else {
+    meno = document.getElementById('am-meno').value.trim();
+    priezvisko = document.getElementById('am-priezvisko').value.trim();
+    adresa = document.getElementById('am-adresa').value.trim();
+    telefon = document.getElementById('am-telefon').value.trim();
+    email = document.getElementById('am-email').value.trim();
+    if (!meno || !priezvisko || !adresa || !telefon) {
+      showToast('⚠️ Vyplňte všetky povinné polia');
+      return;
+    }
+  }
+
   let typ = document.getElementById('am-typ').value;
   if (typ === 'Iný') typ = document.getElementById('am-typ-iny').value.trim();
   const datum = document.getElementById('am-datum').value;
   const datumFmt = datum ? datum.split('-').reverse().join('.') : new Date().toLocaleDateString('sk-SK');
   const poznamky = document.getElementById('am-poznamky').value.trim();
-
-  if (!meno || !priezvisko || !adresa || !telefon) {
-    showToast('⚠️ Vyplňte všetky povinné polia');
-    return;
-  }
 
   document.getElementById('am-up-state').innerHTML = `
     <div class="up-box">
@@ -1918,9 +2082,17 @@ async function ulozAlarmMontaz() {
     </div>`;
 
   try {
+    const zakaznikData = { meno, priezvisko, adresa, telefon, email, typ, datum: datumFmt, poznamky };
+    if (firma) {
+      zakaznikData.isFirma = true;
+      zakaznikData.ico = firma.ico;
+      zakaznikData.dic = firma.dic;
+      zakaznikData.icDph = firma.icDph;
+      zakaznikData.kontakt = firma.kontakt;
+    }
     const r = await apiCall({
       type: 'alarm_montaz',
-      zakaznik: { meno, priezvisko, adresa, telefon, email, typ, datum: datumFmt, poznamky }
+      zakaznik: zakaznikData
     });
     if (!r.ok) throw new Error(r.error || 'Chyba');
     document.getElementById('am-up-state').innerHTML = '';
@@ -2324,15 +2496,14 @@ function resetServis() {
 }
 
 // Override goNext/goBack pre servis
-const _origGoNext = goNext;
-const _origGoBack = goBack;
+// Smart router - rozhoduje ktorý modul je aktívny
 function goNext() {
   if (document.getElementById('servis-app').style.display !== 'none') { goNextServis(); return; }
-  _origGoNext();
+  goNextMontaz();
 }
 function goBack() {
   if (document.getElementById('servis-app').style.display !== 'none') { goBackServis(); return; }
-  _origGoBack();
+  goBackMontaz();
 }
 </script>
 </body>
