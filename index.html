@@ -1783,8 +1783,8 @@ async function prihlasit() {
   try {
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'login', username, heslo, userAgent: navigator.userAgent })
+      headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+      body: 'data=' + encodeURIComponent(JSON.stringify({ type: 'login', username, heslo, userAgent: navigator.userAgent }))
     });
     const data = await res.json();
 
@@ -1867,8 +1867,8 @@ async function registrovat() {
   try {
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'registracia', meno, priezvisko, email, username })
+      headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+      body: 'data=' + encodeURIComponent(JSON.stringify({ type: 'registracia', meno, priezvisko, email, username }))
     });
     const data = await res.json();
     if (data.ok) {
@@ -1902,8 +1902,8 @@ async function zmenHeslo() {
   try {
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'zmenHeslo', username: prihlasenyUzivatel.username, stareHeslo, noveHeslo })
+      headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+      body: 'data=' + encodeURIComponent(JSON.stringify({ type: 'zmenHeslo', username: prihlasenyUzivatel.username, stareHeslo, noveHeslo }))
     });
     const data = await res.json();
     if (data.ok) {
