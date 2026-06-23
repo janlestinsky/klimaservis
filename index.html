@@ -1724,192 +1724,196 @@ async function doUpload() {
   }
 }
 
+function prepniTab(tab) {
+  aktívnyTab = tab;
+  document.getElementById('panel-admin').style.display = tab === 'admin' ? 'block' : 'none';
+  document.getElementById('panel-technik').style.display = tab === 'technik' ? 'block' : 'none';
+  const btnAdmin = document.getElementById('tab-admin');
+  const btnTechnik = document.getElementById('tab-technik');
+  if (tab === 'admin') {
+    btnAdmin.style.background = '#0d3d52'; btnAdmin.style.color = '#fff'; btnAdmin.style.borderColor = '#0d3d52';
+    btnTechnik.style.background = '#fff'; btnTechnik.style.color = '#5a7a88'; btnTechnik.style.borderColor = '#dde4e8';
+    setTimeout(() => document.getElementById('admin-heslo').focus(), 50);
+  } else {
+    btnTechnik.style.background = '#0d3d52'; btnTechnik.style.color = '#fff'; btnTechnik.style.borderColor = '#0d3d52';
+    btnAdmin.style.background = '#fff'; btnAdmin.style.color = '#5a7a88'; btnAdmin.style.borderColor = '#dde4e8';
+    setTimeout(() => document.getElementById('login-username').focus(), 50);
+  }
+  document.getElementById('login-error').style.display = 'none';
+}
+
+async function prihlasit() {
+  const errEl = document.getElementById('login-error');
+  const loadEl = document.getElementById('login-loading');
+  const btnEl = document.querySelector('#login-screen button[onclick="prihlasit()"]');
+
+  let username = '';
+  let heslo = '';
+
+  if (aktívnyTab === 'admin') {
+    heslo = document.getElementById('admin-heslo').value;
+    if (!heslo) { errEl.textContent = '❌ Zadaj heslo'; errEl.style.display = 'block'; return; }
+  } else {
+    username = document.getElementById('login-username').value.trim();
+    heslo = document.getElementById('login-heslo').value;
+    if (!username || !heslo) { errEl.textContent = '❌ Zadaj meno aj heslo'; errEl.style.display = 'block'; return; }
+  }
+
+  errEl.style.display = 'none';
+  loadEl.style.display = 'block';
+  btnEl.disabled = true;
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'login', username, heslo, userAgent: navigator.userAgent })
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+      prihlasenyUzivatel = { username: data.username, meno: data.meno, role: data.role, prvePrihlasenie: data.prvePrihlasenie };
+      sessionStorage.setItem('elwork_user', JSON.stringify(prihlasenyUzivatel));
+      document.getElementById('login-screen').style.display = 'none';
+      if (data.prvePrihlasenie) {
+        // Prvé prihlásenie - zobraz zmenu hesla
+        document.getElementById('zmen-heslo-screen').style.display = 'flex';
+      }
+      const headerEl = document.querySelector('.header-title');
+      if (headerEl) headerEl.title = 'Prihlásený: ' + data.meno;
+    } else {
+      errEl.textContent = '❌ Nesprávne heslo';
+      errEl.style.display = 'block';
+    }
+  } catch(e) {
+    errEl.textContent = '❌ Chyba pripojenia: ' + e.message;
+    errEl.style.display = 'block';
+  } finally {
+    loadEl.style.display = 'none';
+    btnEl.disabled = false;
+  }
+}
+
+function skontrolujPrihlasenie() {
+  sessionStorage.removeItem('klima_auth'); // vymaž starú session
+  const saved = sessionStorage.getItem('elwork_user');
+  if (saved) {
+    try {
+      prihlasenyUzivatel = JSON.parse(saved);
+      document.getElementById('login-screen').style.display = 'none';
+    } catch(e) {
+      sessionStorage.removeItem('elwork_user');
+      document.getElementById('login-screen').style.display = 'flex';
+    }
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+  }
+}
+
+window.addEventListener('load', skontrolujPrihlasenie);
+
+function zobrazRegistraciu() {
+  document.getElementById('login-screen').style.display = 'none';
+  const s = document.getElementById('reg-screen');
+  s.style.display = 'flex';
+  document.getElementById('reg-error').style.display = 'none';
+  document.getElementById('reg-success').style.display = 'none';
+}
+
+function zobrazLogin() {
+  document.getElementById('reg-screen').style.display = 'none';
+  document.getElementById('zmen-heslo-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+async function registrovat() {
+  const meno       = document.getElementById('reg-meno').value.trim();
+  const priezvisko = document.getElementById('reg-priezvisko').value.trim();
+  const email      = document.getElementById('reg-email').value.trim();
+  const username   = document.getElementById('reg-username').value.trim().toLowerCase();
+  const errEl  = document.getElementById('reg-error');
+  const succEl = document.getElementById('reg-success');
+  const loadEl = document.getElementById('reg-loading');
+  const btnEl  = document.querySelector('#reg-screen button[onclick="registrovat()"]');
+
+  errEl.style.display = 'none';
+  succEl.style.display = 'none';
+
+  if (!meno || !priezvisko || !email || !username) {
+    errEl.textContent = '❌ Vyplň všetky polia'; errEl.style.display = 'block'; return;
+  }
+  if (!/^[a-z0-9_]+$/.test(username)) {
+    errEl.textContent = '❌ Používateľské meno: len malé písmená, číslice a podčiarkovník'; errEl.style.display = 'block'; return;
+  }
+
+  loadEl.style.display = 'block'; btnEl.disabled = true;
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'registracia', meno, priezvisko, email, username })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      succEl.innerHTML = '✅ Registrácia úspešná! Skontrolujte email <b>' + email + '</b> – príde vám dočasné heslo.';
+      succEl.style.display = 'block';
+      btnEl.style.display = 'none';
+      setTimeout(() => { zobrazLogin(); prepniTab('technik'); }, 4000);
+    } else {
+      errEl.textContent = '❌ ' + (data.error || 'Chyba registrácie'); errEl.style.display = 'block';
+    }
+  } catch(e) {
+    errEl.textContent = '❌ Chyba pripojenia'; errEl.style.display = 'block';
+  } finally {
+    loadEl.style.display = 'none'; btnEl.disabled = false;
+  }
+}
+
+async function zmenHeslo() {
+  const stareHeslo = document.getElementById('zh-stare').value;
+  const noveHeslo  = document.getElementById('zh-nove').value;
+  const noveHeslo2 = document.getElementById('zh-nove2').value;
+  const errEl  = document.getElementById('zh-error');
+  const loadEl = document.getElementById('zh-loading');
+  const btnEl  = document.querySelector('#zmen-heslo-screen button[onclick="zmenHeslo()"]');
+
+  errEl.style.display = 'none';
+  if (noveHeslo.length < 6) { errEl.textContent = '❌ Heslo musí mať aspoň 6 znakov'; errEl.style.display = 'block'; return; }
+  if (noveHeslo !== noveHeslo2) { errEl.textContent = '❌ Heslá sa nezhodujú'; errEl.style.display = 'block'; return; }
+
+  loadEl.style.display = 'block'; btnEl.disabled = true;
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'zmenHeslo', username: prihlasenyUzivatel.username, stareHeslo, noveHeslo })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      document.getElementById('zmen-heslo-screen').style.display = 'none';
+      prihlasenyUzivatel.prvePrihlasenie = false;
+      sessionStorage.setItem('elwork_user', JSON.stringify(prihlasenyUzivatel));
+    } else {
+      errEl.textContent = '❌ ' + (data.error || 'Chyba'); errEl.style.display = 'block';
+    }
+  } catch(e) {
+    errEl.textContent = '❌ Chyba pripojenia'; errEl.style.display = 'block';
+  } finally {
+    loadEl.style.display = 'none'; btnEl.disabled = false;
+  }
+}
+
+// ══ PRIHLÁSENIE - GLOBÁLNE PREMENNÉ ══
+let prihlasenyUzivatel = null;
+let aktívnyTab = 'admin';
+
 async function apiCall(payload) {
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPbw16_ouBJ7IivkM6pIEhxW9z7b_7CHdrBBspMklJhv-RksHhFM0OqZAdlvPL7Pz0xg/exec';
 
-  // ══ PRIHLÁSENIE ══
-  let prihlasenyUzivatel = null;
-  let aktívnyTab = 'admin';
 
-  function prepniTab(tab) {
-    aktívnyTab = tab;
-    document.getElementById('panel-admin').style.display = tab === 'admin' ? 'block' : 'none';
-    document.getElementById('panel-technik').style.display = tab === 'technik' ? 'block' : 'none';
-    const btnAdmin = document.getElementById('tab-admin');
-    const btnTechnik = document.getElementById('tab-technik');
-    if (tab === 'admin') {
-      btnAdmin.style.background = '#0d3d52'; btnAdmin.style.color = '#fff'; btnAdmin.style.borderColor = '#0d3d52';
-      btnTechnik.style.background = '#fff'; btnTechnik.style.color = '#5a7a88'; btnTechnik.style.borderColor = '#dde4e8';
-      setTimeout(() => document.getElementById('admin-heslo').focus(), 50);
-    } else {
-      btnTechnik.style.background = '#0d3d52'; btnTechnik.style.color = '#fff'; btnTechnik.style.borderColor = '#0d3d52';
-      btnAdmin.style.background = '#fff'; btnAdmin.style.color = '#5a7a88'; btnAdmin.style.borderColor = '#dde4e8';
-      setTimeout(() => document.getElementById('login-username').focus(), 50);
-    }
-    document.getElementById('login-error').style.display = 'none';
-  }
 
-  async function prihlasit() {
-    const errEl = document.getElementById('login-error');
-    const loadEl = document.getElementById('login-loading');
-    const btnEl = document.querySelector('#login-screen button[onclick="prihlasit()"]');
 
-    let username = '';
-    let heslo = '';
-
-    if (aktívnyTab === 'admin') {
-      heslo = document.getElementById('admin-heslo').value;
-      if (!heslo) { errEl.textContent = '❌ Zadaj heslo'; errEl.style.display = 'block'; return; }
-    } else {
-      username = document.getElementById('login-username').value.trim();
-      heslo = document.getElementById('login-heslo').value;
-      if (!username || !heslo) { errEl.textContent = '❌ Zadaj meno aj heslo'; errEl.style.display = 'block'; return; }
-    }
-
-    errEl.style.display = 'none';
-    loadEl.style.display = 'block';
-    btnEl.disabled = true;
-
-    try {
-      const res = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'login', username, heslo, userAgent: navigator.userAgent })
-      });
-      const data = await res.json();
-
-      if (data.ok) {
-        prihlasenyUzivatel = { username: data.username, meno: data.meno, role: data.role, prvePrihlasenie: data.prvePrihlasenie };
-        sessionStorage.setItem('elwork_user', JSON.stringify(prihlasenyUzivatel));
-        document.getElementById('login-screen').style.display = 'none';
-        if (data.prvePrihlasenie) {
-          // Prvé prihlásenie - zobraz zmenu hesla
-          document.getElementById('zmen-heslo-screen').style.display = 'flex';
-        }
-        const headerEl = document.querySelector('.header-title');
-        if (headerEl) headerEl.title = 'Prihlásený: ' + data.meno;
-      } else {
-        errEl.textContent = '❌ Nesprávne heslo';
-        errEl.style.display = 'block';
-      }
-    } catch(e) {
-      errEl.textContent = '❌ Chyba pripojenia: ' + e.message;
-      errEl.style.display = 'block';
-    } finally {
-      loadEl.style.display = 'none';
-      btnEl.disabled = false;
-    }
-  }
-
-  function skontrolujPrihlasenie() {
-    sessionStorage.removeItem('klima_auth'); // vymaž starú session
-    const saved = sessionStorage.getItem('elwork_user');
-    if (saved) {
-      try {
-        prihlasenyUzivatel = JSON.parse(saved);
-        document.getElementById('login-screen').style.display = 'none';
-      } catch(e) {
-        sessionStorage.removeItem('elwork_user');
-        document.getElementById('login-screen').style.display = 'flex';
-      }
-    } else {
-      document.getElementById('login-screen').style.display = 'flex';
-    }
-  }
-
-  window.addEventListener('load', skontrolujPrihlasenie);
-
-  function zobrazRegistraciu() {
-    document.getElementById('login-screen').style.display = 'none';
-    const s = document.getElementById('reg-screen');
-    s.style.display = 'flex';
-    document.getElementById('reg-error').style.display = 'none';
-    document.getElementById('reg-success').style.display = 'none';
-  }
-
-  function zobrazLogin() {
-    document.getElementById('reg-screen').style.display = 'none';
-    document.getElementById('zmen-heslo-screen').style.display = 'none';
-    document.getElementById('login-screen').style.display = 'flex';
-  }
-
-  async function registrovat() {
-    const meno       = document.getElementById('reg-meno').value.trim();
-    const priezvisko = document.getElementById('reg-priezvisko').value.trim();
-    const email      = document.getElementById('reg-email').value.trim();
-    const username   = document.getElementById('reg-username').value.trim().toLowerCase();
-    const errEl  = document.getElementById('reg-error');
-    const succEl = document.getElementById('reg-success');
-    const loadEl = document.getElementById('reg-loading');
-    const btnEl  = document.querySelector('#reg-screen button[onclick="registrovat()"]');
-
-    errEl.style.display = 'none';
-    succEl.style.display = 'none';
-
-    if (!meno || !priezvisko || !email || !username) {
-      errEl.textContent = '❌ Vyplň všetky polia'; errEl.style.display = 'block'; return;
-    }
-    if (!/^[a-z0-9_]+$/.test(username)) {
-      errEl.textContent = '❌ Používateľské meno: len malé písmená, číslice a podčiarkovník'; errEl.style.display = 'block'; return;
-    }
-
-    loadEl.style.display = 'block'; btnEl.disabled = true;
-    try {
-      const res = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'registracia', meno, priezvisko, email, username })
-      });
-      const data = await res.json();
-      if (data.ok) {
-        succEl.innerHTML = '✅ Registrácia úspešná! Skontrolujte email <b>' + email + '</b> – príde vám dočasné heslo.';
-        succEl.style.display = 'block';
-        btnEl.style.display = 'none';
-        setTimeout(() => { zobrazLogin(); prepniTab('technik'); }, 4000);
-      } else {
-        errEl.textContent = '❌ ' + (data.error || 'Chyba registrácie'); errEl.style.display = 'block';
-      }
-    } catch(e) {
-      errEl.textContent = '❌ Chyba pripojenia'; errEl.style.display = 'block';
-    } finally {
-      loadEl.style.display = 'none'; btnEl.disabled = false;
-    }
-  }
-
-  async function zmenHeslo() {
-    const stareHeslo = document.getElementById('zh-stare').value;
-    const noveHeslo  = document.getElementById('zh-nove').value;
-    const noveHeslo2 = document.getElementById('zh-nove2').value;
-    const errEl  = document.getElementById('zh-error');
-    const loadEl = document.getElementById('zh-loading');
-    const btnEl  = document.querySelector('#zmen-heslo-screen button[onclick="zmenHeslo()"]');
-
-    errEl.style.display = 'none';
-    if (noveHeslo.length < 6) { errEl.textContent = '❌ Heslo musí mať aspoň 6 znakov'; errEl.style.display = 'block'; return; }
-    if (noveHeslo !== noveHeslo2) { errEl.textContent = '❌ Heslá sa nezhodujú'; errEl.style.display = 'block'; return; }
-
-    loadEl.style.display = 'block'; btnEl.disabled = true;
-    try {
-      const res = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'zmenHeslo', username: prihlasenyUzivatel.username, stareHeslo, noveHeslo })
-      });
-      const data = await res.json();
-      if (data.ok) {
-        document.getElementById('zmen-heslo-screen').style.display = 'none';
-        prihlasenyUzivatel.prvePrihlasenie = false;
-        sessionStorage.setItem('elwork_user', JSON.stringify(prihlasenyUzivatel));
-      } else {
-        errEl.textContent = '❌ ' + (data.error || 'Chyba'); errEl.style.display = 'block';
-      }
-    } catch(e) {
-      errEl.textContent = '❌ Chyba pripojenia'; errEl.style.display = 'block';
-    } finally {
-      loadEl.style.display = 'none'; btnEl.disabled = false;
-    }
-  }
-  const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
+    const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
