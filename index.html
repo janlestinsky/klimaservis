@@ -1328,7 +1328,8 @@ async function generatePDF(zakaznik, klima, photoKeys, technici, podpisZakaznik,
     doc.text('ELWORK', margin, 20);
   }
   doc.setTextColor(...gray); doc.setFontSize(8); doc.setFont('helvetica','normal');
-  doc.text('Montazny protokol – klimatizacia', W-margin, 13, {align:'right'});
+  const protokolHeader = cisloProtokolu ? 'Montazny protokol c. ' + cisloProtokolu + ', datum montaze ' + zakaznik.datum : 'Montazny protokol, datum montaze ' + zakaznik.datum;
+  doc.text(protokolHeader, W-margin, 13, {align:'right'});
   doc.setTextColor(...dark);
   doc.text(zakaznik.datum, W-margin, 21, {align:'right'});
   doc.setDrawColor(...dark); doc.setLineWidth(0.5);
@@ -1528,6 +1529,7 @@ async function doUpload() {
     const r1 = await apiCall({type:'protokol', zakaznik, klima, technici});
     if (!r1.ok) throw new Error(r1.error||'Chyba uloženia protokolu');
     const folderId = r1.folderId;
+    const cisloProtokolu = r1.cisloProtokolu || '';
     setStep('s1','done');
     setProg(10);
 
@@ -1537,9 +1539,9 @@ async function doUpload() {
 
     // Generuj PDF na serveri (plná slovenčina)
     setStep('s2','active');
-    const rPdfFirma = await apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, logoB64, peciatkaB64, showTechnici: true, nazov:'protokol_firma.pdf'});
+    const rPdfFirma = await apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, logoB64, peciatkaB64, showTechnici: true, nazov:'protokol_firma.pdf', cisloProtokolu});
     if (!rPdfFirma.ok) throw new Error(rPdfFirma.error||'Chyba generovania PDF');
-    const rPdfZakaznik = await apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, logoB64, peciatkaB64, showTechnici: false, nazov:'protokol_zakaznik.pdf'});
+    const rPdfZakaznik = await apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, logoB64, peciatkaB64, showTechnici: false, nazov:'protokol_zakaznik.pdf', cisloProtokolu});
     const pdfZakaznikB64 = null;
     setStep('s2','done');
     setStep('s3','done');
@@ -1589,7 +1591,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby8_Yk0Sr7eFJGTv6uejglhnScRd6Vgzc18KgckSjdmWbaBnpL5L7wSCO9bRheMvt-ANg/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxUHNWZYsKP2lJm3mZ3dnRygyIRykGTzzdqXPBFNYndTjikOK48eaK119s9G868j5pA/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
