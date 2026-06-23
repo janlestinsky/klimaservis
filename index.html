@@ -174,6 +174,154 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
 </head>
 <body>
 
+<!-- ══ ZMENA HESLA (prvé prihlásenie) ══ -->
+<div id="zmen-heslo-screen" style="display:none; position:fixed; inset:0; background:#0d3d52; z-index:9999; display:none; align-items:center; justify-content:center;">
+  <div style="background:#fff; border-radius:16px; padding:36px 32px; width:100%; max-width:380px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="text-align:center; margin-bottom:24px;">
+      <div style="font-size:30px; margin-bottom:8px;">🔑</div>
+      <div style="font-size:20px; font-weight:700; color:#0d3d52;">Nastavte si heslo</div>
+      <div style="font-size:13px; color:#5a7a88; margin-top:6px;">Pre pokračovanie si nastavte vlastné heslo</div>
+    </div>
+    <div style="margin-bottom:14px;">
+      <label style="font-size:12px; font-weight:600; color:#0d3d52; display:block; margin-bottom:6px;">Dočasné heslo</label>
+      <input id="zh-stare" type="password" placeholder="••••••••"
+        style="width:100%; padding:11px 14px; border:1.5px solid #dde4e8; border-radius:8px; font-size:14px; box-sizing:border-box;">
+    </div>
+    <div style="margin-bottom:14px;">
+      <label style="font-size:12px; font-weight:600; color:#0d3d52; display:block; margin-bottom:6px;">Nové heslo</label>
+      <input id="zh-nove" type="password" placeholder="min. 6 znakov"
+        style="width:100%; padding:11px 14px; border:1.5px solid #dde4e8; border-radius:8px; font-size:14px; box-sizing:border-box;">
+    </div>
+    <div style="margin-bottom:20px;">
+      <label style="font-size:12px; font-weight:600; color:#0d3d52; display:block; margin-bottom:6px;">Zopakuj nové heslo</label>
+      <input id="zh-nove2" type="password" placeholder="••••••••"
+        style="width:100%; padding:11px 14px; border:1.5px solid #dde4e8; border-radius:8px; font-size:14px; box-sizing:border-box;"
+        onkeydown="if(event.key==='Enter') zmenHeslo()">
+    </div>
+    <div id="zh-error" style="display:none; background:#fff0f0; border:1px solid #ffcccc; border-radius:8px; padding:10px 14px; font-size:13px; color:#cc0000; margin-bottom:16px;"></div>
+    <button onclick="zmenHeslo()"
+      style="width:100%; padding:13px; background:#0d3d52; color:#fff; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;"
+      onmouseover="this.style.background='#1a5470'" onmouseout="this.style.background='#0d3d52'">
+      Uložiť heslo a pokračovať
+    </button>
+    <div id="zh-loading" style="display:none; text-align:center; margin-top:14px; font-size:13px; color:#5a7a88;">⏳ Ukladám...</div>
+  </div>
+</div>
+
+<!-- ══ REGISTRÁCIA ══ -->
+<div id="reg-screen" style="display:none; position:fixed; inset:0; background:#0d3d52; z-index:9999; align-items:center; justify-content:center;">
+  <div style="background:#fff; border-radius:16px; padding:36px 32px; width:100%; max-width:400px; box-shadow:0 20px 60px rgba(0,0,0,0.3); max-height:90vh; overflow-y:auto;">
+    <div style="text-align:center; margin-bottom:24px;">
+      <div style="font-size:30px; margin-bottom:8px;">📝</div>
+      <div style="font-size:20px; font-weight:700; color:#0d3d52;">Registrácia technika</div>
+      <div style="font-size:13px; color:#5a7a88; margin-top:6px;">Vytvorte si prístup do systému ELWORK</div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+      <div>
+        <label style="font-size:12px; font-weight:600; color:#0d3d52; display:block; margin-bottom:6px;">Meno</label>
+        <input id="reg-meno" type="text" placeholder="Ján"
+          style="width:100%; padding:11px 14px; border:1.5px solid #dde4e8; border-radius:8px; font-size:14px; box-sizing:border-box;">
+      </div>
+      <div>
+        <label style="font-size:12px; font-weight:600; color:#0d3d52; display:block; margin-bottom:6px;">Priezvisko</label>
+        <input id="reg-priezvisko" type="text" placeholder="Novák"
+          style="width:100%; padding:11px 14px; border:1.5px solid #dde4e8; border-radius:8px; font-size:14px; box-sizing:border-box;">
+      </div>
+    </div>
+    <div style="margin-bottom:14px;">
+      <label style="font-size:12px; font-weight:600; color:#0d3d52; display:block; margin-bottom:6px;">Email</label>
+      <input id="reg-email" type="email" placeholder="jan.novak@email.sk"
+        style="width:100%; padding:11px 14px; border:1.5px solid #dde4e8; border-radius:8px; font-size:14px; box-sizing:border-box;">
+    </div>
+    <div style="margin-bottom:20px;">
+      <label style="font-size:12px; font-weight:600; color:#0d3d52; display:block; margin-bottom:6px;">Používateľské meno</label>
+      <input id="reg-username" type="text" placeholder="napr. jnovak"
+        style="width:100%; padding:11px 14px; border:1.5px solid #dde4e8; border-radius:8px; font-size:14px; box-sizing:border-box;">
+      <div style="font-size:11px; color:#5a7a88; margin-top:4px;">Malé písmená, bez medzier, bez diakritiky</div>
+    </div>
+    <div id="reg-error" style="display:none; background:#fff0f0; border:1px solid #ffcccc; border-radius:8px; padding:10px 14px; font-size:13px; color:#cc0000; margin-bottom:16px;"></div>
+    <div id="reg-success" style="display:none; background:#f0fff4; border:1px solid #86efac; border-radius:8px; padding:14px; font-size:13px; color:#166534; margin-bottom:16px;"></div>
+    <button onclick="registrovat()"
+      style="width:100%; padding:13px; background:#0d3d52; color:#fff; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;"
+      onmouseover="this.style.background='#1a5470'" onmouseout="this.style.background='#0d3d52'">
+      Zaregistrovať sa
+    </button>
+    <div id="reg-loading" style="display:none; text-align:center; margin-top:14px; font-size:13px; color:#5a7a88;">⏳ Registrujem...</div>
+    <button onclick="zobrazLogin()"
+      style="width:100%; padding:10px; background:transparent; color:#5a7a88; border:none; font-size:13px; cursor:pointer; margin-top:12px;">
+      ← Späť na prihlásenie
+    </button>
+  </div>
+</div>
+
+<!-- ══ PRIHLASOVACIA OBRAZOVKA ══ -->
+<div id="login-screen" style="display:none; position:fixed; inset:0; background:#0d3d52; z-index:9999; display:flex; align-items:center; justify-content:center;">
+  <div style="background:#fff; border-radius:16px; padding:36px 32px; width:100%; max-width:380px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+
+    <div style="text-align:center; margin-bottom:24px;">
+      <div style="font-size:30px; margin-bottom:8px;">🔐</div>
+      <div style="font-size:22px; font-weight:700; color:#0d3d52;">ELWORK</div>
+      <div style="font-size:13px; color:#5a7a88; margin-top:4px;">Klimatizácie · Servis · Montáž</div>
+    </div>
+
+    <!-- Taby -->
+    <div style="display:flex; gap:8px; margin-bottom:24px;">
+      <button id="tab-admin" onclick="prepniTab('admin')"
+        style="flex:1; padding:9px; border-radius:8px; border:2px solid #0d3d52; background:#0d3d52; color:#fff; font-size:13px; font-weight:600; cursor:pointer;">
+        👤 Admin
+      </button>
+      <button id="tab-technik" onclick="prepniTab('technik')"
+        style="flex:1; padding:9px; border-radius:8px; border:2px solid #dde4e8; background:#fff; color:#5a7a88; font-size:13px; font-weight:600; cursor:pointer;">
+        🔧 Technik
+      </button>
+    </div>
+
+    <!-- Admin panel - len heslo -->
+    <div id="panel-admin">
+      <div style="margin-bottom:20px;">
+        <label style="font-size:12px; font-weight:600; color:#0d3d52; display:block; margin-bottom:6px;">Admin heslo</label>
+        <input id="admin-heslo" type="password" placeholder="••••••••" autocomplete="current-password"
+          style="width:100%; padding:11px 14px; border:1.5px solid #dde4e8; border-radius:8px; font-size:14px; box-sizing:border-box; outline:none;"
+          onkeydown="if(event.key==='Enter') prihlasit()">
+      </div>
+    </div>
+
+    <!-- Technik panel - meno + heslo -->
+    <div id="panel-technik" style="display:none;">
+      <div style="margin-bottom:14px;">
+        <label style="font-size:12px; font-weight:600; color:#0d3d52; display:block; margin-bottom:6px;">Používateľské meno</label>
+        <input id="login-username" type="text" placeholder="napr. technik1" autocomplete="username"
+          style="width:100%; padding:11px 14px; border:1.5px solid #dde4e8; border-radius:8px; font-size:14px; box-sizing:border-box; outline:none;"
+          onkeydown="if(event.key==='Enter') document.getElementById('login-heslo').focus()">
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="font-size:12px; font-weight:600; color:#0d3d52; display:block; margin-bottom:6px;">Heslo</label>
+        <input id="login-heslo" type="password" placeholder="••••••••" autocomplete="current-password"
+          style="width:100%; padding:11px 14px; border:1.5px solid #dde4e8; border-radius:8px; font-size:14px; box-sizing:border-box; outline:none;"
+          onkeydown="if(event.key==='Enter') prihlasit()">
+      </div>
+    </div>
+
+    <div id="login-error" style="display:none; background:#fff0f0; border:1px solid #ffcccc; border-radius:8px; padding:10px 14px; font-size:13px; color:#cc0000; margin-bottom:16px;">
+      ❌ Nesprávne heslo
+    </div>
+
+    <button onclick="prihlasit()"
+      style="width:100%; padding:13px; background:#0d3d52; color:#fff; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;"
+      onmouseover="this.style.background='#1a5470'" onmouseout="this.style.background='#0d3d52'">
+      Prihlásiť sa
+    </button>
+
+    <div id="login-loading" style="display:none; text-align:center; margin-top:14px; font-size:13px; color:#5a7a88;">
+      ⏳ Prihlasujem...
+    </div>
+    <div style="text-align:center; margin-top:16px; padding-top:16px; border-top:1px solid #f0f0f0;">
+      <span style="font-size:13px; color:#5a7a88;">Nemáte účet? </span>
+      <button onclick="zobrazRegistraciu()" style="background:none; border:none; color:#0d3d52; font-size:13px; font-weight:600; cursor:pointer; padding:0;">Registrácia →</button>
+    </div>
+  </div>
+</div>
+
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
@@ -1591,7 +1739,184 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzN-zIoKFtBIpEpAoaRSxa0owQWfeCTeDZZvWD25BSu83-kslMOfnSMVsyMj6rriW7Klw/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPxF5YZj3Z-kczJRhuvbTXZUbAnOh06Ku8oH3oZ-YK6Wjkp1M9mXr93-5W_SSaMK0i0A/exec';
+
+  // ══ PRIHLÁSENIE ══
+  let prihlasenyUzivatel = null;
+  let aktívnyTab = 'admin';
+
+  function prepniTab(tab) {
+    aktívnyTab = tab;
+    document.getElementById('panel-admin').style.display = tab === 'admin' ? 'block' : 'none';
+    document.getElementById('panel-technik').style.display = tab === 'technik' ? 'block' : 'none';
+    const btnAdmin = document.getElementById('tab-admin');
+    const btnTechnik = document.getElementById('tab-technik');
+    if (tab === 'admin') {
+      btnAdmin.style.background = '#0d3d52'; btnAdmin.style.color = '#fff'; btnAdmin.style.borderColor = '#0d3d52';
+      btnTechnik.style.background = '#fff'; btnTechnik.style.color = '#5a7a88'; btnTechnik.style.borderColor = '#dde4e8';
+      setTimeout(() => document.getElementById('admin-heslo').focus(), 50);
+    } else {
+      btnTechnik.style.background = '#0d3d52'; btnTechnik.style.color = '#fff'; btnTechnik.style.borderColor = '#0d3d52';
+      btnAdmin.style.background = '#fff'; btnAdmin.style.color = '#5a7a88'; btnAdmin.style.borderColor = '#dde4e8';
+      setTimeout(() => document.getElementById('login-username').focus(), 50);
+    }
+    document.getElementById('login-error').style.display = 'none';
+  }
+
+  async function prihlasit() {
+    const errEl = document.getElementById('login-error');
+    const loadEl = document.getElementById('login-loading');
+    const btnEl = document.querySelector('#login-screen button[onclick="prihlasit()"]');
+
+    let username = '';
+    let heslo = '';
+
+    if (aktívnyTab === 'admin') {
+      heslo = document.getElementById('admin-heslo').value;
+      if (!heslo) { errEl.textContent = '❌ Zadaj heslo'; errEl.style.display = 'block'; return; }
+    } else {
+      username = document.getElementById('login-username').value.trim();
+      heslo = document.getElementById('login-heslo').value;
+      if (!username || !heslo) { errEl.textContent = '❌ Zadaj meno aj heslo'; errEl.style.display = 'block'; return; }
+    }
+
+    errEl.style.display = 'none';
+    loadEl.style.display = 'block';
+    btnEl.disabled = true;
+
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'login', username, heslo, userAgent: navigator.userAgent })
+      });
+      const data = await res.json();
+
+      if (data.ok) {
+        prihlasenyUzivatel = { username: data.username, meno: data.meno, role: data.role, prvePrihlasenie: data.prvePrihlasenie };
+        sessionStorage.setItem('elwork_user', JSON.stringify(prihlasenyUzivatel));
+        document.getElementById('login-screen').style.display = 'none';
+        if (data.prvePrihlasenie) {
+          // Prvé prihlásenie - zobraz zmenu hesla
+          document.getElementById('zmen-heslo-screen').style.display = 'flex';
+        }
+        const headerEl = document.querySelector('.header-title');
+        if (headerEl) headerEl.title = 'Prihlásený: ' + data.meno;
+      } else {
+        errEl.textContent = '❌ Nesprávne heslo';
+        errEl.style.display = 'block';
+      }
+    } catch(e) {
+      errEl.textContent = '❌ Chyba pripojenia: ' + e.message;
+      errEl.style.display = 'block';
+    } finally {
+      loadEl.style.display = 'none';
+      btnEl.disabled = false;
+    }
+  }
+
+  function skontrolujPrihlasenie() {
+    const saved = sessionStorage.getItem('elwork_user');
+    if (saved) {
+      prihlasenyUzivatel = JSON.parse(saved);
+      document.getElementById('login-screen').style.display = 'none';
+    } else {
+      document.getElementById('login-screen').style.display = 'flex';
+    }
+  }
+
+  window.addEventListener('load', skontrolujPrihlasenie);
+
+  function zobrazRegistraciu() {
+    document.getElementById('login-screen').style.display = 'none';
+    const s = document.getElementById('reg-screen');
+    s.style.display = 'flex';
+    document.getElementById('reg-error').style.display = 'none';
+    document.getElementById('reg-success').style.display = 'none';
+  }
+
+  function zobrazLogin() {
+    document.getElementById('reg-screen').style.display = 'none';
+    document.getElementById('zmen-heslo-screen').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+  }
+
+  async function registrovat() {
+    const meno       = document.getElementById('reg-meno').value.trim();
+    const priezvisko = document.getElementById('reg-priezvisko').value.trim();
+    const email      = document.getElementById('reg-email').value.trim();
+    const username   = document.getElementById('reg-username').value.trim().toLowerCase();
+    const errEl  = document.getElementById('reg-error');
+    const succEl = document.getElementById('reg-success');
+    const loadEl = document.getElementById('reg-loading');
+    const btnEl  = document.querySelector('#reg-screen button[onclick="registrovat()"]');
+
+    errEl.style.display = 'none';
+    succEl.style.display = 'none';
+
+    if (!meno || !priezvisko || !email || !username) {
+      errEl.textContent = '❌ Vyplň všetky polia'; errEl.style.display = 'block'; return;
+    }
+    if (!/^[a-z0-9_]+$/.test(username)) {
+      errEl.textContent = '❌ Používateľské meno: len malé písmená, číslice a podčiarkovník'; errEl.style.display = 'block'; return;
+    }
+
+    loadEl.style.display = 'block'; btnEl.disabled = true;
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'registracia', meno, priezvisko, email, username })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        succEl.innerHTML = '✅ Registrácia úspešná! Skontrolujte email <b>' + email + '</b> – príde vám dočasné heslo.';
+        succEl.style.display = 'block';
+        btnEl.style.display = 'none';
+        setTimeout(() => { zobrazLogin(); prepniTab('technik'); }, 4000);
+      } else {
+        errEl.textContent = '❌ ' + (data.error || 'Chyba registrácie'); errEl.style.display = 'block';
+      }
+    } catch(e) {
+      errEl.textContent = '❌ Chyba pripojenia'; errEl.style.display = 'block';
+    } finally {
+      loadEl.style.display = 'none'; btnEl.disabled = false;
+    }
+  }
+
+  async function zmenHeslo() {
+    const stareHeslo = document.getElementById('zh-stare').value;
+    const noveHeslo  = document.getElementById('zh-nove').value;
+    const noveHeslo2 = document.getElementById('zh-nove2').value;
+    const errEl  = document.getElementById('zh-error');
+    const loadEl = document.getElementById('zh-loading');
+    const btnEl  = document.querySelector('#zmen-heslo-screen button[onclick="zmenHeslo()"]');
+
+    errEl.style.display = 'none';
+    if (noveHeslo.length < 6) { errEl.textContent = '❌ Heslo musí mať aspoň 6 znakov'; errEl.style.display = 'block'; return; }
+    if (noveHeslo !== noveHeslo2) { errEl.textContent = '❌ Heslá sa nezhodujú'; errEl.style.display = 'block'; return; }
+
+    loadEl.style.display = 'block'; btnEl.disabled = true;
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'zmenHeslo', username: prihlasenyUzivatel.username, stareHeslo, noveHeslo })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        document.getElementById('zmen-heslo-screen').style.display = 'none';
+        prihlasenyUzivatel.prvePrihlasenie = false;
+        sessionStorage.setItem('elwork_user', JSON.stringify(prihlasenyUzivatel));
+      } else {
+        errEl.textContent = '❌ ' + (data.error || 'Chyba'); errEl.style.display = 'block';
+      }
+    } catch(e) {
+      errEl.textContent = '❌ Chyba pripojenia'; errEl.style.display = 'block';
+    } finally {
+      loadEl.style.display = 'none'; btnEl.disabled = false;
+    }
+  }
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
