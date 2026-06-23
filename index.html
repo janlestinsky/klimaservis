@@ -279,9 +279,12 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
     <div id="panel-admin">
       <div style="margin-bottom:20px;">
         <label style="font-size:12px; font-weight:600; color:#0d3d52; display:block; margin-bottom:6px;">Admin heslo</label>
-        <input id="admin-heslo" type="password" placeholder="••••••••" autocomplete="current-password"
-          style="width:100%; padding:11px 14px; border:1.5px solid #dde4e8; border-radius:8px; font-size:14px; box-sizing:border-box; outline:none;"
-          onkeydown="if(event.key==='Enter') prihlasit()">
+        <div style="position:relative;">
+          <input id="admin-heslo" type="password" placeholder="••••••••" autocomplete="current-password"
+            style="width:100%; padding:11px 40px 11px 14px; border:1.5px solid #dde4e8; border-radius:8px; font-size:14px; box-sizing:border-box; outline:none;"
+            onkeydown="if(event.key==='Enter') prihlasit()">
+          <span onclick="toggleHeslo('admin-heslo', this)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:18px; user-select:none;">👁️</span>
+        </div>
       </div>
     </div>
 
@@ -295,9 +298,12 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
       </div>
       <div style="margin-bottom:20px;">
         <label style="font-size:12px; font-weight:600; color:#0d3d52; display:block; margin-bottom:6px;">Heslo</label>
-        <input id="login-heslo" type="password" placeholder="••••••••" autocomplete="current-password"
-          style="width:100%; padding:11px 14px; border:1.5px solid #dde4e8; border-radius:8px; font-size:14px; box-sizing:border-box; outline:none;"
-          onkeydown="if(event.key==='Enter') prihlasit()">
+        <div style="position:relative;">
+          <input id="login-heslo" type="password" placeholder="••••••••" autocomplete="current-password"
+            style="width:100%; padding:11px 40px 11px 14px; border:1.5px solid #dde4e8; border-radius:8px; font-size:14px; box-sizing:border-box; outline:none;"
+            onkeydown="if(event.key==='Enter') prihlasit()">
+          <span onclick="toggleHeslo('login-heslo', this)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:18px; user-select:none;">👁️</span>
+        </div>
       </div>
     </div>
 
@@ -1724,6 +1730,17 @@ async function doUpload() {
   }
 }
 
+function toggleHeslo(id, icon) {
+  const input = document.getElementById(id);
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    icon.textContent = '👁️';
+  }
+}
+
 function prepniTab(tab) {
   aktívnyTab = tab;
   document.getElementById('panel-admin').style.display = tab === 'admin' ? 'block' : 'none';
@@ -1904,6 +1921,7 @@ async function zmenHeslo() {
 }
 
 // ══ PRIHLÁSENIE - GLOBÁLNE PREMENNÉ ══
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPbw16_ouBJ7IivkM6pIEhxW9z7b_7CHdrBBspMklJhv-RksHhFM0OqZAdlvPL7Pz0xg/exec';
 let prihlasenyUzivatel = null;
 let aktívnyTab = 'admin';
 
