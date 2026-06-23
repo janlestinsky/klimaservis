@@ -283,7 +283,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
           <input id="admin-heslo" type="password" placeholder="••••••••" autocomplete="current-password"
             style="width:100%; padding:11px 40px 11px 14px; border:1.5px solid #dde4e8; border-radius:8px; font-size:14px; box-sizing:border-box; outline:none;"
             onkeydown="if(event.key==='Enter') prihlasit()">
-          <span onclick="toggleHeslo('admin-heslo', this)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:18px; user-select:none;">👁️</span>
+          <span onclick="toggleHeslo('admin-heslo', this)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; user-select:none; line-height:0;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5a7a88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>
         </div>
       </div>
     </div>
@@ -302,7 +302,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
           <input id="login-heslo" type="password" placeholder="••••••••" autocomplete="current-password"
             style="width:100%; padding:11px 40px 11px 14px; border:1.5px solid #dde4e8; border-radius:8px; font-size:14px; box-sizing:border-box; outline:none;"
             onkeydown="if(event.key==='Enter') prihlasit()">
-          <span onclick="toggleHeslo('login-heslo', this)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:18px; user-select:none;">👁️</span>
+          <span onclick="toggleHeslo('login-heslo', this)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; user-select:none; line-height:0;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5a7a88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>
         </div>
       </div>
     </div>
@@ -1734,10 +1734,10 @@ function toggleHeslo(id, icon) {
   const input = document.getElementById(id);
   if (input.type === 'password') {
     input.type = 'text';
-    icon.textContent = '🙈';
+    icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5a7a88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
   } else {
     input.type = 'password';
-    icon.textContent = '👁️';
+    icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5a7a88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
   }
 }
 
@@ -1792,9 +1792,11 @@ async function prihlasit() {
       prihlasenyUzivatel = { username: data.username, meno: data.meno, role: data.role, prvePrihlasenie: data.prvePrihlasenie };
       sessionStorage.setItem('elwork_user', JSON.stringify(prihlasenyUzivatel));
       document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('setup-screen').style.display = 'none';
       if (data.prvePrihlasenie) {
-        // Prvé prihlásenie - zobraz zmenu hesla
         document.getElementById('zmen-heslo-screen').style.display = 'flex';
+      } else {
+        zobrazRezim();
       }
       const headerEl = document.querySelector('.header-title');
       if (headerEl) headerEl.title = 'Prihlásený: ' + data.meno;
@@ -1818,6 +1820,8 @@ function skontrolujPrihlasenie() {
     try {
       prihlasenyUzivatel = JSON.parse(saved);
       document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('setup-screen').style.display = 'none';
+      zobrazRezim();
     } catch(e) {
       sessionStorage.removeItem('elwork_user');
       document.getElementById('login-screen').style.display = 'flex';
