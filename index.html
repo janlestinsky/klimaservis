@@ -1727,6 +1727,9 @@ async function doUpload() {
   }
 }
 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwVwce2M_62MXmRjxd0oGdcmCXc_u8z5Q2V4RbC4OarMHhlJAUakJbjef3cWRWdd2P5_Q/exec';
+let prihlasenyUzivatel = null;
+
 function toggleHeslo(id, icon) {
   const input = document.getElementById(id);
   if (input.type === 'password') {
@@ -1943,7 +1946,7 @@ async function zmenHeslo() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPbw16_ouBJ7IivkM6pIEhxW9z7b_7CHdrBBspMklJhv-RksHhFM0OqZAdlvPL7Pz0xg/exec';
+
 
 
 
