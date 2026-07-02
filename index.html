@@ -400,6 +400,15 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
       <div class="rezim-sub">Ročný servis zabezpečovacieho systému</div>
     </div>
   </button>
+
+  <div style="margin-top:24px; padding-top:20px; border-top:1px solid #e8edf0; text-align:center;">
+    <button onclick="odhlasitSa()"
+      style="background:none; border:1.5px solid #dde4e8; border-radius:10px; padding:11px 28px; color:#5a7a88; font-size:14px; font-weight:600; cursor:pointer;"
+      onmouseover="this.style.borderColor='#0d3d52';this.style.color='#0d3d52'"
+      onmouseout="this.style.borderColor='#dde4e8';this.style.color='#5a7a88'">
+      🔓 Odhlásiť sa
+    </button>
+  </div>
 </div>
 
 <!-- ALARM MONTAZ APP -->
@@ -2289,6 +2298,18 @@ window.addEventListener('load', () => {
 // ══ REŽIM VÝBER ══
 let servisZakaznik = null;
 let servisStep = 1;
+
+function odhlasitSa() {
+  sessionStorage.removeItem('elwork_user');
+  prihlasenyUzivatel = null;
+  document.getElementById('rezim-screen').style.display = 'none';
+  document.getElementById('prihlaseny-meno').textContent = '—';
+  document.getElementById('panel-prihlasenie').style.display = 'block';
+  document.getElementById('panel-reset').style.display = 'none';
+  document.getElementById('login-username').value = '';
+  document.getElementById('login-heslo-input').value = '';
+  document.getElementById('login-screen').style.display = 'flex';
+}
 
 function zobrazRezim() {
   document.getElementById('main-app').style.display = 'none';
