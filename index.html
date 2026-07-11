@@ -174,19 +174,6 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
 </head>
 <body>
 
-<div id="login-screen">
-  <div class="login-box">
-    <div class="login-logo">
-      <img src="logo.jpg" alt="Elwork">
-    </div>
-    <h2>Servisný portál ELWORK</h2>
-    <p>Zadajte heslo pre prístup do aplikácie</p>
-    <input type="password" class="login-input" id="login-pass" placeholder="••••••" onkeydown="if(event.key==='Enter') checkLogin()">
-    <button class="login-btn" onclick="checkLogin()">Prihlásiť sa →</button>
-    <div class="login-error" id="login-error">⚠️ Nesprávne heslo</div>
-  </div>
-</div>
-
 <div id="zmen-heslo-screen" style="display:none; position:fixed; inset:0; background:#0d3d52; z-index:9999; align-items:center; justify-content:center;">
   <div style="background:#fff; border-radius:16px; padding:36px 32px; width:100%; max-width:380px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
     <div style="text-align:center; margin-bottom:24px;"><div style="font-size:30px; margin-bottom:8px;">🔑</div><div style="font-size:20px; font-weight:700; color:#0d3d52;">Nastavte si heslo</div></div>
@@ -1971,15 +1958,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
 // ══ LOGIN ══
-function checkLogin() {
-  const pass = document.getElementById('login-pass').value;
-  const err = document.getElementById('login-error');
-  if (pass === 'elwork') {
-    document.getElementById('login-screen').style.display = 'none';
-    sessionStorage.setItem('klima_auth', '1');
-    document.getElementById('setup-screen').style.display = 'none';
-    zobrazRezim();
-  } else {
+ else {
     err.style.display = 'block';
     document.getElementById('login-pass').value = '';
     document.getElementById('login-pass').focus();
