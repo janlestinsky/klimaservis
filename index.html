@@ -1,4 +1,4 @@
-<!DOCTYPE html>  
+<!DOCTYPE html>
 <html lang="sk">
 <head>
 <meta charset="UTF-8">
@@ -199,7 +199,6 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
   </div>
 </div>
 
-  
 <div id="reg-screen" style="display:none; position:fixed; inset:0; background:#0d3d52; z-index:9999; align-items:center; justify-content:center;">
   <div style="background:#fff; border-radius:16px; padding:36px 32px; width:100%; max-width:400px; box-shadow:0 20px 60px rgba(0,0,0,0.3); max-height:90vh; overflow-y:auto;">
     <div style="text-align:center; margin-bottom:24px;"><div style="font-size:30px;">📝</div><div style="font-size:20px; font-weight:700; color:#0d3d52; margin-top:8px;">Registrácia technika</div></div>
@@ -1648,7 +1647,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwYMPdFWK4BzTeUG9_POxnkioxxeLgoknYSDwo0QNS_yfXawRmnpNh80fGOBxC0zdHsyg/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw3XqMO_hHNqwdfj5O-GTid-d0J4z0O8wZgGjCKlcC040mmz-LbLq7N3co4p9BajJGhKg/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
