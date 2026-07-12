@@ -1808,7 +1808,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxfoX5Si7Rol-6GdEne5-NiI-dq3ZGIAtvxfLA_YQQpXJvPX67F4I3ph-OSpIr84q0JqA/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbycDWMTaswgClnTIaLsZa6FAMfDM6s-rTTKppX6lFWb6qG7ERUT9UuFV_Qf_ptYGw3M-g/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2827,6 +2827,13 @@ function showServisStep(n) {
 function goNextServis() {
   if (servisStep === 1) {
     if (!servisZakaznik) { showToast('⚠️ Vyberte zákazníka'); return; }
+    // Validácia technika
+    const t1 = document.getElementById('servis-technik')?.value || '';
+    if (!t1 || t1 === '') { showToast('⚠️ Vyberte aspoň 1 servisného technika'); return; }
+    if (t1 === 'Iný') {
+      const t1i = document.getElementById('servis-technik-iny')?.value?.trim() || '';
+      if (!t1i) { showToast('⚠️ Zadajte meno technika'); return; }
+    }
   }
   if (servisStep === 5) { doServisUpload(); return; }
   servisStep++;
