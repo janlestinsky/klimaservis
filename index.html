@@ -584,76 +584,76 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
 
   
   <div class="section" id="sv2">
-    <div class="sec-hdr"><div class="sec-icon" style="background:linear-gradient(135deg,var(--cold),var(--accent));">📋</div><div><h2>Údaje servisu</h2><p>Krok 2 z 4</p></div></div>
+    <div class="sec-hdr"><div class="sec-icon" style="background:linear-gradient(135deg,var(--cold),var(--accent));">📋</div><div><h2>Údaje servisu</h2><p>Krok 2 z 5</p></div></div>
     <div class="card">
-      <div class="two-col">
-        <div class="field"><label>Dátum servisu</label>
-          <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:.85rem;color:var(--muted);font-weight:500;white-space:nowrap;">Dňa:</span><input type="date" id="servis-datum" style="flex:1;"></div>
-        </div>
-        <!-- Výber jednotiek -->
-        <div class="field"><label>Typ systému</label>
-          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:8px;">
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.9rem; padding:8px 14px; border:1.5px solid var(--border); border-radius:9px; background:white;">
-              <input type="radio" name="servis-typ" value="split" checked onchange="updateJednotkyCount()"> Split
-            </label>
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.9rem; padding:8px 14px; border:1.5px solid var(--border); border-radius:9px; background:white;">
-              <input type="radio" name="servis-typ" value="multisplit" onchange="updateJednotkyCount()"> Multi-split
-            </label>
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.9rem; padding:8px 14px; border:1.5px solid var(--border); border-radius:9px; background:white;">
-              <input type="radio" name="servis-typ" value="kazeta" onchange="updateJednotkyCount()"> Kazetová
-            </label>
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.9rem; padding:8px 14px; border:1.5px solid var(--border); border-radius:9px; background:white;">
-              <input type="radio" name="servis-typ" value="ine" onchange="updateJednotkyCount()"> Iné
-            </label>
-          </div>
-        </div>
-        <div id="servis-jednotky-pocet" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:4px;">
-          <div class="field"><label>Počet vonkajších jednotiek</label>
-            <select id="servis-vonkajsie" style="width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.9rem; background:white;">
-              <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
-            </select>
-          </div>
-          <div class="field"><label>Počet vnútorných jednotiek</label>
-            <select id="servis-vnutorne" style="width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.9rem; background:white;">
-              <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option>
-            </select>
-          </div>
-        </div>
-        <div class="field"><label>Výrobca / Model</label>
-          <input type="text" id="servis-model" placeholder="napr. Sinclair, Gree, Samsung..." style="width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.9rem; box-sizing:border-box;">
-        </div>
-
-        <div class="field"><label>Servisný technik 1 <span class="req">*</span></label>
-          <select id="servis-technik" onchange="if(this.value==='Iný'){document.getElementById('servis-technik-iny').style.display='block';}else{document.getElementById('servis-technik-iny').style.display='none';}" style="width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; background:white; color:var(--text);">
-            <option value="">-- Vybrať technika --</option>
-            <option value="Miroslav Paška">Miroslav Paška</option>
-            <option value="Jaroslav Brna">Jaroslav Brna</option>
-            <option value="Adam Brziak">Adam Brziak</option>
-            <option value="Ľuboš Hamza">Ľuboš Hamza</option>
-            <option value="Iný">Iný...</option>
-          </select>
-          <input type="text" id="servis-technik-iny" placeholder="Meno iného technika" style="display:none; margin-top:8px; width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; box-sizing:border-box;">
-        </div>
-        <div class="field"><label>Servisný technik 2 (voliteľné)</label>
-          <select id="servis-technik2" onchange="if(this.value==='Iný'){document.getElementById('servis-technik2-iny').style.display='block';}else{document.getElementById('servis-technik2-iny').style.display='none';}" style="width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; background:white; color:var(--text);">
-            <option value="">-- Žiadny --</option>
-            <option value="Miroslav Paška">Miroslav Paška</option>
-            <option value="Jaroslav Brna">Jaroslav Brna</option>
-            <option value="Adam Brziak">Adam Brziak</option>
-            <option value="Ľuboš Hamza">Ľuboš Hamza</option>
-            <option value="Iný">Iný...</option>
-          </select>
-          <input type="text" id="servis-technik2-iny" placeholder="Meno iného technika" style="display:none; margin-top:8px; width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; box-sizing:border-box;">
-        </div>
+      <!-- Dátum -->
+      <div class="field"><label>Dátum servisu</label>
+        <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:.85rem;color:var(--muted);font-weight:500;white-space:nowrap;">Dňa:</span><input type="date" id="servis-datum" style="flex:1;"></div>
       </div>
-      <div class="field">
-        <label>Model zariadenia / Počet ks</label>
-        <div id="servis-modely" style="font-size:.85rem;color:var(--deep);padding:8px;background:var(--ice);border-radius:8px;min-height:36px;"></div>
+
+      <!-- Technici -->
+      <div class="field"><label>Servisný technik 1 <span class="req">*</span></label>
+        <select id="servis-technik" onchange="if(this.value==='Iný'){document.getElementById('servis-technik-iny').style.display='block';}else{document.getElementById('servis-technik-iny').style.display='none';}" style="width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; background:white; color:var(--text);">
+          <option value="">-- Vybrať technika --</option>
+          <option value="Miroslav Paška">Miroslav Paška</option>
+          <option value="Jaroslav Brna">Jaroslav Brna</option>
+          <option value="Adam Brziak">Adam Brziak</option>
+          <option value="Ľuboš Hamza">Ľuboš Hamza</option>
+          <option value="Iný">Iný...</option>
+        </select>
+        <input type="text" id="servis-technik-iny" placeholder="Meno iného technika" style="display:none; margin-top:8px; width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; box-sizing:border-box;">
+      </div>
+      <div class="field"><label>Servisný technik 2 (voliteľné)</label>
+        <select id="servis-technik2" onchange="if(this.value==='Iný'){document.getElementById('servis-technik2-iny').style.display='block';}else{document.getElementById('servis-technik2-iny').style.display='none';}" style="width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; background:white; color:var(--text);">
+          <option value="">-- Žiadny --</option>
+          <option value="Miroslav Paška">Miroslav Paška</option>
+          <option value="Jaroslav Brna">Jaroslav Brna</option>
+          <option value="Adam Brziak">Adam Brziak</option>
+          <option value="Ľuboš Hamza">Ľuboš Hamza</option>
+          <option value="Iný">Iný...</option>
+        </select>
+        <input type="text" id="servis-technik2-iny" placeholder="Meno iného technika" style="display:none; margin-top:8px; width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; box-sizing:border-box;">
       </div>
     </div>
+
+    <!-- Typ systému a jednotky -->
+    <div class="card">
+      <div style="font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">🌡️ Klimatizačný systém</div>
+      <div class="field"><label>Typ systému</label>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.85rem; padding:7px 12px; border:1.5px solid var(--border); border-radius:9px; background:white;">
+            <input type="radio" name="servis-typ" value="split" checked onchange="generujJednotky()"> Split
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.85rem; padding:7px 12px; border:1.5px solid var(--border); border-radius:9px; background:white;">
+            <input type="radio" name="servis-typ" value="multisplit" onchange="generujJednotky()"> Multi-split
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.85rem; padding:7px 12px; border:1.5px solid var(--border); border-radius:9px; background:white;">
+            <input type="radio" name="servis-typ" value="kazeta" onchange="generujJednotky()"> Kazetová
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.85rem; padding:7px 12px; border:1.5px solid var(--border); border-radius:9px; background:white;">
+            <input type="radio" name="servis-typ" value="ine" onchange="generujJednotky()"> Iné
+          </label>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+        <div class="field"><label>Vonkajšie jednotky</label>
+          <select id="servis-vonkajsie" onchange="generujJednotky()" style="width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.9rem; background:white;">
+            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+          </select>
+        </div>
+        <div class="field"><label>Vnútorné jednotky</label>
+          <select id="servis-vnutorne" onchange="generujJednotky()" style="width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.9rem; background:white;">
+            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Dynamické jednotky -->
+      <div id="servis-jednotky-detail"></div>
+    </div>
+
   </div>
 
-  
   <div class="section" id="sv3">
     <div class="sec-hdr"><div class="sec-icon" style="background:linear-gradient(135deg,var(--cold),var(--accent));">✅</div><div><h2>Servisný protokol</h2><p>Krok 3 z 4</p></div></div>
 
@@ -745,17 +745,25 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
         <label>Režim merania</label>
         <div style="display:flex; gap:20px; margin-bottom:12px;">
           <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.9rem;">
-            <input type="radio" name="tlak-rezim" value="chladenie" checked> ❄️ Chladenie
+            <input type="radio" name="tlak-rezim" value="chladenie" checked onchange="generujTlakMerania()"> ❄️ Chladenie
           </label>
           <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.9rem;">
-            <input type="radio" name="tlak-rezim" value="kurenie"> 🔥 Kúrenie
+            <input type="radio" name="tlak-rezim" value="kurenie" onchange="generujTlakMerania()"> 🔥 Kúrenie
           </label>
         </div>
       </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-        <div class="field"><label>Teplota (°C)</label><input type="number" id="tlak-teplota" step="0.1" placeholder="napr. 12.0" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;"></div>
-        <div class="field"><label>Tlak (bar)</label><input type="number" id="tlak-hodnota" step="0.1" placeholder="napr. 8.5" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;"></div>
+      <div class="field">
+        <label>Počet meraní</label>
+        <select id="tlak-pocet" onchange="generujTlakMerania()" style="width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.9rem; background:white; max-width:150px;">
+          <option value="1">1 meranie</option>
+          <option value="2">2 merania</option>
+          <option value="3">3 merania</option>
+          <option value="4">4 merania</option>
+          <option value="5">5 meraní</option>
+          <option value="6">6 meraní</option>
+        </select>
       </div>
+      <div id="tlak-merania-container"></div>
       <div class="field"><label>Poznámky k meraniu</label><textarea id="tlak-poznamky" rows="2" placeholder="Prípadné poznámky k meraniu..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;resize:none;"></textarea></div>
     </div>
   </div>
@@ -1808,7 +1816,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQ1im4OchGv16WlbgMPpJj--I4JM-tv30qXz8nYPb7utwkX-Twl8dCEJJJBq8y0ZCkzw/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxNstRog6P9Z24vEgge0c7PWM4SQjmcByDRgkmVWv7bM8DoDcOFIuRC43us1S9NrIWDPw/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2803,6 +2811,8 @@ function showServisStep(n) {
   document.querySelectorAll('#servis-app .section').forEach(s => s.classList.remove('visible'));
   const secId = 'sv' + n;
   document.getElementById(secId)?.classList.add('visible');
+  if (n === 2) { setTimeout(generujJednotky, 50); }
+  if (n === 4) { setTimeout(generujTlakMerania, 50); }
   const btnBack = document.getElementById('btn-back');
   const btnNext = document.getElementById('btn-next');
   btnBack.style.display = n < 6 ? 'block' : 'none';
@@ -2994,14 +3004,9 @@ async function doServisUpload() {
   const servisVonkajsie = document.getElementById('servis-vonkajsie')?.value || '1';
   const servisVnutorne = document.getElementById('servis-vnutorne')?.value || '1';
   const servisModel = document.getElementById('servis-model')?.value || '';
+  const jednotkyData = zberJednotkyData();
 
-  const tlakRezim = document.querySelector('input[name="tlak-rezim"]:checked')?.value || 'chladenie';
-  const tlakData = {
-    rezim: tlakRezim === 'kurenie' ? 'Kúrenie' : 'Chladenie',
-    teplota: document.getElementById('tlak-teplota')?.value || '',
-    tlak: document.getElementById('tlak-hodnota')?.value || '',
-    poznamky: document.getElementById('tlak-poznamky')?.value || ''
-  };
+  const tlakData = zberTlakData();
 
   // Zober všetky checkboxy
   const checkboxy = {};
@@ -3037,6 +3042,7 @@ async function doServisUpload() {
       vonkajsieJednotky: servisVonkajsie,
       vnutorneJednotky: servisVnutorne,
       modelZariadenia: servisModel,
+      jednotky: jednotkyData,
       technik: technikFull,
       showTechnikZakaznik: false,
       tlak: tlakData,
@@ -3073,18 +3079,169 @@ async function doServisUpload() {
   }
 }
 
-function updateJednotkyCount() {
+// ══ DYNAMICKÉ JEDNOTKY V SERVISE ══
+function generujJednotky() {
   const typ = document.querySelector('input[name="servis-typ"]:checked')?.value || 'split';
-  const pocetDiv = document.getElementById('servis-jednotky-pocet');
-  const vnutorne = document.getElementById('servis-vnutorne');
+  const vonk = parseInt(document.getElementById('servis-vonkajsie')?.value || '1');
+  const vnut = parseInt(document.getElementById('servis-vnutorne')?.value || '1');
+  const container = document.getElementById('servis-jednotky-detail');
+  if (!container) return;
+
+  // Pre split - zablokuj výber viac jednotiek
   if (typ === 'split') {
-    if (pocetDiv) pocetDiv.style.display = 'grid';
-    if (vnutorne) vnutorne.value = '1';
-  } else if (typ === 'multisplit') {
-    if (pocetDiv) pocetDiv.style.display = 'grid';
-  } else {
-    if (pocetDiv) pocetDiv.style.display = 'grid';
+    document.getElementById('servis-vonkajsie').value = '1';
+    document.getElementById('servis-vnutorne').value = '1';
   }
+
+  const finalVonk = typ === 'split' ? 1 : vonk;
+  const finalVnut = typ === 'split' ? 1 : vnut;
+
+  // Získaj existujúce hodnoty (pre zachovanie pri zmene počtu)
+  const existValues = {};
+  container.querySelectorAll('input[id^="sj-"]').forEach(el => {
+    existValues[el.id] = el.value;
+  });
+
+  // Predvyplnené hodnoty zo zákazníka
+  const zakazSerial = servisZakaznik?.serialCisla || '';
+  const zakazModel = servisZakaznik?.modely || '';
+
+  let html = '';
+
+  // VONKAJŠIE JEDNOTKY
+  for (let i = 0; i < finalVonk; i++) {
+    html += `
+    <div style="background:#f0f7fa; border-radius:10px; padding:14px; margin-bottom:10px; border:1px solid var(--border);">
+      <div style="font-size:.75rem;font-weight:700;color:var(--deep);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">🏗️ Vonkajšia jednotka ${finalVonk > 1 ? i+1 : ''}</div>
+      <div style="display:grid; grid-template-columns:1fr; gap:8px;">
+        <div class="field" style="margin:0;">
+          <label style="font-size:0.8rem;">Model / Výrobca</label>
+          <div style="display:flex; gap:6px;">
+            <input type="text" id="sj-vonk-${i}-model" value="${existValues['sj-vonk-'+i+'-model'] || zakazModel}" placeholder="napr. Sinclair 3.5kW" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; box-sizing:border-box;">
+            <button onclick="fotitJednotku('sj-vonk-${i}-model')" style="padding:9px 12px; background:var(--deep); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem;">📷</button>
+          </div>
+        </div>
+        <div class="field" style="margin:0;">
+          <label style="font-size:0.8rem;">Sériové číslo</label>
+          <div style="display:flex; gap:6px;">
+            <input type="text" id="sj-vonk-${i}-serial" value="${existValues['sj-vonk-'+i+'-serial'] || ''}" placeholder="napr. SN123456" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; font-family:monospace; box-sizing:border-box;">
+            <button onclick="fotitJednotku('sj-vonk-${i}-serial')" style="padding:9px 12px; background:var(--deep); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem;">📷</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // VNÚTORNÉ JEDNOTKY
+  for (let i = 0; i < finalVnut; i++) {
+    html += `
+    <div style="background:#fff8f0; border-radius:10px; padding:14px; margin-bottom:10px; border:1px solid #fed7aa;">
+      <div style="font-size:.75rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">🏠 Vnútorná jednotka ${finalVnut > 1 ? i+1 : ''}</div>
+      <div style="display:grid; grid-template-columns:1fr; gap:8px;">
+        <div class="field" style="margin:0;">
+          <label style="font-size:0.8rem;">Model / Výrobca</label>
+          <div style="display:flex; gap:6px;">
+            <input type="text" id="sj-vnut-${i}-model" value="${existValues['sj-vnut-'+i+'-model'] || zakazModel}" placeholder="napr. Sinclair 3.5kW" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; box-sizing:border-box;">
+            <button onclick="fotitJednotku('sj-vnut-${i}-model')" style="padding:9px 12px; background:var(--orange); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem;">📷</button>
+          </div>
+        </div>
+        <div class="field" style="margin:0;">
+          <label style="font-size:0.8rem;">Sériové číslo</label>
+          <div style="display:flex; gap:6px;">
+            <input type="text" id="sj-vnut-${i}-serial" value="${existValues['sj-vnut-'+i+'-serial'] || ''}" placeholder="napr. SN789012" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; font-family:monospace; box-sizing:border-box;">
+            <button onclick="fotitJednotku('sj-vnut-${i}-serial')" style="padding:9px 12px; background:var(--orange); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem;">📷</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function fotitJednotku(targetId) {
+  // Otvor kameru a skenuj - použi existujúcu logiku z montáže
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.capture = 'environment';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const target = document.getElementById(targetId);
+    if (!target) return;
+    // Použij OCR ak je dostupné, inak len notifikuj
+    showToast('📷 Fotka nasnímaná — zadajte hodnotu manuálne');
+  };
+  input.click();
+}
+
+function generujTlakMerania() {
+  const pocet = parseInt(document.getElementById('tlak-pocet')?.value || '1');
+  const container = document.getElementById('tlak-merania-container');
+  if (!container) return;
+
+  let html = '';
+  for (let i = 0; i < pocet; i++) {
+    html += `
+    <div style="background:#fff8f0; border-radius:10px; padding:12px; margin-bottom:8px; border:1px solid #fed7aa;">
+      ${pocet > 1 ? `<div style="font-size:0.75rem; font-weight:700; color:var(--orange); margin-bottom:8px;">Meranie ${i+1}</div>` : ''}
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Tlak (bar)</label>
+          <input type="number" id="tlak-${i}-hodnota" step="0.1" placeholder="napr. 8.5" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
+        </div>
+        <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Teplota (°C)</label>
+          <input type="number" id="tlak-${i}-teplota" step="0.1" placeholder="napr. 12.0" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
+        </div>
+      </div>
+    </div>`;
+  }
+  container.innerHTML = html;
+}
+
+function zberTlakData() {
+  const pocet = parseInt(document.getElementById('tlak-pocet')?.value || '1');
+  const rezim = document.querySelector('input[name="tlak-rezim"]:checked')?.value || 'chladenie';
+  const merania = [];
+  for (let i = 0; i < pocet; i++) {
+    const tlak = document.getElementById(`tlak-${i}-hodnota`)?.value || '';
+    const teplota = document.getElementById(`tlak-${i}-teplota`)?.value || '';
+    if (tlak || teplota) merania.push({ tlak, teplota });
+  }
+  return {
+    rezim: rezim === 'kurenie' ? 'Kúrenie' : 'Chladenie',
+    merania,
+    poznamky: document.getElementById('tlak-poznamky')?.value || ''
+  };
+}
+
+function zberJednotkyData() {
+  const vonk = parseInt(document.getElementById('servis-vonkajsie')?.value || '1');
+  const vnut = parseInt(document.getElementById('servis-vnutorne')?.value || '1');
+  const typ = document.querySelector('input[name="servis-typ"]:checked')?.value || 'split';
+  const finalVonk = typ === 'split' ? 1 : vonk;
+  const finalVnut = typ === 'split' ? 1 : vnut;
+
+  const vonkajsie = [];
+  const vnutorne = [];
+
+  for (let i = 0; i < finalVonk; i++) {
+    vonkajsie.push({
+      model: document.getElementById(`sj-vonk-${i}-model`)?.value || '',
+      serial: document.getElementById(`sj-vonk-${i}-serial`)?.value || ''
+    });
+  }
+  for (let i = 0; i < finalVnut; i++) {
+    vnutorne.push({
+      model: document.getElementById(`sj-vnut-${i}-model`)?.value || '',
+      serial: document.getElementById(`sj-vnut-${i}-serial`)?.value || ''
+    });
+  }
+  return { vonkajsie, vnutorne };
+}
+
+function updateJednotkyCount() {
+  generujJednotky();
 }
 
 function resetServis() {
