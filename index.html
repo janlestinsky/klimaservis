@@ -2827,7 +2827,9 @@ function showServisStep(n) {
 function goNextServis() {
   if (servisStep === 1) {
     if (!servisZakaznik) { showToast('⚠️ Vyberte zákazníka'); return; }
-    // Validácia technika
+  }
+  if (servisStep === 2) {
+    // Validácia technika na kroku 2
     const t1 = document.getElementById('servis-technik')?.value || '';
     if (!t1 || t1 === '') { showToast('⚠️ Vyberte aspoň 1 servisného technika'); return; }
     if (t1 === 'Iný') {
