@@ -553,7 +553,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
       <div class="field">
         <label>Meno / Priezvisko / Adresa</label>
         <div style="display:flex;gap:8px;">
-          <input type="text" id="servis-search" placeholder="napr. Novák alebo Hlavná..." oninput="searchZakaznik()">
+          <input type="text" id="servis-search" placeholder="Priezvisko, adresa alebo email..." oninput="searchZakaznik()">
           <button onclick="searchZakaznik()" style="padding:0 16px;background:linear-gradient(135deg,var(--cold),var(--accent));color:white;border:none;border-radius:10px;font-size:1rem;cursor:pointer;flex-shrink:0;">🔍</button>
         </div>
       </div>
@@ -706,7 +706,31 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
 
   
   <div class="section" id="sv4">
-    <div class="sec-hdr"><div class="sec-icon" style="background:linear-gradient(135deg,var(--cold),var(--accent));">✍️</div><div><h2>Podpisy</h2><p>Krok 4 z 4</p></div></div>
+    <div class="sec-hdr"><div class="sec-icon" style="background:linear-gradient(135deg,#f97316,#ea580c);">🌡️</div><div><h2>Meranie tlaku</h2><p>Krok 4 z 5</p></div></div>
+    <div class="card">
+      <div class="field">
+        <label>Režim merania</label>
+        <div style="display:flex; gap:20px; margin-bottom:12px;">
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.9rem;">
+            <input type="radio" name="tlak-rezim" value="chladenie" checked> ❄️ Chladenie
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.9rem;">
+            <input type="radio" name="tlak-rezim" value="kurenie"> 🔥 Kúrenie
+          </label>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="field"><label>Sací tlak (bar)</label><input type="number" id="tlak-saci" step="0.1" placeholder="napr. 8.5" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;"></div>
+        <div class="field"><label>Výtlačný tlak (bar)</label><input type="number" id="tlak-vytlacny" step="0.1" placeholder="napr. 22.0" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;"></div>
+        <div class="field"><label>Sacacia teplota (°C)</label><input type="number" id="tlak-teplota-saci" step="0.1" placeholder="napr. 12.0" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;"></div>
+        <div class="field"><label>Výtlačná teplota (°C)</label><input type="number" id="tlak-teplota-vytlacna" step="0.1" placeholder="napr. 55.0" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;"></div>
+      </div>
+      <div class="field"><label>Poznámky k meraniu</label><textarea id="tlak-poznamky" rows="2" placeholder="Prípadné poznámky k meraniu..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;resize:none;"></textarea></div>
+    </div>
+  </div>
+
+  <div class="section" id="sv5">
+    <div class="sec-hdr"><div class="sec-icon" style="background:linear-gradient(135deg,var(--cold),var(--accent));">✍️</div><div><h2>Podpisy</h2><p>Krok 5 z 5</p></div></div>
     <div class="card">
       <div style="font-size:.75rem;font-weight:700;color:var(--cold);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">✍️ Podpis zákazníka</div>
       <canvas id="canvas-servis-zakaznik" style="width:100%;height:180px;border:2px solid var(--border);border-radius:12px;background:white;touch-action:none;display:block;cursor:crosshair;"></canvas>
@@ -1728,7 +1752,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzrKgaA1w-ljBL-5pkb4PPy1u-RgE85sE2lq8vm1c07zSRluoAUH0wSrakwzCS_pQxbgA/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDGx6DDkR2LqRfZZYdRA3K95MRBkgdkgae6-2mUvXh6x0C3cgFiFNANcrGenpciE0ghQ/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2725,12 +2749,12 @@ function showServisStep(n) {
   document.getElementById(secId)?.classList.add('visible');
   const btnBack = document.getElementById('btn-back');
   const btnNext = document.getElementById('btn-next');
-  btnBack.style.display = n < 5 ? 'block' : 'none';
-  if (n === 4) {
+  btnBack.style.display = n < 6 ? 'block' : 'none';
+  if (n === 5) {
     btnNext.textContent = '📤 Nahrať servis';
     btnNext.className = 'btn btn-success';
     initCanvas('canvas-servis-zakaznik');
-  } else if (n === 5) {
+  } else if (n === 6) {
     document.getElementById('nav-buttons').style.display = 'none';
     return;
   } else {
@@ -2745,7 +2769,7 @@ function goNextServis() {
   if (servisStep === 1) {
     if (!servisZakaznik) { showToast('⚠️ Vyberte zákazníka'); return; }
   }
-  if (servisStep === 4) { doServisUpload(); return; }
+  if (servisStep === 5) { doServisUpload(); return; }
   servisStep++;
   showServisStep(servisStep);
 }
@@ -2888,6 +2912,17 @@ async function doServisUpload() {
   const logoB64 = document.querySelector('header img')?.src || null;
   const peciatkaB64 = PECIATKA_B64 || null;
 
+  // Meranie tlaku
+  const tlakRezim = document.querySelector('input[name="tlak-rezim"]:checked')?.value || 'chladenie';
+  const tlakData = {
+    rezim: tlakRezim === 'kurenie' ? 'Kúrenie' : 'Chladenie',
+    saciTlak: document.getElementById('tlak-saci')?.value || '',
+    vytlacnyTlak: document.getElementById('tlak-vytlacny')?.value || '',
+    saciaTeplotа: document.getElementById('tlak-teplota-saci')?.value || '',
+    vytlacnaTeplotа: document.getElementById('tlak-teplota-vytlacna')?.value || '',
+    poznamky: document.getElementById('tlak-poznamky')?.value || ''
+  };
+
   // Zober všetky checkboxy
   const checkboxy = {};
   ['v1','v2','v3','v4','k1','k2','k3','ko1','ko2','ko3','t1','t2','t3',
@@ -2917,6 +2952,7 @@ async function doServisUpload() {
       datum: datumFmt,
       technik: technikFull,
       showTechnikZakaznik: false,
+      tlak: tlakData,
       poznamky,
       checkboxy,
       podpisZakaznik: podpis,
