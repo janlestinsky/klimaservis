@@ -1808,7 +1808,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbycDWMTaswgClnTIaLsZa6FAMfDM6s-rTTKppX6lFWb6qG7ERUT9UuFV_Qf_ptYGw3M-g/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQ1im4OchGv16WlbgMPpJj--I4JM-tv30qXz8nYPb7utwkX-Twl8dCEJJJBq8y0ZCkzw/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2942,6 +2942,7 @@ function vyberZakaznika(i) {
     <div class="rv-item"><span class="rk">Telefón</span><span class="rv">${servisZakaznik.telefon}</span></div>
     <div class="rv-item"><span class="rk">Email</span><span class="rv">${servisZakaznik.email || '–'}</span></div>
     <div class="rv-item"><span class="rk">Klimatizácia</span><span class="rv">${servisZakaznik.modely || '–'}</span></div>
+    ${servisZakaznik.serialCisla ? `<div class="rv-item"><span class="rk">Sériové čísla</span><span class="rv" style="font-family:monospace;font-size:0.8rem;">${servisZakaznik.serialCisla}</span></div>` : ''}
   `;
 
   // Zobraz históriu servisov
@@ -3027,7 +3028,10 @@ async function doServisUpload() {
     setS('sus1','active');
     const r = await apiCall({
       type: 'servis',
-      zakaznik: servisZakaznik,
+      zakaznik: {
+        ...servisZakaznik,
+        serialCisla: servisZakaznik.serialCisla || ''
+      },
       datum: datumFmt,
       typSystemu: servisTyp,
       vonkajsieJednotky: servisVonkajsie,
