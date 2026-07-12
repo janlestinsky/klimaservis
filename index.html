@@ -720,10 +720,8 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
         </div>
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-        <div class="field"><label>Sací tlak (bar)</label><input type="number" id="tlak-saci" step="0.1" placeholder="napr. 8.5" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;"></div>
-        <div class="field"><label>Výtlačný tlak (bar)</label><input type="number" id="tlak-vytlacny" step="0.1" placeholder="napr. 22.0" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;"></div>
-        <div class="field"><label>Sacacia teplota (°C)</label><input type="number" id="tlak-teplota-saci" step="0.1" placeholder="napr. 12.0" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;"></div>
-        <div class="field"><label>Výtlačná teplota (°C)</label><input type="number" id="tlak-teplota-vytlacna" step="0.1" placeholder="napr. 55.0" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;"></div>
+        <div class="field"><label>Teplota (°C)</label><input type="number" id="tlak-teplota" step="0.1" placeholder="napr. 12.0" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;"></div>
+        <div class="field"><label>Tlak (bar)</label><input type="number" id="tlak-hodnota" step="0.1" placeholder="napr. 8.5" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;"></div>
       </div>
       <div class="field"><label>Poznámky k meraniu</label><textarea id="tlak-poznamky" rows="2" placeholder="Prípadné poznámky k meraniu..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;resize:none;"></textarea></div>
     </div>
@@ -746,7 +744,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
   </div>
 
   
-  <div class="section" id="sv5">
+  <div class="section" id="sv6">
     <div class="suc-screen">
       <div class="suc-icon">✓</div>
       <h2>Servis uložený!</h2>
@@ -1695,7 +1693,21 @@ async function doUpload() {
     setProg(10);
 
     // Získaj logo a pečiatku
-    const logoB64 = document.querySelector('header img')?.src || null;
+    // Logo - get as base64 if possible
+  let logoB64 = null;
+  try {
+    const logoImg = document.querySelector('header img');
+    if (logoImg && logoImg.src) {
+      if (logoImg.src.startsWith('data:')) {
+        logoB64 = logoImg.src;
+      } else {
+        // Convert external URL to base64
+        const logoResp = await fetch(logoImg.src);
+        const logoBlob = await logoResp.blob();
+        logoB64 = await new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(logoBlob); });
+      }
+    }
+  } catch(le) { logoB64 = null; }
     const peciatkaB64 = PECIATKA_B64 || null;
 
     // Generuj PDF na serveri (plná slovenčina)
@@ -1752,7 +1764,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDGx6DDkR2LqRfZZYdRA3K95MRBkgdkgae6-2mUvXh6x0C3cgFiFNANcrGenpciE0ghQ/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbziYykSmNz9h5ko16P8FpMfOw6eEhyUVYFucx0sEtNfnube3o9U5xMDWEdER0Yv-73I1g/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2757,6 +2769,9 @@ function showServisStep(n) {
   } else if (n === 6) {
     document.getElementById('nav-buttons').style.display = 'none';
     return;
+  } else if (n > 6) {
+    document.getElementById('nav-buttons').style.display = 'none';
+    return;
   } else {
     btnNext.textContent = 'Ďalej →';
     btnNext.className = 'btn btn-primary';
@@ -2909,17 +2924,22 @@ async function doServisUpload() {
   const technikFull = technik2 ? technik + ', ' + technik2 : technik;
   const poznamky = document.getElementById('servis-poznamky').value || '';
   const podpis = getCanvasDataUrl('canvas-servis-zakaznik');
-  const logoB64 = document.querySelector('header img')?.src || null;
+  let logoB64 = null;
+  try {
+    const logoImgEl = document.querySelector('header img');
+    if (logoImgEl?.src) {
+      if (logoImgEl.src.startsWith('data:')) { logoB64 = logoImgEl.src; }
+      else { const lr = await fetch(logoImgEl.src); const lb = await lr.blob(); logoB64 = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(lb); }); }
+    }
+  } catch(le) {}
   const peciatkaB64 = PECIATKA_B64 || null;
 
   // Meranie tlaku
   const tlakRezim = document.querySelector('input[name="tlak-rezim"]:checked')?.value || 'chladenie';
   const tlakData = {
     rezim: tlakRezim === 'kurenie' ? 'Kúrenie' : 'Chladenie',
-    saciTlak: document.getElementById('tlak-saci')?.value || '',
-    vytlacnyTlak: document.getElementById('tlak-vytlacny')?.value || '',
-    saciaTeplotа: document.getElementById('tlak-teplota-saci')?.value || '',
-    vytlacnaTeplotа: document.getElementById('tlak-teplota-vytlacna')?.value || '',
+    teplota: document.getElementById('tlak-teplota')?.value || '',
+    tlak: document.getElementById('tlak-hodnota')?.value || '',
     poznamky: document.getElementById('tlak-poznamky')?.value || ''
   };
 
@@ -2965,7 +2985,7 @@ async function doServisUpload() {
 
     await sleep(400);
     document.querySelectorAll('#servis-app .section').forEach(s => s.classList.remove('visible'));
-    document.getElementById('sv5').classList.add('visible');
+    document.getElementById('sv6').classList.add('visible');
     document.getElementById('nav-buttons').style.display = 'none';
     document.getElementById('servis-saved-date').textContent = 'Uložené: ' + datumFmt;
     const dl = document.getElementById('servis-drive-link');
