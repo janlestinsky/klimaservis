@@ -590,6 +590,39 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
         <div class="field"><label>Dátum servisu</label>
           <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:.85rem;color:var(--muted);font-weight:500;white-space:nowrap;">Dňa:</span><input type="date" id="servis-datum" style="flex:1;"></div>
         </div>
+        <!-- Výber jednotiek -->
+        <div class="field"><label>Typ systému</label>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:8px;">
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.9rem; padding:8px 14px; border:1.5px solid var(--border); border-radius:9px; background:white;">
+              <input type="radio" name="servis-typ" value="split" checked onchange="updateJednotkyCount()"> Split
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.9rem; padding:8px 14px; border:1.5px solid var(--border); border-radius:9px; background:white;">
+              <input type="radio" name="servis-typ" value="multisplit" onchange="updateJednotkyCount()"> Multi-split
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.9rem; padding:8px 14px; border:1.5px solid var(--border); border-radius:9px; background:white;">
+              <input type="radio" name="servis-typ" value="kazeta" onchange="updateJednotkyCount()"> Kazetová
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.9rem; padding:8px 14px; border:1.5px solid var(--border); border-radius:9px; background:white;">
+              <input type="radio" name="servis-typ" value="ine" onchange="updateJednotkyCount()"> Iné
+            </label>
+          </div>
+        </div>
+        <div id="servis-jednotky-pocet" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:4px;">
+          <div class="field"><label>Počet vonkajších jednotiek</label>
+            <select id="servis-vonkajsie" style="width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.9rem; background:white;">
+              <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+            </select>
+          </div>
+          <div class="field"><label>Počet vnútorných jednotiek</label>
+            <select id="servis-vnutorne" style="width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.9rem; background:white;">
+              <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Výrobca / Model</label>
+          <input type="text" id="servis-model" placeholder="napr. Sinclair, Gree, Samsung..." style="width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.9rem; box-sizing:border-box;">
+        </div>
+
         <div class="field"><label>Servisný technik 1 <span class="req">*</span></label>
           <select id="servis-technik" onchange="if(this.value==='Iný'){document.getElementById('servis-technik-iny').style.display='block';}else{document.getElementById('servis-technik-iny').style.display='none';}" style="width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; background:white; color:var(--text);">
             <option value="">-- Vybrať technika --</option>
@@ -1775,7 +1808,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzI6f-T7PC5cgPKpLjYQg3xgllzRc7lKlyewx5DptIC_fiHq0Qgy61hCGzLj_FDlOKQ-w/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxfoX5Si7Rol-6GdEne5-NiI-dq3ZGIAtvxfLA_YQQpXJvPX67F4I3ph-OSpIr84q0JqA/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2946,6 +2979,12 @@ async function doServisUpload() {
   const peciatkaB64 = PECIATKA_B64 || null;
 
   // Meranie tlaku
+  // Jednotky
+  const servisTyp = document.querySelector('input[name="servis-typ"]:checked')?.value || 'split';
+  const servisVonkajsie = document.getElementById('servis-vonkajsie')?.value || '1';
+  const servisVnutorne = document.getElementById('servis-vnutorne')?.value || '1';
+  const servisModel = document.getElementById('servis-model')?.value || '';
+
   const tlakRezim = document.querySelector('input[name="tlak-rezim"]:checked')?.value || 'chladenie';
   const tlakData = {
     rezim: tlakRezim === 'kurenie' ? 'Kúrenie' : 'Chladenie',
@@ -2981,6 +3020,10 @@ async function doServisUpload() {
       type: 'servis',
       zakaznik: servisZakaznik,
       datum: datumFmt,
+      typSystemu: servisTyp,
+      vonkajsieJednotky: servisVonkajsie,
+      vnutorneJednotky: servisVnutorne,
+      modelZariadenia: servisModel,
       technik: technikFull,
       showTechnikZakaznik: false,
       tlak: tlakData,
@@ -3014,6 +3057,20 @@ async function doServisUpload() {
         <button onclick="doServisUpload()" style="padding:10px 16px;background:var(--orange);color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer;margin-top:12px;">🔄 Skúsiť znova</button>
       </div>`;
     document.getElementById('nav-buttons').style.display = 'flex';
+  }
+}
+
+function updateJednotkyCount() {
+  const typ = document.querySelector('input[name="servis-typ"]:checked')?.value || 'split';
+  const pocetDiv = document.getElementById('servis-jednotky-pocet');
+  const vnutorne = document.getElementById('servis-vnutorne');
+  if (typ === 'split') {
+    if (pocetDiv) pocetDiv.style.display = 'grid';
+    if (vnutorne) vnutorne.value = '1';
+  } else if (typ === 'multisplit') {
+    if (pocetDiv) pocetDiv.style.display = 'grid';
+  } else {
+    if (pocetDiv) pocetDiv.style.display = 'grid';
   }
 }
 
