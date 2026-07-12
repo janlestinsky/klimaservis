@@ -1708,7 +1708,18 @@ async function doUpload() {
       }
     }
   } catch(le) { logoB64 = null; }
-    const peciatkaB64 = PECIATKA_B64 || null;
+    // Pečiatka - konvertuj na base64
+  let peciatkaB64 = null;
+  try {
+    const pecSrc = PECIATKA_B64 || 'peciatka.jpg';
+    if (pecSrc.startsWith('data:')) {
+      peciatkaB64 = pecSrc;
+    } else {
+      const pecResp = await fetch(pecSrc);
+      const pecBlob = await pecResp.blob();
+      peciatkaB64 = await new Promise(res => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(pecBlob); });
+    }
+  } catch(pe) { peciatkaB64 = null; }
 
     // Generuj PDF na serveri (plná slovenčina)
     setStep('s2','active');
@@ -1764,7 +1775,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbziYykSmNz9h5ko16P8FpMfOw6eEhyUVYFucx0sEtNfnube3o9U5xMDWEdER0Yv-73I1g/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzI6f-T7PC5cgPKpLjYQg3xgllzRc7lKlyewx5DptIC_fiHq0Qgy61hCGzLj_FDlOKQ-w/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
