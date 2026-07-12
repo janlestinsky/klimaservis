@@ -234,6 +234,68 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
   </div>
 </div>
 
+
+<!-- ══ ADMIN DASHBOARD ══ -->
+<div id="admin-dashboard" style="display:none; max-width:1000px; margin:0 auto; padding:24px 16px 100px;">
+  <div style="text-align:center; margin-bottom:24px;">
+    <div style="font-size:1.4rem; font-weight:800; color:var(--deep); font-family:'Syne',sans-serif;">📊 Admin Dashboard</div>
+    <div style="font-size:0.85rem; color:var(--muted); margin-top:6px;">Prehľad aktivít a štatistík</div>
+  </div>
+
+  <div style="display:flex; gap:8px; justify-content:center; margin-bottom:20px; flex-wrap:wrap;">
+    <button onclick="filterObdobie('tyzden')" id="fb-tyzden" class="dash-filter-btn active">Tento týždeň</button>
+    <button onclick="filterObdobie('mesiac')" id="fb-mesiac" class="dash-filter-btn">Tento mesiac</button>
+    <button onclick="filterObdobie('rok')" id="fb-rok" class="dash-filter-btn">Tento rok</button>
+    <button onclick="filterObdobie('vsetko')" id="fb-vsetko" class="dash-filter-btn">Celkovo</button>
+  </div>
+
+  <div id="dash-loading" style="text-align:center; padding:40px; color:var(--muted);">
+    <div class="spinner" style="margin:0 auto 12px;"></div>
+    Načítavam štatistiky...
+  </div>
+
+  <div id="dash-content" style="display:none;">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:24px;">
+      <div class="dash-card"><div class="dash-icon" style="background:linear-gradient(135deg,#f97316,#ea580c);">🌡️</div><div class="dash-num" id="dn-montaze">–</div><div class="dash-label">Montáže klimatizácií</div></div>
+      <div class="dash-card"><div class="dash-icon" style="background:linear-gradient(135deg,#06b6d4,#0891b2);">🔧</div><div class="dash-num" id="dn-servisy">–</div><div class="dash-label">Servisné prehliadky</div></div>
+      <div class="dash-card"><div class="dash-icon" style="background:linear-gradient(135deg,#a855f7,#7c3aed);">🛡️</div><div class="dash-num" id="dn-alarmy-m">–</div><div class="dash-label">Alarmy — montáž</div></div>
+      <div class="dash-card"><div class="dash-icon" style="background:linear-gradient(135deg,#22c55e,#16a34a);">🔒</div><div class="dash-num" id="dn-alarmy-s">–</div><div class="dash-label">Alarmy — servis</div></div>
+      <div class="dash-card"><div class="dash-icon" style="background:linear-gradient(135deg,#eab308,#ca8a04);">📧</div><div class="dash-num" id="dn-emaily">–</div><div class="dash-label">Odoslané upomienky</div></div>
+      <div class="dash-card"><div class="dash-icon" style="background:linear-gradient(135deg,#3b82f6,#2563eb);">💨</div><div class="dash-num" id="dn-chladivo">–</div><div class="dash-label">Doplnené chladivo (kg)</div></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr; gap:16px;">
+      <div class="dash-tabulka">
+        <div class="dash-tabulka-hdr">👷 Prehľad podľa technikov</div>
+        <div id="tab-technici" style="padding:12px;"></div>
+      </div>
+      <div class="dash-tabulka">
+        <div class="dash-tabulka-hdr">💨 Doplnené chladivo — podľa zákazníkov</div>
+        <div id="tab-chladivo" style="padding:12px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center; margin-top:24px;">
+    <button onclick="zobrazRezim()" style="background:none; border:1.5px solid #dde4e8; border-radius:10px; padding:12px 28px; color:#5a7a88; font-size:14px; font-weight:600; cursor:pointer;">← Späť na menu</button>
+  </div>
+</div>
+
+<style>
+.dash-filter-btn{background:white; border:1.5px solid #dde4e8; border-radius:9px; padding:9px 16px; font-size:0.82rem; font-weight:600; color:#5a7a88; cursor:pointer;}
+.dash-filter-btn.active{background:#0d3d52; color:white; border-color:#0d3d52;}
+.dash-card{background:white; border-radius:14px; padding:18px; border:1px solid var(--border); box-shadow:0 2px 8px rgba(13,61,82,.05); text-align:center;}
+.dash-icon{width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.4rem; margin:0 auto 10px;}
+.dash-num{font-size:1.8rem; font-weight:800; color:var(--deep); font-family:'Syne',sans-serif;}
+.dash-label{font-size:0.78rem; color:var(--muted); margin-top:4px;}
+.dash-tabulka{background:white; border-radius:14px; border:1px solid var(--border); overflow:hidden;}
+.dash-tabulka-hdr{background:#f0f7fa; padding:12px 16px; font-weight:700; color:var(--deep); font-size:0.9rem; border-bottom:1px solid var(--border);}
+.dash-row{display:flex; justify-content:space-between; padding:8px 6px; border-bottom:1px solid #f0f0f0; font-size:0.85rem;}
+.dash-row:last-child{border-bottom:none;}
+.dash-row .rn{color:var(--text); font-weight:500;}
+.dash-row .rv{color:var(--deep); font-weight:700;}
+</style>
+
 <header>
   <div class="header-inner">
     <div class="header-logo">
@@ -310,6 +372,15 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
       <div class="rezim-sub">Ročný servis zabezpečovacieho systému</div>
     </div>
   </button>
+
+  <button id="admin-dashboard-btn" onclick="zobrazDashboard()" class="rezim-btn" style="display:none; margin-top:16px; background:linear-gradient(135deg,#0d3d52,#1a5470); color:white; border:none;">
+    <div class="rezim-icon" style="background:rgba(255,255,255,0.2);">📊</div>
+    <div>
+      <div class="rezim-title" style="color:white;">Admin Dashboard</div>
+      <div class="rezim-sub" style="color:rgba(255,255,255,0.8);">Prehľad štatistík a aktivít</div>
+    </div>
+  </button>
+
   <div style="margin-top:16px; padding-top:16px; border-top:1px solid #e8edf0;">
     <button onclick="odhlasitSa()" style="width:100%; background:#f8fafc; border:1.5px solid #dde4e8; border-radius:12px; padding:14px; color:#5a7a88; font-size:14px; font-weight:600; cursor:pointer; box-sizing:border-box;">🔓 Odhlásiť sa</button>
   </div>
@@ -1634,7 +1705,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw3XqMO_hHNqwdfj5O-GTid-d0J4z0O8wZgGjCKlcC040mmz-LbLq7N3co4p9BajJGhKg/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyijmBYSYF5lgWHOKTvC0cazAYjd7-78Yf49TP-t7AowVTqM5eFcfjOxcCEmFP05xsRQg/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2019,6 +2090,7 @@ async function prihlasit() {
       document.getElementById('setup-screen').style.display = 'none';
       const menoEl = document.getElementById('prihlaseny-meno');
       if (menoEl) menoEl.textContent = data.meno;
+      setTimeout(skontrolujAdmin, 100);
       if (data.prvePrihlasenie) { document.getElementById('zmen-heslo-screen').style.display = 'flex'; }
       else { zobrazRezim(); }
     } else { errEl.textContent='❌ Nesprávne meno alebo heslo'; errEl.style.display='block'; }
@@ -2036,6 +2108,7 @@ function skontrolujPrihlasenie() {
       const menoEl = document.getElementById('prihlaseny-meno');
       if (menoEl && prihlasenyUzivatel.meno) menoEl.textContent = prihlasenyUzivatel.meno;
       zobrazRezim();
+      setTimeout(skontrolujAdmin, 100);
     } catch(e) { sessionStorage.removeItem('elwork_user'); document.getElementById('login-screen').style.display = 'flex'; }
   } else { document.getElementById('login-screen').style.display = 'flex'; }
 }
@@ -2097,6 +2170,84 @@ async function zmenHeslo() {
   }catch(e){errEl.textContent='❌ Chyba pripojenia';errEl.style.display='block';}
   finally{loadEl.style.display='none';btnEl.disabled=false;}
 }
+
+// ══ ADMIN DASHBOARD ══
+let aktualneObdobie = 'tyzden';
+
+function zobrazDashboard() {
+  document.getElementById('rezim-screen').style.display = 'none';
+  document.getElementById('admin-dashboard').style.display = 'block';
+  document.getElementById('dash-loading').style.display = 'block';
+  document.getElementById('dash-content').style.display = 'none';
+  nacitajStatistiky();
+}
+
+function filterObdobie(obd) {
+  aktualneObdobie = obd;
+  document.querySelectorAll('.dash-filter-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('fb-' + obd).classList.add('active');
+  document.getElementById('dash-loading').style.display = 'block';
+  document.getElementById('dash-content').style.display = 'none';
+  nacitajStatistiky();
+}
+
+async function nacitajStatistiky() {
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=UTF-8'},
+      body: 'data=' + encodeURIComponent(JSON.stringify({type: 'statistiky', obdobie: aktualneObdobie}))
+    });
+    const data = await res.json();
+    if (data.ok) {
+      document.getElementById('dn-montaze').textContent = data.montaze || 0;
+      document.getElementById('dn-servisy').textContent = data.servisy || 0;
+      document.getElementById('dn-alarmy-m').textContent = data.alarmyMontaz || 0;
+      document.getElementById('dn-alarmy-s').textContent = data.alarmyServis || 0;
+      document.getElementById('dn-emaily').textContent = data.emaily || 0;
+      document.getElementById('dn-chladivo').textContent = (data.chladivo || 0).toFixed(2);
+
+      // Technici
+      const techEl = document.getElementById('tab-technici');
+      if (data.technici && data.technici.length) {
+        techEl.innerHTML = data.technici.map(t =>
+          `<div class="dash-row"><span class="rn">${t.meno}</span><span class="rv">${t.pocet}</span></div>`
+        ).join('');
+      } else {
+        techEl.innerHTML = '<div style="text-align:center; color:var(--muted); padding:20px;">Žiadne údaje</div>';
+      }
+
+      // Chladivo
+      const chladEl = document.getElementById('tab-chladivo');
+      if (data.chladivoDetail && data.chladivoDetail.length) {
+        chladEl.innerHTML = data.chladivoDetail.map(c =>
+          `<div class="dash-row"><span class="rn">${c.zakaznik}</span><span class="rv">${c.kg} kg</span></div>`
+        ).join('');
+      } else {
+        chladEl.innerHTML = '<div style="text-align:center; color:var(--muted); padding:20px;">Žiadne údaje</div>';
+      }
+
+      document.getElementById('dash-loading').style.display = 'none';
+      document.getElementById('dash-content').style.display = 'block';
+    } else {
+      document.getElementById('dash-loading').innerHTML = '❌ Chyba: ' + (data.error || 'Neznáma');
+    }
+  } catch(e) {
+    document.getElementById('dash-loading').innerHTML = '❌ Chyba pripojenia: ' + e.message;
+  }
+}
+
+// Zobraz admin button ak je prihlásený admin
+function skontrolujAdmin() {
+  const btn = document.getElementById('admin-dashboard-btn');
+  if (btn && prihlasenyUzivatel && prihlasenyUzivatel.role === 'admin') {
+    btn.style.display = 'flex';
+  } else if (btn) {
+    btn.style.display = 'none';
+  }
+}
+
+
 window.addEventListener('load', skontrolujPrihlasenie);
 
 window.addEventListener('load', () => {
@@ -2114,6 +2265,7 @@ let servisStep = 1;
 
 function zobrazRezim() {
   document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('admin-dashboard').style.display = 'none';
   document.getElementById('main-app').style.display = 'none';
   document.getElementById('servis-app').style.display = 'none';
   document.getElementById('alarm-montaz-app').style.display = 'none';
