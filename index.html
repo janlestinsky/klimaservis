@@ -2422,7 +2422,7 @@ function getFirmaData(prefix) {
 
 function spustiMontaz() {
   document.getElementById('rezim-screen').style.display = 'none';
-  document.getElementById('main-app').style.display = '';
+  document.getElementById('main-app').style.display = 'block';
   document.getElementById('nav-buttons').style.display = 'flex';
   document.getElementById('prog-bar').style.display = 'flex';
   currentStep = 1; showStep(1);
@@ -2433,7 +2433,8 @@ function spustiMontaz() {
 
 function spustiServis() {
   document.getElementById('rezim-screen').style.display = 'none';
-  document.getElementById('servis-app').style.display = '';
+  document.getElementById('admin-dashboard').style.display = 'none';
+  document.getElementById('servis-app').style.display = 'block';
   document.getElementById('nav-buttons').style.display = 'flex';
   document.getElementById('prog-bar').style.display = 'none';
   servisStep = 1;
@@ -2445,7 +2446,7 @@ function spustiServis() {
 
 function spustiMontazAlarm() {
   document.getElementById('rezim-screen').style.display = 'none';
-  document.getElementById('alarm-montaz-app').style.display = '';
+  document.getElementById('alarm-montaz-app').style.display = 'block';
   document.getElementById('nav-buttons').style.display = 'none';
   document.getElementById('prog-bar').style.display = 'none';
   const today = new Date().toISOString().split('T')[0];
@@ -2457,7 +2458,7 @@ function spustiMontazAlarm() {
 
 function spustiServisAlarm() {
   document.getElementById('rezim-screen').style.display = 'none';
-  document.getElementById('alarm-servis-app').style.display = '';
+  document.getElementById('alarm-servis-app').style.display = 'block';
   document.getElementById('nav-buttons').style.display = 'none';
   document.getElementById('prog-bar').style.display = 'none';
   alarmServisZakaznik = null;
