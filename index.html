@@ -590,7 +590,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
         <div class="field"><label>Dátum servisu</label>
           <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:.85rem;color:var(--muted);font-weight:500;white-space:nowrap;">Dňa:</span><input type="date" id="servis-datum" style="flex:1;"></div>
         </div>
-        <div class="field"><label>Servisný technik</label>
+        <div class="field"><label>Servisný technik 1 <span class="req">*</span></label>
           <select id="servis-technik" onchange="if(this.value==='Iný'){document.getElementById('servis-technik-iny').style.display='block';}else{document.getElementById('servis-technik-iny').style.display='none';}" style="width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; background:white; color:var(--text);">
             <option value="">-- Vybrať technika --</option>
             <option value="Miroslav Paška">Miroslav Paška</option>
@@ -599,7 +599,18 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
             <option value="Ľuboš Hamza">Ľuboš Hamza</option>
             <option value="Iný">Iný...</option>
           </select>
-          <input type="text" id="servis-technik-iny" placeholder="Meno technika" style="display:none; margin-top:8px; width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; box-sizing:border-box;">
+          <input type="text" id="servis-technik-iny" placeholder="Meno iného technika" style="display:none; margin-top:8px; width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; box-sizing:border-box;">
+        </div>
+        <div class="field"><label>Servisný technik 2 (voliteľné)</label>
+          <select id="servis-technik2" onchange="if(this.value==='Iný'){document.getElementById('servis-technik2-iny').style.display='block';}else{document.getElementById('servis-technik2-iny').style.display='none';}" style="width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; background:white; color:var(--text);">
+            <option value="">-- Žiadny --</option>
+            <option value="Miroslav Paška">Miroslav Paška</option>
+            <option value="Jaroslav Brna">Jaroslav Brna</option>
+            <option value="Adam Brziak">Adam Brziak</option>
+            <option value="Ľuboš Hamza">Ľuboš Hamza</option>
+            <option value="Iný">Iný...</option>
+          </select>
+          <input type="text" id="servis-technik2-iny" placeholder="Meno iného technika" style="display:none; margin-top:8px; width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; box-sizing:border-box;">
         </div>
       </div>
       <div class="field">
@@ -1717,7 +1728,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx6yeptZRWyGGTHSwia6db-ytNIFRtqbnCgis0k3DD016NPd2f6Hk6L2Ze53UozFsSr/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzrKgaA1w-ljBL-5pkb4PPy1u-RgE85sE2lq8vm1c07zSRluoAUH0wSrakwzCS_pQxbgA/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2868,6 +2879,10 @@ async function doServisUpload() {
   const technikSel = document.getElementById('servis-technik');
   let technik = technikSel ? technikSel.value : '';
   if (technik === 'Iný') { technik = (document.getElementById('servis-technik-iny')||{}).value || ''; }
+  const technikSel2 = document.getElementById('servis-technik2');
+  let technik2 = technikSel2 ? technikSel2.value : '';
+  if (technik2 === 'Iný') { technik2 = (document.getElementById('servis-technik2-iny')||{}).value || ''; }
+  const technikFull = technik2 ? technik + ', ' + technik2 : technik;
   const poznamky = document.getElementById('servis-poznamky').value || '';
   const podpis = getCanvasDataUrl('canvas-servis-zakaznik');
   const logoB64 = document.querySelector('header img')?.src || null;
@@ -2900,7 +2915,8 @@ async function doServisUpload() {
       type: 'servis',
       zakaznik: servisZakaznik,
       datum: datumFmt,
-      technik,
+      technik: technikFull,
+      showTechnikZakaznik: false,
       poznamky,
       checkboxy,
       podpisZakaznik: podpis,
