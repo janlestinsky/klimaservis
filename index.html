@@ -562,6 +562,10 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
     <div class="card" id="servis-zakaznik-card" style="display:none">
       <div style="font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">✅ Vybraný zákazník</div>
       <div id="servis-zakaznik-info"></div>
+      <div id="servis-historia" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
+        <div style="font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">📅 História servisov</div>
+        <div id="servis-historia-list" style="font-size:0.85rem; color:var(--deep);"></div>
+      </div>
     </div>
     <div class="card" id="novy-zakaznik-card" style="display:none">
       <div style="font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">➕ Nový zákazník (bez predchádzajúcej montáže)</div>
@@ -587,7 +591,15 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
           <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:.85rem;color:var(--muted);font-weight:500;white-space:nowrap;">Dňa:</span><input type="date" id="servis-datum" style="flex:1;"></div>
         </div>
         <div class="field"><label>Servisný technik</label>
-          <input type="text" id="servis-technik" placeholder="Meno technika">
+          <select id="servis-technik" onchange="if(this.value==='Iný'){document.getElementById('servis-technik-iny').style.display='block';}else{document.getElementById('servis-technik-iny').style.display='none';}" style="width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; background:white; color:var(--text);">
+            <option value="">-- Vybrať technika --</option>
+            <option value="Miroslav Paška">Miroslav Paška</option>
+            <option value="Jaroslav Brna">Jaroslav Brna</option>
+            <option value="Adam Brziak">Adam Brziak</option>
+            <option value="Ľuboš Hamza">Ľuboš Hamza</option>
+            <option value="Iný">Iný...</option>
+          </select>
+          <input type="text" id="servis-technik-iny" placeholder="Meno technika" style="display:none; margin-top:8px; width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; box-sizing:border-box;">
         </div>
       </div>
       <div class="field">
@@ -1705,7 +1717,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyxn3g7_EXg_NGQVr0yFYwO4FpGYr8vydTKf5cZmT6loDoJ0gZZ5ttCUjIjULcoZBzWnQ/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx6yeptZRWyGGTHSwia6db-ytNIFRtqbnCgis0k3DD016NPd2f6Hk6L2Ze53UozFsSr/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2820,7 +2832,7 @@ function vyberZakaznika(i) {
 
   // Zobraz info
   const card = document.getElementById('servis-zakaznik-card');
-  card.style.display = '';
+  card.style.display = 'block';
   document.getElementById('servis-zakaznik-info').innerHTML = `
     <div class="rv-item"><span class="rk">Meno</span><span class="rv">${servisZakaznik.meno} ${servisZakaznik.priezvisko}</span></div>
     <div class="rv-item"><span class="rk">Adresa</span><span class="rv">${servisZakaznik.adresa}</span></div>
@@ -2828,6 +2840,19 @@ function vyberZakaznika(i) {
     <div class="rv-item"><span class="rk">Email</span><span class="rv">${servisZakaznik.email || '–'}</span></div>
     <div class="rv-item"><span class="rk">Klimatizácia</span><span class="rv">${servisZakaznik.modely || '–'}</span></div>
   `;
+
+  // Zobraz históriu servisov
+  const servisy = [servisZakaznik.servis1, servisZakaznik.servis2, servisZakaznik.servis3, servisZakaznik.servis4, servisZakaznik.servis5].filter(s => s && String(s).trim() !== '');
+  const historiaEl = document.getElementById('servis-historia');
+  const historiaList = document.getElementById('servis-historia-list');
+  if (historiaEl && historiaList) {
+    if (servisy.length > 0) {
+      historiaList.innerHTML = servisy.map((s,i) => `<div style="padding:4px 0; border-bottom:1px solid #f0f0f0; font-size:0.83rem;">Servis č.${i+1}: <strong>${s}</strong></div>`).join('');
+      historiaEl.style.display = 'block';
+    } else {
+      historiaEl.style.display = 'none';
+    }
+  }
 
   // Nastav modely v kroku 2
   setTimeout(() => {
@@ -2840,7 +2865,9 @@ function vyberZakaznika(i) {
 async function doServisUpload() {
   const datum = document.getElementById('servis-datum').value;
   const datumFmt = datum ? datum.split('-').reverse().join('.') : new Date().toLocaleDateString('sk-SK');
-  const technik = document.getElementById('servis-technik').value || '';
+  const technikSel = document.getElementById('servis-technik');
+  let technik = technikSel ? technikSel.value : '';
+  if (technik === 'Iný') { technik = (document.getElementById('servis-technik-iny')||{}).value || ''; }
   const poznamky = document.getElementById('servis-poznamky').value || '';
   const podpis = getCanvasDataUrl('canvas-servis-zakaznik');
   const logoB64 = document.querySelector('header img')?.src || null;
