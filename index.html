@@ -755,33 +755,95 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
 
   
   <div class="section" id="sv4">
-    <div class="sec-hdr"><div class="sec-icon" style="background:linear-gradient(135deg,#f97316,#ea580c);">🌡️</div><div><h2>Meranie tlaku</h2><p>Krok 4 z 5</p></div></div>
+    <div class="sec-hdr"><div class="sec-icon" style="background:linear-gradient(135deg,#f97316,#ea580c);">🌡️</div><div><h2>Meranie tlaku a doplnenie</h2><p>Krok 4 z 5</p></div></div>
+
+    <!-- Meranie tlaku - checkboxy -->
     <div class="card">
-      <div class="field">
-        <label>Režim merania</label>
-        <div style="display:flex; gap:20px; margin-bottom:12px;">
-          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.9rem;">
-            <input type="radio" name="tlak-rezim" value="chladenie" checked onchange="generujTlakMerania()"> ❄️ Chladenie
-          </label>
-          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.9rem;">
-            <input type="radio" name="tlak-rezim" value="kurenie" onchange="generujTlakMerania()"> 🔥 Kúrenie
-          </label>
+      <div class="unit-card-title">🌡️ Meranie tlaku</div>
+
+      <div class="chk-group" style="grid-template-columns:1fr;">
+        <label class="chk-row"><input type="checkbox" id="sc_tlak_chl"><div class="chk-box">✓</div>❄️ Merané v režime Chladenie</label>
+        <label class="chk-row"><input type="checkbox" id="sc_tlak_kur"><div class="chk-box">✓</div>🔥 Merané v režime Kúrenie</label>
+      </div>
+
+      <!-- Chladenie hodnoty - zobrazia sa pri zaškrtnutí -->
+      <div id="tlak-chl-detail" style="display:none; margin-top:10px; background:#f0f7ff; border-radius:10px; padding:12px; border:1px solid #bfdbfe;">
+        <div style="font-size:0.75rem;font-weight:700;color:#1d4ed8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">❄️ Chladenie — namerané hodnoty</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Tlak sací (bar)</label>
+            <input type="number" id="tlak-chl-saci" step="0.1" placeholder="napr. 8.5" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
+          </div>
+          <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Tlak výtlačný (bar)</label>
+            <input type="number" id="tlak-chl-vytlacny" step="0.1" placeholder="napr. 26.0" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
+          </div>
+          <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Teplota vstup (°C)</label>
+            <input type="number" id="tlak-chl-teplota-in" step="0.1" placeholder="napr. 12.0" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
+          </div>
+          <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Teplota výstup (°C)</label>
+            <input type="number" id="tlak-chl-teplota-out" step="0.1" placeholder="napr. 7.0" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
+          </div>
         </div>
       </div>
-      <div class="field">
-        <label>Počet meraní</label>
-        <select id="tlak-pocet" onchange="generujTlakMerania()" style="width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.9rem; background:white; max-width:150px;">
-          <option value="1">1 meranie</option>
-          <option value="2">2 merania</option>
-          <option value="3">3 merania</option>
-          <option value="4">4 merania</option>
-          <option value="5">5 meraní</option>
-          <option value="6">6 meraní</option>
-        </select>
+
+      <!-- Kúrenie hodnoty -->
+      <div id="tlak-kur-detail" style="display:none; margin-top:10px; background:#fff8f0; border-radius:10px; padding:12px; border:1px solid #fed7aa;">
+        <div style="font-size:0.75rem;font-weight:700;color:#ea580c;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">🔥 Kúrenie — namerané hodnoty</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Tlak sací (bar)</label>
+            <input type="number" id="tlak-kur-saci" step="0.1" placeholder="napr. 10.0" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
+          </div>
+          <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Tlak výtlačný (bar)</label>
+            <input type="number" id="tlak-kur-vytlacny" step="0.1" placeholder="napr. 30.0" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
+          </div>
+          <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Teplota vstup (°C)</label>
+            <input type="number" id="tlak-kur-teplota-in" step="0.1" placeholder="napr. 30.0" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
+          </div>
+          <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Teplota výstup (°C)</label>
+            <input type="number" id="tlak-kur-teplota-out" step="0.1" placeholder="napr. 35.0" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
+          </div>
+        </div>
       </div>
-      <div id="tlak-merania-container"></div>
-      <div class="field"><label>Poznámky k meraniu</label><textarea id="tlak-poznamky" rows="2" placeholder="Prípadné poznámky k meraniu..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;resize:none;"></textarea></div>
+
+      <div class="field" style="margin-top:12px;"><label>Poznámky k meraniu</label>
+        <textarea id="tlak-poznamky" rows="2" placeholder="Prípadné poznámky k meraniu..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;resize:none;"></textarea>
+      </div>
     </div>
+
+    <!-- Doplnenie chladiva -->
+    <div class="card">
+      <div class="unit-card-title">🧊 Doplnenie chladiva</div>
+      <div class="chk-group" style="grid-template-columns:1fr;">
+        <label class="chk-row"><input type="checkbox" id="sc_chladivo_doplnenie" onchange="toggleChladivoDoplnenie(this)"><div class="chk-box">✓</div>Doplnenie chladiva</label>
+      </div>
+      <div id="chladivo-doplnenie-detail" style="display:none; margin-top:10px; background:#f0fdf4; border-radius:10px; padding:12px; border:1px solid #86efac;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="field" style="margin:0; flex:1;"><label style="font-size:0.8rem;">Množstvo doplneného chladiva (g)</label>
+            <input type="number" id="chladivo-doplnene-g" step="10" placeholder="napr. 150" style="width:100%;padding:9px 12px;border:1.5px solid #86efac;border-radius:9px;font-size:0.95rem;font-weight:700;color:#166534;box-sizing:border-box;">
+          </div>
+          <div class="field" style="margin:0; flex:1;"><label style="font-size:0.8rem;">Typ chladiva</label>
+            <select id="chladivo-typ" style="width:100%;padding:10px 12px;border:1.5px solid #86efac;border-radius:9px;font-size:0.85rem;background:white;box-sizing:border-box;">
+              <option value="">– Vybrať –</option>
+              <option>R-32</option><option>R-410A</option><option>R-22</option><option>R-134a</option><option>R-290</option><option>R-407C</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Iný servis / popis práce -->
+    <div class="card">
+      <div class="unit-card-title">🔧 Iný servis / popis vykonanej práce</div>
+      <div class="chk-group" style="grid-template-columns:1fr;">
+        <label class="chk-row"><input type="checkbox" id="sc_iny_servis" onchange="toggleInyServis(this)"><div class="chk-box">✓</div>Iný servis / oprava</label>
+      </div>
+      <div id="iny-servis-detail" style="display:none; margin-top:10px;">
+        <div class="field" style="margin:0;">
+          <label style="font-size:0.8rem;">Popis vykonanej práce</label>
+          <textarea id="iny-servis-popis" rows="4" placeholder="napr. výmena poškodeného dielu, oprava úniku chladiva, výmena filtra..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;resize:vertical;"></textarea>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <div class="section" id="sv5">
@@ -1832,7 +1894,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwncAhHBI5e5BlTC5_bbz_crKHPURESCMb49Mq3ne58CJ4-HP0Wr8jBf_pu_Nal2zhPlA/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztygL52E8S7yyoAGxgBva-nhi-c_GTPcIGG6LxtPJ3FAQuxlJf5l5wzvhQOtgup3lz1A/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2157,7 +2219,7 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 
 // ══ LOGIN ══
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwncAhHBI5e5BlTC5_bbz_crKHPURESCMb49Mq3ne58CJ4-HP0Wr8jBf_pu_Nal2zhPlA/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztygL52E8S7yyoAGxgBva-nhi-c_GTPcIGG6LxtPJ3FAQuxlJf5l5wzvhQOtgup3lz1A/exec';
 let prihlasenyUzivatel = null;
 
 function toggleHeslo(id, icon) {
@@ -2984,34 +3046,62 @@ function vyberZakaznika(i) {
     }
   }
 
-  // Predvyplň výrobcu z modely reťazca (napr. "Daikin FTXB25C")
+  // Predvyplň výrobcu — priorita: priamo z Excelu (vyrobcaExcel), inak detekovať z modely
   const _modelStr = servisZakaznik.modely || '';
+  const _vyrobcaExcel = servisZakaznik.vyrobcaExcel || '';
   const _vyrobcaList = ['Daikin','Mitsubishi Electric','Mitsubishi Heavy','Samsung','LG','Panasonic',
     'Toshiba','Fujitsu','Midea','Gree','Carrier','Bosch','Naitec','Sinclair','Hisense'];
-  const _detectedVyrobca = _vyrobcaList.find(v => _modelStr.toLowerCase().includes(v.toLowerCase())) || '';
+  const _detectedVyrobca = _vyrobcaExcel ||
+    _vyrobcaList.find(v => _modelStr.toLowerCase().includes(v.toLowerCase())) || '';
 
-  // Parsuj modely do štruktúrovaných jednotiek
-  const _modelParts = _modelStr.split('/').map(s => s.trim()).filter(Boolean);
-  servisZakaznik.jednotkyVonk = _modelParts.length > 0 ? [{ model: _modelParts[0] || '', serial: '' }] : [];
-  servisZakaznik.jednotkyVnut = _modelParts.length > 1 ? [{ model: _modelParts[1] || '', serial: '' }]
-    : (_modelParts.length === 1 ? [{ model: _modelParts[0] || '', serial: '' }] : []);
-
-  // Parsuj sériové čísla
-  if (servisZakaznik.serialCisla) {
-    const _serials = servisZakaznik.serialCisla.split(',').map(s => s.trim()).filter(Boolean);
-    if (_serials.length > 0 && servisZakaznik.jednotkyVonk[0]) servisZakaznik.jednotkyVonk[0].serial = _serials[0];
-    for (let _si = 1; _si < _serials.length; _si++) {
-      if (servisZakaznik.jednotkyVnut[_si-1]) servisZakaznik.jednotkyVnut[_si-1].serial = _serials[_si];
-    }
+  // Zisti počet jednotiek z typKlima (napr. "Multisplit (1 vonk. / 2 vnút.)")
+  const _typKlima = servisZakaznik.typKlima || '';
+  let _pocetVonk = 1, _pocetVnut = 1, _isMultisplit = false;
+  const _multiMatch = _typKlima.match(/Multisplit\s*\((\d+)\s*vonk\.\s*\/\s*(\d+)\s*vnút\.\)/i);
+  if (_multiMatch) {
+    _isMultisplit = true;
+    _pocetVonk = parseInt(_multiMatch[1]) || 1;
+    _pocetVnut = parseInt(_multiMatch[2]) || 1;
   }
+
+  // Parsuj sériové čísla z montáže do jednotiek
+  const _serials = (servisZakaznik.serialCisla || '').split(/[,|]/).map(s => s.trim()).filter(Boolean);
+  // Modely z modely reťazca (napr. "Daikin FTXB25C / RXB25C")
+  const _modelParts = _modelStr.split('/').map(s => s.trim()).filter(Boolean);
+
+  // Zostav štruktúrované jednotky pre predvyplnenie
+  servisZakaznik.jednotkyVonk = Array.from({length: _pocetVonk}, (_, i) => ({
+    model: _modelParts[i] || '',
+    serial: _serials[i] || ''
+  }));
+  servisZakaznik.jednotkyVnut = Array.from({length: _pocetVnut}, (_, i) => ({
+    model: _modelParts[_pocetVonk + i] || _modelParts[i] || '',
+    serial: _serials[_pocetVonk + i] || _serials[i] || ''
+  }));
 
   // Nastav modely v kroku 2
   setTimeout(() => {
     const modDiv = document.getElementById('servis-modely');
     if (modDiv) modDiv.innerHTML = servisZakaznik.modely || '–';
+
     // Predvyplň výrobcu
     const _vyrobcaEl = document.getElementById('servis-vyrobca');
-    if (_vyrobcaEl && _detectedVyrobca) _vyrobcaEl.value = _detectedVyrobca;
+    if (_vyrobcaEl && _detectedVyrobca) {
+      // Pokús sa nastaviť presnú hodnotu, inak "Iný"
+      const opts = Array.from(_vyrobcaEl.options).map(o => o.value);
+      _vyrobcaEl.value = opts.includes(_detectedVyrobca) ? _detectedVyrobca : '';
+    }
+
+    // Nastav typ systému (split/multisplit)
+    if (_isMultisplit) {
+      const radMulti = document.querySelector('input[name="servis-typ"][value="multisplit"]');
+      if (radMulti) { radMulti.checked = true; }
+      const vonkSel = document.getElementById('servis-vonkajsie');
+      const vnutSel = document.getElementById('servis-vnutorne');
+      if (vonkSel) vonkSel.value = String(_pocetVonk);
+      if (vnutSel) vnutSel.value = String(_pocetVnut);
+    }
+
     // Pregeneru jednotky s predvyplnenými hodnotami
     generujJednotky();
   }, 100);
@@ -3064,7 +3154,8 @@ async function doServisUpload() {
   // Zober všetky checkboxy
   const checkboxy = {};
   ['v1','v2','v3','v4','k1','k2','k3','ko1','ko2','ko3','t1','t2','t3',
-   'vv1','vv2','vv3','vp1','vp2','vp3','rp1','rp2','tj1','tj2','r1','r2','rs1','rs2'
+   'vv1','vv2','vv3','vp1','vp2','vp3','rp1','rp2','tj1','tj2','r1','r2','rs1','rs2',
+   'tlak_chl','tlak_kur','chladivo_doplnenie','iny_servis'
   ].forEach(id => {
     checkboxy[id] = document.getElementById('sc_'+id)?.checked || false;
   });
@@ -3253,42 +3344,68 @@ function fotitStitok(modelId, serialId) {
 // Starý alias pre kompatibilitu
 function fotitJednotku(targetId) { fotitStitok(targetId, targetId); }
 
-function generujTlakMerania() {
-  const pocet = parseInt(document.getElementById('tlak-pocet')?.value || '1');
-  const container = document.getElementById('tlak-merania-container');
-  if (!container) return;
-
-  let html = '';
-  for (let i = 0; i < pocet; i++) {
-    html += `
-    <div style="background:#fff8f0; border-radius:10px; padding:12px; margin-bottom:8px; border:1px solid #fed7aa;">
-      ${pocet > 1 ? `<div style="font-size:0.75rem; font-weight:700; color:var(--orange); margin-bottom:8px;">Meranie ${i+1}</div>` : ''}
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-        <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Tlak (bar)</label>
-          <input type="number" id="tlak-${i}-hodnota" step="0.1" placeholder="napr. 8.5" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
-        </div>
-        <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Teplota (°C)</label>
-          <input type="number" id="tlak-${i}-teplota" step="0.1" placeholder="napr. 12.0" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
-        </div>
-      </div>
-    </div>`;
+// Zobraz/skry detaily merania pri zaškrtnutí
+document.addEventListener('change', function(e) {
+  if (e.target.id === 'sc_tlak_chl') {
+    document.getElementById('tlak-chl-detail').style.display = e.target.checked ? '' : 'none';
   }
-  container.innerHTML = html;
+  if (e.target.id === 'sc_tlak_kur') {
+    document.getElementById('tlak-kur-detail').style.display = e.target.checked ? '' : 'none';
+  }
+});
+
+function toggleChladivoDoplnenie(cb) {
+  document.getElementById('chladivo-doplnenie-detail').style.display = cb.checked ? '' : 'none';
 }
 
+function toggleInyServis(cb) {
+  document.getElementById('iny-servis-detail').style.display = cb.checked ? '' : 'none';
+}
+
+// Starý alias - kompatibilita (už sa nepoužíva aktívne)
+function generujTlakMerania() {}
+
 function zberTlakData() {
-  const pocet = parseInt(document.getElementById('tlak-pocet')?.value || '1');
-  const rezim = document.querySelector('input[name="tlak-rezim"]:checked')?.value || 'chladenie';
   const merania = [];
-  for (let i = 0; i < pocet; i++) {
-    const tlak = document.getElementById(`tlak-${i}-hodnota`)?.value || '';
-    const teplota = document.getElementById(`tlak-${i}-teplota`)?.value || '';
-    if (tlak || teplota) merania.push({ tlak, teplota });
+  const chlChecked = document.getElementById('sc_tlak_chl')?.checked;
+  const kurChecked = document.getElementById('sc_tlak_kur')?.checked;
+
+  if (chlChecked) {
+    merania.push({
+      rezim: 'Chladenie',
+      tlakSaci: document.getElementById('tlak-chl-saci')?.value || '',
+      tlakVytlacny: document.getElementById('tlak-chl-vytlacny')?.value || '',
+      teplotaIn: document.getElementById('tlak-chl-teplota-in')?.value || '',
+      teplotaOut: document.getElementById('tlak-chl-teplota-out')?.value || ''
+    });
   }
+  if (kurChecked) {
+    merania.push({
+      rezim: 'Kúrenie',
+      tlakSaci: document.getElementById('tlak-kur-saci')?.value || '',
+      tlakVytlacny: document.getElementById('tlak-kur-vytlacny')?.value || '',
+      teplotaIn: document.getElementById('tlak-kur-teplota-in')?.value || '',
+      teplotaOut: document.getElementById('tlak-kur-teplota-out')?.value || ''
+    });
+  }
+
+  // Doplnenie chladiva
+  const chladivoDoplnenie = document.getElementById('sc_chladivo_doplnenie')?.checked || false;
+  const chladivoG = document.getElementById('chladivo-doplnene-g')?.value || '';
+  const chladivoTyp = document.getElementById('chladivo-typ')?.value || '';
+
+  // Iný servis
+  const inyServis = document.getElementById('sc_iny_servis')?.checked || false;
+  const inyServisPopis = document.getElementById('iny-servis-popis')?.value || '';
+
   return {
-    rezim: rezim === 'kurenie' ? 'Kúrenie' : 'Chladenie',
     merania,
-    poznamky: document.getElementById('tlak-poznamky')?.value || ''
+    poznamky: document.getElementById('tlak-poznamky')?.value || '',
+    chladivoDoplnenie,
+    chladivoG,
+    chladivoTyp,
+    inyServis,
+    inyServisPopis
   };
 }
 
