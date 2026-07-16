@@ -619,6 +619,22 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
     <!-- Typ systému a jednotky -->
     <div class="card">
       <div style="font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">🌡️ Klimatizačný systém</div>
+
+      <!-- Výrobca -->
+      <div class="field">
+        <label>Výrobca</label>
+        <select id="servis-vyrobca" style="width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; background:white; color:var(--text);">
+          <option value="">– Vybrať –</option>
+          <option>Daikin</option><option>Mitsubishi Electric</option><option>Mitsubishi Heavy</option>
+          <option>Samsung</option><option>LG</option><option>Panasonic</option>
+          <option>Toshiba</option><option>Fujitsu</option><option>Midea</option>
+          <option>Gree</option><option>Carrier</option><option>Bosch</option>
+          <option>Naitec</option><option>Sinclair</option><option>Hisense</option>
+          <option>Iný</option>
+        </select>
+      </div>
+
+      <!-- Typ systému -->
       <div class="field"><label>Typ systému</label>
         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
           <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.85rem; padding:7px 12px; border:1.5px solid var(--border); border-radius:9px; background:white;">
@@ -1816,7 +1832,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxdslKJH4Pzp-PYQ39icxESadCFb7KWc-IgUj-25YwqOU1FE7AXZckIwxg1S9B7KFEbwg/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwncAhHBI5e5BlTC5_bbz_crKHPURESCMb49Mq3ne58CJ4-HP0Wr8jBf_pu_Nal2zhPlA/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2141,7 +2157,7 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 
 // ══ LOGIN ══
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw3XqMO_hHNqwdfj5O-GTid-d0J4z0O8wZgGjCKlcC040mmz-LbLq7N3co4p9BajJGhKg/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwncAhHBI5e5BlTC5_bbz_crKHPURESCMb49Mq3ne58CJ4-HP0Wr8jBf_pu_Nal2zhPlA/exec';
 let prihlasenyUzivatel = null;
 
 function toggleHeslo(id, icon) {
@@ -2968,10 +2984,36 @@ function vyberZakaznika(i) {
     }
   }
 
+  // Predvyplň výrobcu z modely reťazca (napr. "Daikin FTXB25C")
+  const _modelStr = servisZakaznik.modely || '';
+  const _vyrobcaList = ['Daikin','Mitsubishi Electric','Mitsubishi Heavy','Samsung','LG','Panasonic',
+    'Toshiba','Fujitsu','Midea','Gree','Carrier','Bosch','Naitec','Sinclair','Hisense'];
+  const _detectedVyrobca = _vyrobcaList.find(v => _modelStr.toLowerCase().includes(v.toLowerCase())) || '';
+
+  // Parsuj modely do štruktúrovaných jednotiek
+  const _modelParts = _modelStr.split('/').map(s => s.trim()).filter(Boolean);
+  servisZakaznik.jednotkyVonk = _modelParts.length > 0 ? [{ model: _modelParts[0] || '', serial: '' }] : [];
+  servisZakaznik.jednotkyVnut = _modelParts.length > 1 ? [{ model: _modelParts[1] || '', serial: '' }]
+    : (_modelParts.length === 1 ? [{ model: _modelParts[0] || '', serial: '' }] : []);
+
+  // Parsuj sériové čísla
+  if (servisZakaznik.serialCisla) {
+    const _serials = servisZakaznik.serialCisla.split(',').map(s => s.trim()).filter(Boolean);
+    if (_serials.length > 0 && servisZakaznik.jednotkyVonk[0]) servisZakaznik.jednotkyVonk[0].serial = _serials[0];
+    for (let _si = 1; _si < _serials.length; _si++) {
+      if (servisZakaznik.jednotkyVnut[_si-1]) servisZakaznik.jednotkyVnut[_si-1].serial = _serials[_si];
+    }
+  }
+
   // Nastav modely v kroku 2
   setTimeout(() => {
     const modDiv = document.getElementById('servis-modely');
     if (modDiv) modDiv.innerHTML = servisZakaznik.modely || '–';
+    // Predvyplň výrobcu
+    const _vyrobcaEl = document.getElementById('servis-vyrobca');
+    if (_vyrobcaEl && _detectedVyrobca) _vyrobcaEl.value = _detectedVyrobca;
+    // Pregeneru jednotky s predvyplnenými hodnotami
+    generujJednotky();
   }, 100);
 }
 
@@ -2996,7 +3038,18 @@ async function doServisUpload() {
       else { const lr = await fetch(logoImgEl.src); const lb = await lr.blob(); logoB64 = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(lb); }); }
     }
   } catch(le) {}
-  const peciatkaB64 = PECIATKA_B64 || null;
+  // Pečiatka - konvertuj na base64 (rovnaký postup ako v montážnom protokole)
+  let peciatkaB64 = null;
+  try {
+    const _pecSrc = PECIATKA_B64 || 'peciatka.jpg';
+    if (_pecSrc.startsWith('data:')) {
+      peciatkaB64 = _pecSrc;
+    } else {
+      const _pecResp = await fetch(_pecSrc);
+      const _pecBlob = await _pecResp.blob();
+      peciatkaB64 = await new Promise(res => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(_pecBlob); });
+    }
+  } catch(_pe) { peciatkaB64 = null; }
 
   // Meranie tlaku
   // Jednotky
@@ -3042,6 +3095,7 @@ async function doServisUpload() {
       vonkajsieJednotky: servisVonkajsie,
       vnutorneJednotky: servisVnutorne,
       modelZariadenia: servisModel,
+      vyrobca: jednotkyData.vyrobca || document.getElementById('servis-vyrobca')?.value || '',
       jednotky: jednotkyData,
       technik: technikFull,
       showTechnikZakaznik: false,
@@ -3110,22 +3164,24 @@ function generujJednotky() {
 
   // VONKAJŠIE JEDNOTKY
   for (let i = 0; i < finalVonk; i++) {
+    const prefillModel = existValues['sj-vonk-'+i+'-model'] || (servisZakaznik?.jednotkyVonk?.[i]?.model) || '';
+    const prefillSerial = existValues['sj-vonk-'+i+'-serial'] || (servisZakaznik?.jednotkyVonk?.[i]?.serial) || '';
+    const prefillTyp = existValues['sj-vonk-'+i+'-typ'] || '';
     html += `
     <div style="background:#f0f7fa; border-radius:10px; padding:14px; margin-bottom:10px; border:1px solid var(--border);">
       <div style="font-size:.75rem;font-weight:700;color:var(--deep);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">🏗️ Vonkajšia jednotka ${finalVonk > 1 ? i+1 : ''}</div>
       <div style="display:grid; grid-template-columns:1fr; gap:8px;">
         <div class="field" style="margin:0;">
-          <label style="font-size:0.8rem;">Model / Výrobca</label>
+          <label style="font-size:0.8rem;">Model</label>
           <div style="display:flex; gap:6px;">
-            <input type="text" id="sj-vonk-${i}-model" value="${existValues['sj-vonk-'+i+'-model'] || zakazModel}" placeholder="napr. Sinclair 3.5kW" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; box-sizing:border-box;">
-            <button onclick="fotitJednotku('sj-vonk-${i}-model')" style="padding:9px 12px; background:var(--deep); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem;">📷</button>
+            <input type="text" id="sj-vonk-${i}-model" value="${prefillModel}" placeholder="napr. RXB25C" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; box-sizing:border-box;">
+            <button onclick="fotitStitok('sj-vonk-${i}-model','sj-vonk-${i}-serial')" style="padding:9px 12px; background:var(--deep); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem; white-space:nowrap;">🏷️ Štítok</button>
           </div>
         </div>
         <div class="field" style="margin:0;">
           <label style="font-size:0.8rem;">Sériové číslo</label>
           <div style="display:flex; gap:6px;">
-            <input type="text" id="sj-vonk-${i}-serial" value="${existValues['sj-vonk-'+i+'-serial'] || ''}" placeholder="napr. SN123456" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; font-family:monospace; box-sizing:border-box;">
-            <button onclick="fotitJednotku('sj-vonk-${i}-serial')" style="padding:9px 12px; background:var(--deep); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem;">📷</button>
+            <input type="text" id="sj-vonk-${i}-serial" value="${prefillSerial}" placeholder="napr. SN123456" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; font-family:monospace; box-sizing:border-box;">
           </div>
         </div>
       </div>
@@ -3134,22 +3190,35 @@ function generujJednotky() {
 
   // VNÚTORNÉ JEDNOTKY
   for (let i = 0; i < finalVnut; i++) {
+    const prefillModelV = existValues['sj-vnut-'+i+'-model'] || (servisZakaznik?.jednotkyVnut?.[i]?.model) || '';
+    const prefillSerialV = existValues['sj-vnut-'+i+'-serial'] || (servisZakaznik?.jednotkyVnut?.[i]?.serial) || '';
+    const prefillTypV = existValues['sj-vnut-'+i+'-typ'] || '';
     html += `
     <div style="background:#fff8f0; border-radius:10px; padding:14px; margin-bottom:10px; border:1px solid #fed7aa;">
       <div style="font-size:.75rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">🏠 Vnútorná jednotka ${finalVnut > 1 ? i+1 : ''}</div>
       <div style="display:grid; grid-template-columns:1fr; gap:8px;">
         <div class="field" style="margin:0;">
-          <label style="font-size:0.8rem;">Model / Výrobca</label>
+          <label style="font-size:0.8rem;">Typ jednotky</label>
+          <select id="sj-vnut-${i}-typ" style="width:100%; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; background:white;">
+            <option value="">– Vybrať –</option>
+            <option value="Nástenná" ${prefillTypV==='Nástenná'?'selected':''}>Nástenná</option>
+            <option value="Kazetová" ${prefillTypV==='Kazetová'?'selected':''}>Kazetová</option>
+            <option value="Kanálová" ${prefillTypV==='Kanálová'?'selected':''}>Kanálová</option>
+            <option value="Podstropnoparapetná" ${prefillTypV==='Podstropnoparapetná'?'selected':''}>Podstropnoparapetná</option>
+            <option value="Iná" ${prefillTypV==='Iná'?'selected':''}>Iná</option>
+          </select>
+        </div>
+        <div class="field" style="margin:0;">
+          <label style="font-size:0.8rem;">Model</label>
           <div style="display:flex; gap:6px;">
-            <input type="text" id="sj-vnut-${i}-model" value="${existValues['sj-vnut-'+i+'-model'] || zakazModel}" placeholder="napr. Sinclair 3.5kW" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; box-sizing:border-box;">
-            <button onclick="fotitJednotku('sj-vnut-${i}-model')" style="padding:9px 12px; background:var(--orange); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem;">📷</button>
+            <input type="text" id="sj-vnut-${i}-model" value="${prefillModelV}" placeholder="napr. FTXB25C" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; box-sizing:border-box;">
+            <button onclick="fotitStitok('sj-vnut-${i}-model','sj-vnut-${i}-serial')" style="padding:9px 12px; background:var(--orange); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem; white-space:nowrap;">🏷️ Štítok</button>
           </div>
         </div>
         <div class="field" style="margin:0;">
           <label style="font-size:0.8rem;">Sériové číslo</label>
           <div style="display:flex; gap:6px;">
-            <input type="text" id="sj-vnut-${i}-serial" value="${existValues['sj-vnut-'+i+'-serial'] || ''}" placeholder="napr. SN789012" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; font-family:monospace; box-sizing:border-box;">
-            <button onclick="fotitJednotku('sj-vnut-${i}-serial')" style="padding:9px 12px; background:var(--orange); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem;">📷</button>
+            <input type="text" id="sj-vnut-${i}-serial" value="${prefillSerialV}" placeholder="napr. SN789012" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; font-family:monospace; box-sizing:border-box;">
           </div>
         </div>
       </div>
@@ -3159,8 +3228,8 @@ function generujJednotky() {
   container.innerHTML = html;
 }
 
-function fotitJednotku(targetId) {
-  // Otvor kameru a skenuj - použi existujúcu logiku z montáže
+function fotitStitok(modelId, serialId) {
+  // Odfotiť štítok jednotky - uloží fotku a upozorní technika
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'image/*';
@@ -3168,13 +3237,21 @@ function fotitJednotku(targetId) {
   input.onchange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const target = document.getElementById(targetId);
-    if (!target) return;
-    // Použij OCR ak je dostupné, inak len notifikuj
-    showToast('📷 Fotka nasnímaná — zadajte hodnotu manuálne');
+    // Ulož fotku do photos pre neskoršie odoslanie
+    const photoKey = 'stit_' + modelId;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (!window.servisPhotos) window.servisPhotos = {};
+      window.servisPhotos[photoKey] = { file, dataUrl: reader.result, label: 'Štítok ' + modelId };
+      showToast('🏷️ Štítok nasnímaný — skontrolujte a doplňte model/SN manuálne');
+    };
+    reader.readAsDataURL(file);
   };
   input.click();
 }
+
+// Starý alias pre kompatibilitu
+function fotitJednotku(targetId) { fotitStitok(targetId, targetId); }
 
 function generujTlakMerania() {
   const pocet = parseInt(document.getElementById('tlak-pocet')?.value || '1');
@@ -3228,16 +3305,18 @@ function zberJednotkyData() {
   for (let i = 0; i < finalVonk; i++) {
     vonkajsie.push({
       model: document.getElementById(`sj-vonk-${i}-model`)?.value || '',
-      serial: document.getElementById(`sj-vonk-${i}-serial`)?.value || ''
+      serial: document.getElementById(`sj-vonk-${i}-serial`)?.value || '',
+      typ: document.getElementById(`sj-vonk-${i}-typ`)?.value || ''
     });
   }
   for (let i = 0; i < finalVnut; i++) {
     vnutorne.push({
       model: document.getElementById(`sj-vnut-${i}-model`)?.value || '',
-      serial: document.getElementById(`sj-vnut-${i}-serial`)?.value || ''
+      serial: document.getElementById(`sj-vnut-${i}-serial`)?.value || '',
+      typ: document.getElementById(`sj-vnut-${i}-typ`)?.value || ''
     });
   }
-  return { vonkajsie, vnutorne };
+  return { vonkajsie, vnutorne, vyrobca: document.getElementById('servis-vyrobca')?.value || '' };
 }
 
 function updateJednotkyCount() {
