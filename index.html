@@ -636,19 +636,9 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
 
       <!-- Typ systému -->
       <div class="field"><label>Typ systému</label>
-        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
-          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.85rem; padding:7px 12px; border:1.5px solid var(--border); border-radius:9px; background:white;">
-            <input type="radio" name="servis-typ" value="split" checked onchange="generujJednotky()"> Split
-          </label>
-          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.85rem; padding:7px 12px; border:1.5px solid var(--border); border-radius:9px; background:white;">
-            <input type="radio" name="servis-typ" value="multisplit" onchange="generujJednotky()"> Multi-split
-          </label>
-          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.85rem; padding:7px 12px; border:1.5px solid var(--border); border-radius:9px; background:white;">
-            <input type="radio" name="servis-typ" value="kazeta" onchange="generujJednotky()"> Kazetová
-          </label>
-          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.85rem; padding:7px 12px; border:1.5px solid var(--border); border-radius:9px; background:white;">
-            <input type="radio" name="servis-typ" value="ine" onchange="generujJednotky()"> Iné
-          </label>
+        <div class="chk-group" style="grid-template-columns:1fr 1fr; margin-bottom:12px;">
+          <label class="chk-row"><input type="radio" name="servis-typ" value="split" checked onchange="generujJednotky()"><div class="chk-box">✓</div>Split</label>
+          <label class="chk-row"><input type="radio" name="servis-typ" value="multisplit" onchange="generujJednotky()"><div class="chk-box">✓</div>Multisplit</label>
         </div>
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
@@ -769,39 +759,25 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
       <!-- Chladenie hodnoty - zobrazia sa pri zaškrtnutí -->
       <div id="tlak-chl-detail" style="display:none; margin-top:10px; background:#f0f7ff; border-radius:10px; padding:12px; border:1px solid #bfdbfe;">
         <div style="font-size:0.75rem;font-weight:700;color:#1d4ed8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">❄️ Chladenie — namerané hodnoty</div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-          <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Tlak sací (bar)</label>
-            <input type="number" id="tlak-chl-saci" step="0.1" placeholder="napr. 8.5" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
-          </div>
-          <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Tlak výtlačný (bar)</label>
-            <input type="number" id="tlak-chl-vytlacny" step="0.1" placeholder="napr. 26.0" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
-          </div>
-          <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Teplota vstup (°C)</label>
-            <input type="number" id="tlak-chl-teplota-in" step="0.1" placeholder="napr. 12.0" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
-          </div>
-          <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Teplota výstup (°C)</label>
-            <input type="number" id="tlak-chl-teplota-out" step="0.1" placeholder="napr. 7.0" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
-          </div>
+        <div class="field" style="margin:0 0 10px 0;"><label style="font-size:0.8rem;">Počet jednotiek</label>
+          <select id="tlak-chl-pocet" onchange="generujTlakJednotky('chl')" style="width:100%; max-width:150px; padding:9px 12px; border:1.5px solid #bfdbfe; border-radius:9px; font-size:0.85rem; background:white;">
+            <option value="1">1 jednotka</option><option value="2">2 jednotky</option><option value="3">3 jednotky</option>
+            <option value="4">4 jednotky</option><option value="5">5 jednotiek</option><option value="6">6 jednotiek</option>
+          </select>
         </div>
+        <div id="tlak-chl-jednotky"></div>
       </div>
 
       <!-- Kúrenie hodnoty -->
       <div id="tlak-kur-detail" style="display:none; margin-top:10px; background:#fff8f0; border-radius:10px; padding:12px; border:1px solid #fed7aa;">
         <div style="font-size:0.75rem;font-weight:700;color:#ea580c;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">🔥 Kúrenie — namerané hodnoty</div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-          <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Tlak sací (bar)</label>
-            <input type="number" id="tlak-kur-saci" step="0.1" placeholder="napr. 10.0" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
-          </div>
-          <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Tlak výtlačný (bar)</label>
-            <input type="number" id="tlak-kur-vytlacny" step="0.1" placeholder="napr. 30.0" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
-          </div>
-          <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Teplota vstup (°C)</label>
-            <input type="number" id="tlak-kur-teplota-in" step="0.1" placeholder="napr. 30.0" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
-          </div>
-          <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Teplota výstup (°C)</label>
-            <input type="number" id="tlak-kur-teplota-out" step="0.1" placeholder="napr. 35.0" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
-          </div>
+        <div class="field" style="margin:0 0 10px 0;"><label style="font-size:0.8rem;">Počet jednotiek</label>
+          <select id="tlak-kur-pocet" onchange="generujTlakJednotky('kur')" style="width:100%; max-width:150px; padding:9px 12px; border:1.5px solid #fed7aa; border-radius:9px; font-size:0.85rem; background:white;">
+            <option value="1">1 jednotka</option><option value="2">2 jednotky</option><option value="3">3 jednotky</option>
+            <option value="4">4 jednotky</option><option value="5">5 jednotiek</option><option value="6">6 jednotiek</option>
+          </select>
         </div>
+        <div id="tlak-kur-jednotky"></div>
       </div>
 
       <div class="field" style="margin-top:12px;"><label>Poznámky k meraniu</label>
@@ -1894,7 +1870,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztygL52E8S7yyoAGxgBva-nhi-c_GTPcIGG6LxtPJ3FAQuxlJf5l5wzvhQOtgup3lz1A/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxv6QyGNda59ETX9LaWknQk2kdKceyTlhi21M_5or07VHjTTJT2P3qxN7hWAoughUvzpQ/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2219,7 +2195,7 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 
 // ══ LOGIN ══
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztygL52E8S7yyoAGxgBva-nhi-c_GTPcIGG6LxtPJ3FAQuxlJf5l5wzvhQOtgup3lz1A/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxv6QyGNda59ETX9LaWknQk2kdKceyTlhi21M_5or07VHjTTJT2P3qxN7hWAoughUvzpQ/exec';
 let prihlasenyUzivatel = null;
 
 function toggleHeslo(id, icon) {
@@ -3199,6 +3175,29 @@ async function doServisUpload() {
     });
     if (!r.ok) throw new Error(r.error || 'Chyba');
     setS('sus1','done'); setP(60);
+
+    // Nahraj fotky štítkov ak nejaké sú
+    if (window.servisPhotos && Object.keys(window.servisPhotos).length > 0 && r.folderId) {
+      const fotoKeys = Object.keys(window.servisPhotos);
+      for (let fi = 0; fi < fotoKeys.length; fi++) {
+        const fk = fotoKeys[fi];
+        const foto = window.servisPhotos[fk];
+        try {
+          const b64 = foto.dataUrl.split(',')[1];
+          const ext = (foto.file?.name || '').split('.').pop() || 'jpg';
+          await apiCall({
+            type: 'servisFoto',
+            folderId: r.folderId,
+            nazov: fk.replace(/[^a-zA-Z0-9_-]/g, '_') + '.' + ext,
+            mime: foto.file?.type || 'image/jpeg',
+            obsah: b64
+          });
+        } catch(fe) { console.warn('Foto upload zlyhal:', fk, fe); }
+        setP(60 + Math.round(35 * (fi+1) / fotoKeys.length));
+      }
+      window.servisPhotos = {};
+    }
+
     setS('sus2','done'); setP(100);
 
     await sleep(400);
@@ -3266,13 +3265,14 @@ function generujJednotky() {
           <label style="font-size:0.8rem;">Model</label>
           <div style="display:flex; gap:6px;">
             <input type="text" id="sj-vonk-${i}-model" value="${prefillModel}" placeholder="napr. RXB25C" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; box-sizing:border-box;">
-            <button onclick="fotitStitok('sj-vonk-${i}-model','sj-vonk-${i}-serial')" style="padding:9px 12px; background:var(--deep); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem; white-space:nowrap;">🏷️ Štítok</button>
+            <button onclick="fotitPole('sj-vonk-${i}-model','Model vonkajšia ${i+1}')" style="padding:9px 12px; background:var(--deep); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem;">📷</button>
           </div>
         </div>
         <div class="field" style="margin:0;">
           <label style="font-size:0.8rem;">Sériové číslo</label>
           <div style="display:flex; gap:6px;">
             <input type="text" id="sj-vonk-${i}-serial" value="${prefillSerial}" placeholder="napr. SN123456" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; font-family:monospace; box-sizing:border-box;">
+            <button onclick="fotitPole('sj-vonk-${i}-serial','SN vonkajšia ${i+1}')" style="padding:9px 12px; background:var(--deep); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem;">📷</button>
           </div>
         </div>
       </div>
@@ -3303,13 +3303,14 @@ function generujJednotky() {
           <label style="font-size:0.8rem;">Model</label>
           <div style="display:flex; gap:6px;">
             <input type="text" id="sj-vnut-${i}-model" value="${prefillModelV}" placeholder="napr. FTXB25C" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; box-sizing:border-box;">
-            <button onclick="fotitStitok('sj-vnut-${i}-model','sj-vnut-${i}-serial')" style="padding:9px 12px; background:var(--orange); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem; white-space:nowrap;">🏷️ Štítok</button>
+            <button onclick="fotitPole('sj-vnut-${i}-model','Model vnútorná ${i+1}')" style="padding:9px 12px; background:var(--orange); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem;">📷</button>
           </div>
         </div>
         <div class="field" style="margin:0;">
           <label style="font-size:0.8rem;">Sériové číslo</label>
           <div style="display:flex; gap:6px;">
             <input type="text" id="sj-vnut-${i}-serial" value="${prefillSerialV}" placeholder="napr. SN789012" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; font-family:monospace; box-sizing:border-box;">
+            <button onclick="fotitPole('sj-vnut-${i}-serial','SN vnútorná ${i+1}')" style="padding:9px 12px; background:var(--orange); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem;">📷</button>
           </div>
         </div>
       </div>
@@ -3319,8 +3320,8 @@ function generujJednotky() {
   container.innerHTML = html;
 }
 
-function fotitStitok(modelId, serialId) {
-  // Odfotiť štítok jednotky - uloží fotku a upozorní technika
+function fotitPole(targetId, popisFotky) {
+  // Odfotiť štítok/pole - fotka sa uloží a pošle spolu s protokolom
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'image/*';
@@ -3328,29 +3329,33 @@ function fotitStitok(modelId, serialId) {
   input.onchange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    // Ulož fotku do photos pre neskoršie odoslanie
-    const photoKey = 'stit_' + modelId;
     const reader = new FileReader();
     reader.onload = () => {
       if (!window.servisPhotos) window.servisPhotos = {};
-      window.servisPhotos[photoKey] = { file, dataUrl: reader.result, label: 'Štítok ' + modelId };
-      showToast('🏷️ Štítok nasnímaný — skontrolujte a doplňte model/SN manuálne');
+      window.servisPhotos['foto_' + targetId] = { file, dataUrl: reader.result, label: popisFotky || targetId };
+      // Vizuálne označ input že má fotku
+      const el = document.getElementById(targetId);
+      if (el) { el.style.borderColor = '#22c55e'; el.style.background = '#f0fdf4'; }
+      showToast('📷 Fotka uložená (' + (popisFotky || targetId) + ')');
     };
     reader.readAsDataURL(file);
   };
   input.click();
 }
 
-// Starý alias pre kompatibilitu
-function fotitJednotku(targetId) { fotitStitok(targetId, targetId); }
+// Staré aliasy pre kompatibilitu
+function fotitStitok(modelId, serialId) { fotitPole(modelId, 'Štítok'); }
+function fotitJednotku(targetId) { fotitPole(targetId, 'Štítok'); }
 
 // Zobraz/skry detaily merania pri zaškrtnutí
 document.addEventListener('change', function(e) {
   if (e.target.id === 'sc_tlak_chl') {
     document.getElementById('tlak-chl-detail').style.display = e.target.checked ? '' : 'none';
+    if (e.target.checked) generujTlakJednotky('chl');
   }
   if (e.target.id === 'sc_tlak_kur') {
     document.getElementById('tlak-kur-detail').style.display = e.target.checked ? '' : 'none';
+    if (e.target.checked) generujTlakJednotky('kur');
   }
 });
 
@@ -3362,7 +3367,36 @@ function toggleInyServis(cb) {
   document.getElementById('iny-servis-detail').style.display = cb.checked ? '' : 'none';
 }
 
-// Starý alias - kompatibilita (už sa nepoužíva aktívne)
+// Vygeneruj polia Tlak+Teplota pre každú jednotku (rezim = 'chl' alebo 'kur')
+function generujTlakJednotky(rezim) {
+  const pocet = parseInt(document.getElementById('tlak-'+rezim+'-pocet')?.value || '1');
+  const container = document.getElementById('tlak-'+rezim+'-jednotky');
+  if (!container) return;
+
+  // Zachovaj existujúce hodnoty
+  const exist = {};
+  container.querySelectorAll('input').forEach(el => { exist[el.id] = el.value; });
+
+  const farba = rezim === 'chl' ? '#1d4ed8' : '#ea580c';
+  let html = '';
+  for (let i = 0; i < pocet; i++) {
+    html += `
+    <div style="background:white; border-radius:9px; padding:10px; margin-bottom:8px; border:1px solid ${rezim==='chl'?'#bfdbfe':'#fed7aa'};">
+      ${pocet > 1 ? `<div style="font-size:0.72rem; font-weight:700; color:${farba}; margin-bottom:6px;">Jednotka č. ${i+1}</div>` : ''}
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Tlak (bar)</label>
+          <input type="number" id="tlak-${rezim}-${i}-tlak" value="${exist['tlak-'+rezim+'-'+i+'-tlak']||''}" step="0.1" placeholder="napr. 8.5" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
+        </div>
+        <div class="field" style="margin:0;"><label style="font-size:0.8rem;">Teplota (°C)</label>
+          <input type="number" id="tlak-${rezim}-${i}-teplota" value="${exist['tlak-'+rezim+'-'+i+'-teplota']||''}" step="0.1" placeholder="napr. 12.0" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:0.85rem;box-sizing:border-box;">
+        </div>
+      </div>
+    </div>`;
+  }
+  container.innerHTML = html;
+}
+
+// Starý alias - kompatibilita
 function generujTlakMerania() {}
 
 function zberTlakData() {
@@ -3371,22 +3405,20 @@ function zberTlakData() {
   const kurChecked = document.getElementById('sc_tlak_kur')?.checked;
 
   if (chlChecked) {
-    merania.push({
-      rezim: 'Chladenie',
-      tlakSaci: document.getElementById('tlak-chl-saci')?.value || '',
-      tlakVytlacny: document.getElementById('tlak-chl-vytlacny')?.value || '',
-      teplotaIn: document.getElementById('tlak-chl-teplota-in')?.value || '',
-      teplotaOut: document.getElementById('tlak-chl-teplota-out')?.value || ''
-    });
+    const pocet = parseInt(document.getElementById('tlak-chl-pocet')?.value || '1');
+    for (let i = 0; i < pocet; i++) {
+      const tlak = document.getElementById(`tlak-chl-${i}-tlak`)?.value || '';
+      const teplota = document.getElementById(`tlak-chl-${i}-teplota`)?.value || '';
+      if (tlak || teplota) merania.push({ rezim: 'Chladenie', jednotka: pocet > 1 ? 'Jednotka č. ' + (i+1) : '', tlak, teplota });
+    }
   }
   if (kurChecked) {
-    merania.push({
-      rezim: 'Kúrenie',
-      tlakSaci: document.getElementById('tlak-kur-saci')?.value || '',
-      tlakVytlacny: document.getElementById('tlak-kur-vytlacny')?.value || '',
-      teplotaIn: document.getElementById('tlak-kur-teplota-in')?.value || '',
-      teplotaOut: document.getElementById('tlak-kur-teplota-out')?.value || ''
-    });
+    const pocet = parseInt(document.getElementById('tlak-kur-pocet')?.value || '1');
+    for (let i = 0; i < pocet; i++) {
+      const tlak = document.getElementById(`tlak-kur-${i}-tlak`)?.value || '';
+      const teplota = document.getElementById(`tlak-kur-${i}-teplota`)?.value || '';
+      if (tlak || teplota) merania.push({ rezim: 'Kúrenie', jednotka: pocet > 1 ? 'Jednotka č. ' + (i+1) : '', tlak, teplota });
+    }
   }
 
   // Doplnenie chladiva
