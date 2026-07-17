@@ -348,14 +348,14 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
   <button class="rezim-btn" onclick="spustiMontaz()">
     <div class="rezim-icon montaz">🔧</div>
     <div>
-      <div class="rezim-title">Montážny protokol</div>
+      <div class="rezim-title">Montážny protokol klimatizácia</div>
       <div class="rezim-sub">Nová inštalácia klimatizácie</div>
     </div>
   </button>
   <button class="rezim-btn" onclick="spustiServis()">
     <div class="rezim-icon servis">🔍</div>
     <div>
-      <div class="rezim-title">Servis a servisná prehliadka</div>
+      <div class="rezim-title">Servis a servisná prehliadka klimatizácie</div>
       <div class="rezim-sub">Ročný servis existujúceho zákazníka</div>
     </div>
   </button>
@@ -1914,7 +1914,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxeHJ0Nc5W8NlVIPcasvyC_GV4Y5EpctwDSXc7VL1nf5-xVzILDKBzo57ep3H45ic5fxQ/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzg_unAv7wyxODhcyfOy_UhlVKTgg1vWIvutdBisfTcUKEiyrLffS4_8iD-iWpwQHaaBA/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2239,7 +2239,7 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 
 // ══ LOGIN ══
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxeHJ0Nc5W8NlVIPcasvyC_GV4Y5EpctwDSXc7VL1nf5-xVzILDKBzo57ep3H45ic5fxQ/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzg_unAv7wyxODhcyfOy_UhlVKTgg1vWIvutdBisfTcUKEiyrLffS4_8iD-iWpwQHaaBA/exec';
 let prihlasenyUzivatel = null;
 
 function toggleHeslo(id, icon) {
