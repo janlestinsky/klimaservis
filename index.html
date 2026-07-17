@@ -737,11 +737,6 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
     </div>
 
     
-    <div class="card">
-      <div class="field"><label>Poznámky k servisu</label>
-        <textarea id="servis-poznamky" placeholder="Prípadné závady, odporúčania..."></textarea>
-      </div>
-    </div>
   </div>
 
   
@@ -816,14 +811,9 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
         <label class="chk-row"><input type="checkbox" id="sc_iny_servis" onchange="toggleInyServis(this)"><div class="chk-box">✓</div>Iný servis / oprava</label>
       </div>
       <div id="iny-servis-detail" style="display:none; margin-top:10px;">
-        <div class="field" style="margin:0 0 10px 0;">
+        <div class="field" style="margin:0;">
           <label style="font-size:0.8rem;">Popis vykonanej práce</label>
           <textarea id="iny-servis-popis" rows="4" placeholder="napr. výmena poškodeného dielu, oprava úniku chladiva, výmena filtra..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;resize:vertical;"></textarea>
-        </div>
-        <div class="field" style="margin:0;">
-          <label style="font-size:0.8rem;">Fotky zo servisu</label>
-          <button onclick="pridatServisFoto()" style="width:100%;padding:11px;background:var(--deep);color:white;border:none;border-radius:10px;font-size:0.9rem;font-weight:600;cursor:pointer;">📷 Pridať fotku zo servisu</button>
-          <div id="iny-servis-fotky" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
         </div>
       </div>
     </div>
@@ -831,15 +821,33 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
   </div>
 
   <div class="section" id="sv5">
-    <div class="sec-hdr"><div class="sec-icon" style="background:linear-gradient(135deg,var(--cold),var(--accent));">✍️</div><div><h2>Podpisy</h2><p>Krok 5 z 5</p></div></div>
+    <div class="sec-hdr"><div class="sec-icon" style="background:linear-gradient(135deg,var(--cold),var(--accent));">✍️</div><div><h2>Záver a podpisy</h2><p>Krok 5 z 5</p></div></div>
+
+    <!-- Poznámky k servisu -->
+    <div class="card">
+      <div class="unit-card-title">📝 Poznámky k servisu</div>
+      <div class="field" style="margin:0;">
+        <textarea id="servis-poznamky" rows="3" placeholder="Prípadné závady, odporúčania pre zákazníka..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;resize:vertical;"></textarea>
+      </div>
+    </div>
+
+    <!-- Fotky zo servisu - samostatná sekcia -->
+    <div class="card">
+      <div class="unit-card-title">📷 Fotodokumentácia</div>
+      <div class="field" style="margin:0 0 10px 0;">
+        <button onclick="pridatServisFoto()" style="width:100%;padding:12px;background:var(--deep);color:white;border:none;border-radius:10px;font-size:0.95rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">📷 Pridať fotku zo servisu</button>
+      </div>
+      <div id="iny-servis-fotky" style="display:flex;flex-wrap:wrap;gap:8px;min-height:0;"></div>
+    </div>
 
     <!-- GDPR súhlas -->
-    <div class="card" style="background:#f8fafc;">
+    <div class="card" style="background:#fffbeb; border:1.5px solid #fbbf24;">
       <label class="chk-row" style="border:none; padding:4px 0; align-items:flex-start;">
-        <input type="checkbox" id="sc_gdpr_servis">
+        <input type="checkbox" id="sc_gdpr_servis" onchange="kontrolujGDPRServis()">
         <div class="chk-box" style="flex-shrink:0; margin-top:2px;">✓</div>
         <span style="font-size:0.78rem; line-height:1.5; color:var(--text);">Zákazník súhlasí so spracovaním svojich osobných údajov (meno, priezvisko, adresa, telefón, e-mail) spoločnosťou ELWORK, s.r.o. na účely plnenia zmluvy, vedenia servisnej evidencie a plnenia zákonných povinností, v súlade s Nariadením Európskeho parlamentu a Rady (EÚ) 2016/679 (GDPR) a zákonom č. 18/2018 Z. z. o ochrane osobných údajov. Osobné údaje budú uchovávané len po dobu nevyhnutnú na uvedené účely.</span>
       </label>
+      <div id="gdpr-servis-warning" style="display:none; margin-top:8px; padding:8px 12px; background:#fee2e2; border-radius:8px; color:#dc2626; font-size:0.8rem; font-weight:600;">⚠️ Pre odoslanie protokolu musí zákazník potvrdiť súhlas so spracovaním osobných údajov.</div>
     </div>
 
     <div class="card">
@@ -1906,7 +1914,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqum0_NM8Zj4DaVtRwwtapCnmkKJZKKi0X6ETI8Y6R3VhJKwwXADpjjP9xL3p8FASDOQ/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9xZYMosdKuJlq0sui8Ck8L-q6AOXVSzwVJM_konglJ80WwARIZnEw2xrnprg45uZG-g/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2231,7 +2239,7 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 
 // ══ LOGIN ══
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqum0_NM8Zj4DaVtRwwtapCnmkKJZKKi0X6ETI8Y6R3VhJKwwXADpjjP9xL3p8FASDOQ/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9xZYMosdKuJlq0sui8Ck8L-q6AOXVSzwVJM_konglJ80WwARIZnEw2xrnprg45uZG-g/exec';
 let prihlasenyUzivatel = null;
 
 function toggleHeslo(id, icon) {
@@ -3138,7 +3146,19 @@ function vyberZakaznika(i) {
 }
 
 // ══ SERVIS UPLOAD ══
+function kontrolujGDPRServis() {
+  const w = document.getElementById('gdpr-servis-warning');
+  if (w) w.style.display = document.getElementById('sc_gdpr_servis')?.checked ? 'none' : 'none';
+}
+
 async function doServisUpload() {
+  // GDPR blokácia
+  if (!document.getElementById('sc_gdpr_servis')?.checked) {
+    const w = document.getElementById('gdpr-servis-warning');
+    if (w) { w.style.display = ''; w.scrollIntoView({behavior:'smooth', block:'center'}); }
+    showToast('⚠️ Zákazník musí potvrdiť súhlas GDPR', 3500);
+    return;
+  }
   const datum = document.getElementById('servis-datum').value;
   const datumFmt = datum ? datum.split('-').reverse().join('.') : new Date().toLocaleDateString('sk-SK');
   const technikSel = document.getElementById('servis-technik');
@@ -3219,7 +3239,7 @@ async function doServisUpload() {
       vyrobca: jednotkyData.vyrobca || document.getElementById('servis-vyrobca')?.value || '',
       jednotky: jednotkyData,
       technik: technikFull,
-      showTechnikZakaznik: false,
+      showTechnikZakaznik: false, // zákazníkova kópia (firma kópia generovaná v GAS s flagom true)
       tlak: tlakData,
       poznamky,
       checkboxy,
