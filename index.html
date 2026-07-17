@@ -151,6 +151,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
 .chk-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--ice);font-size:.82rem;cursor:pointer;}
 .chk-row:last-child{border-bottom:none;}
 .chk-row input[type=checkbox]{display:none;}
+.chk-row input[type=radio]{display:none;}
 .chk-box{width:20px;height:20px;border:2px solid var(--border);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.75rem;transition:all .2s;}
 .chk-row:has(input:checked) .chk-box{background:var(--orange);border-color:var(--orange);color:white;}
 .chk-row:has(input:checked){color:var(--deep);font-weight:600;}
@@ -354,7 +355,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
   <button class="rezim-btn" onclick="spustiServis()">
     <div class="rezim-icon servis">🔍</div>
     <div>
-      <div class="rezim-title">Servisná prehliadka klimatizácie</div>
+      <div class="rezim-title">Servis a servisná prehliadka</div>
       <div class="rezim-sub">Ročný servis existujúceho zákazníka</div>
     </div>
   </button>
@@ -636,9 +637,9 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
 
       <!-- Typ systému -->
       <div class="field"><label>Typ systému</label>
-        <div class="chk-group" style="grid-template-columns:1fr 1fr; margin-bottom:12px;">
-          <label class="chk-row"><input type="radio" name="servis-typ" value="split" checked onchange="generujJednotky()"><div class="chk-box">✓</div>Split</label>
-          <label class="chk-row"><input type="radio" name="servis-typ" value="multisplit" onchange="generujJednotky()"><div class="chk-box">✓</div>Multisplit</label>
+        <div style="display:flex; gap:24px; margin-bottom:12px;">
+          <label class="chk-row" style="border:none; padding:4px 0;"><input type="radio" name="servis-typ" value="split" checked onchange="generujJednotky()"><div class="chk-box">✓</div>Split</label>
+          <label class="chk-row" style="border:none; padding:4px 0;"><input type="radio" name="servis-typ" value="multisplit" onchange="generujJednotky()"><div class="chk-box">✓</div>Multisplit</label>
         </div>
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
@@ -797,10 +798,12 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
             <input type="number" id="chladivo-doplnene-g" step="10" placeholder="napr. 150" style="width:100%;padding:9px 12px;border:1.5px solid #86efac;border-radius:9px;font-size:0.95rem;font-weight:700;color:#166534;box-sizing:border-box;">
           </div>
           <div class="field" style="margin:0; flex:1;"><label style="font-size:0.8rem;">Typ chladiva</label>
-            <select id="chladivo-typ" style="width:100%;padding:10px 12px;border:1.5px solid #86efac;border-radius:9px;font-size:0.85rem;background:white;box-sizing:border-box;">
-              <option value="">– Vybrať –</option>
-              <option>R-32</option><option>R-410A</option><option>R-22</option><option>R-134a</option><option>R-290</option><option>R-407C</option>
-            </select>
+            <input type="text" id="chladivo-typ" list="chladivo-typy-list" placeholder="napr. R-32 alebo zadaj ručne" style="width:100%;padding:10px 12px;border:1.5px solid #86efac;border-radius:9px;font-size:0.85rem;background:white;box-sizing:border-box;">
+            <datalist id="chladivo-typy-list">
+              <option value="R-32"></option><option value="R-410A"></option><option value="R-22"></option>
+              <option value="R-134a"></option><option value="R-290"></option><option value="R-407C"></option>
+              <option value="R-404A"></option><option value="R-454B"></option>
+            </datalist>
           </div>
         </div>
       </div>
@@ -813,9 +816,14 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
         <label class="chk-row"><input type="checkbox" id="sc_iny_servis" onchange="toggleInyServis(this)"><div class="chk-box">✓</div>Iný servis / oprava</label>
       </div>
       <div id="iny-servis-detail" style="display:none; margin-top:10px;">
-        <div class="field" style="margin:0;">
+        <div class="field" style="margin:0 0 10px 0;">
           <label style="font-size:0.8rem;">Popis vykonanej práce</label>
           <textarea id="iny-servis-popis" rows="4" placeholder="napr. výmena poškodeného dielu, oprava úniku chladiva, výmena filtra..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;box-sizing:border-box;resize:vertical;"></textarea>
+        </div>
+        <div class="field" style="margin:0;">
+          <label style="font-size:0.8rem;">Fotky zo servisu</label>
+          <button onclick="pridatServisFoto()" style="width:100%;padding:11px;background:var(--deep);color:white;border:none;border-radius:10px;font-size:0.9rem;font-weight:600;cursor:pointer;">📷 Pridať fotku zo servisu</button>
+          <div id="iny-servis-fotky" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
         </div>
       </div>
     </div>
@@ -824,6 +832,16 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
 
   <div class="section" id="sv5">
     <div class="sec-hdr"><div class="sec-icon" style="background:linear-gradient(135deg,var(--cold),var(--accent));">✍️</div><div><h2>Podpisy</h2><p>Krok 5 z 5</p></div></div>
+
+    <!-- GDPR súhlas -->
+    <div class="card" style="background:#f8fafc;">
+      <label class="chk-row" style="border:none; padding:4px 0; align-items:flex-start;">
+        <input type="checkbox" id="sc_gdpr_servis">
+        <div class="chk-box" style="flex-shrink:0; margin-top:2px;">✓</div>
+        <span style="font-size:0.78rem; line-height:1.5; color:var(--text);">Zákazník súhlasí so spracovaním svojich osobných údajov (meno, priezvisko, adresa, telefón, e-mail) spoločnosťou ELWORK, s.r.o. na účely plnenia zmluvy, vedenia servisnej evidencie a plnenia zákonných povinností, v súlade s Nariadením Európskeho parlamentu a Rady (EÚ) 2016/679 (GDPR) a zákonom č. 18/2018 Z. z. o ochrane osobných údajov. Osobné údaje budú uchovávané len po dobu nevyhnutnú na uvedené účely.</span>
+      </label>
+    </div>
+
     <div class="card">
       <div style="font-size:.75rem;font-weight:700;color:var(--cold);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">✍️ Podpis zákazníka</div>
       <canvas id="canvas-servis-zakaznik" style="width:100%;height:180px;border:2px solid var(--border);border-radius:12px;background:white;touch-action:none;display:block;cursor:crosshair;"></canvas>
@@ -1142,6 +1160,15 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
   
   <div class="section" id="sec5p">
     <div class="sec-hdr"><div class="sec-icon">✍️</div><div><h2>Podpisy</h2><p>Krok 5 z 6</p></div></div>
+
+    <!-- GDPR súhlas -->
+    <div class="card" style="background:#f8fafc;">
+      <label class="chk-row" style="border:none; padding:4px 0; align-items:flex-start;">
+        <input type="checkbox" id="sc_gdpr_montaz">
+        <div class="chk-box" style="flex-shrink:0; margin-top:2px;">✓</div>
+        <span style="font-size:0.78rem; line-height:1.5; color:var(--text);">Zákazník súhlasí so spracovaním svojich osobných údajov (meno, priezvisko, adresa, telefón, e-mail) spoločnosťou ELWORK, s.r.o. na účely plnenia zmluvy, vedenia servisnej evidencie a plnenia zákonných povinností, v súlade s Nariadením Európskeho parlamentu a Rady (EÚ) 2016/679 (GDPR) a zákonom č. 18/2018 Z. z. o ochrane osobných údajov. Osobné údaje budú uchovávané len po dobu nevyhnutnú na uvedené účely.</span>
+      </label>
+    </div>
 
     <div class="card">
       <div style="font-size:.75rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">✍️ Podpis zákazníka</div>
@@ -1713,6 +1740,14 @@ async function generatePDF(zakaznik, klima, photoKeys, technici, podpisZakaznik,
   // ── PODPISY ──
   if (y > 220) { doc.addPage(); y = 20; }
   y += 4;
+  // GDPR súhlas
+  const gdprChecked = document.getElementById('sc_gdpr_montaz')?.checked;
+  doc.setTextColor(...gray); doc.setFontSize(6); doc.setFont('helvetica','normal');
+  const gdprText = (gdprChecked ? '[X] ' : '[ ] ') + 'Zakaznik suhlasi so spracovanim svojich osobnych udajov (meno, priezvisko, adresa, telefon, e-mail) spolocnostou ELWORK, s.r.o. na ucely plnenia zmluvy, vedenia servisnej evidencie a plnenia zakonnych povinnosti, v sulade s Nariadenim EU 2016/679 (GDPR) a zakonom c. 18/2018 Z. z. o ochrane osobnych udajov. Osobne udaje budu uchovavane len po dobu nevyhnutnu na uvedene ucely.';
+  const gdprLines = doc.splitTextToSize(gdprText, W - margin*2);
+  doc.text(gdprLines, margin, y);
+  y += gdprLines.length * 2.6 + 4;
+
   addSection('PODPISY');
   const sigW = (W-margin*2-8)/2;
   const sigH = 40;
@@ -1818,9 +1853,10 @@ async function doUpload() {
 
     // Generuj PDF na serveri (plná slovenčina)
     setStep('s2','active');
-    const rPdfFirma = await apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, logoB64, peciatkaB64, showTechnici: true, nazov:'protokol_firma.pdf'});
+    const gdprSuhlas = document.getElementById('sc_gdpr_montaz')?.checked || false;
+    const rPdfFirma = await apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, logoB64, peciatkaB64, gdprSuhlas, showTechnici: true, nazov:'protokol_firma.pdf'});
     if (!rPdfFirma.ok) throw new Error(rPdfFirma.error||'Chyba generovania PDF');
-    const rPdfZakaznik = await apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, logoB64, peciatkaB64, showTechnici: false, nazov:'protokol_zakaznik.pdf'});
+    const rPdfZakaznik = await apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, logoB64, peciatkaB64, gdprSuhlas, showTechnici: false, nazov:'protokol_zakaznik.pdf'});
     const pdfZakaznikB64 = null;
     setStep('s2','done');
     setStep('s3','done');
@@ -1870,7 +1906,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxv6QyGNda59ETX9LaWknQk2kdKceyTlhi21M_5or07VHjTTJT2P3qxN7hWAoughUvzpQ/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqum0_NM8Zj4DaVtRwwtapCnmkKJZKKi0X6ETI8Y6R3VhJKwwXADpjjP9xL3p8FASDOQ/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2195,7 +2231,7 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 
 // ══ LOGIN ══
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxv6QyGNda59ETX9LaWknQk2kdKceyTlhi21M_5or07VHjTTJT2P3qxN7hWAoughUvzpQ/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqum0_NM8Zj4DaVtRwwtapCnmkKJZKKi0X6ETI8Y6R3VhJKwwXADpjjP9xL3p8FASDOQ/exec';
 let prihlasenyUzivatel = null;
 
 function toggleHeslo(id, icon) {
@@ -3042,18 +3078,36 @@ function vyberZakaznika(i) {
 
   // Parsuj sériové čísla z montáže do jednotiek
   const _serials = (servisZakaznik.serialCisla || '').split(/[,|]/).map(s => s.trim()).filter(Boolean);
-  // Modely z modely reťazca (napr. "Daikin FTXB25C / RXB25C")
-  const _modelParts = _modelStr.split('/').map(s => s.trim()).filter(Boolean);
 
-  // Zostav štruktúrované jednotky pre predvyplnenie
-  servisZakaznik.jednotkyVonk = Array.from({length: _pocetVonk}, (_, i) => ({
-    model: _modelParts[i] || '',
-    serial: _serials[i] || ''
-  }));
-  servisZakaznik.jednotkyVnut = Array.from({length: _pocetVnut}, (_, i) => ({
-    model: _modelParts[_pocetVonk + i] || _modelParts[i] || '',
-    serial: _serials[_pocetVonk + i] || _serials[i] || ''
-  }));
+  // PRIORITA 1: kompletné jednotky z montáže (JSON v Exceli, stĺpec Q)
+  // Obsahuje: typy vnútorných jednotiek, modely a sériové čísla — natiahne sa všetko
+  let _jednotkyOK = false;
+  if (servisZakaznik.jednotkyJSON) {
+    try {
+      const _jj = JSON.parse(servisZakaznik.jednotkyJSON);
+      if (_jj && (_jj.vonk?.length || _jj.vnut?.length)) {
+        servisZakaznik.jednotkyVonk = (_jj.vonk || []).map(j => ({ model: j.model || '', serial: j.serial || '' }));
+        servisZakaznik.jednotkyVnut = (_jj.vnut || []).map(j => ({ typ: j.typ || '', model: j.model || '', serial: j.serial || '' }));
+        // Počty podľa skutočných jednotiek z montáže
+        if (servisZakaznik.jednotkyVonk.length) _pocetVonk = servisZakaznik.jednotkyVonk.length;
+        if (servisZakaznik.jednotkyVnut.length) _pocetVnut = servisZakaznik.jednotkyVnut.length;
+        if (_pocetVonk > 1 || _pocetVnut > 1) _isMultisplit = true;
+        _jednotkyOK = true;
+      }
+    } catch(_pe) { console.warn('jednotkyJSON parse error', _pe); }
+  }
+
+  // PRIORITA 2 (fallback pre starých zákazníkov bez JSON): len sériové čísla
+  if (!_jednotkyOK) {
+    servisZakaznik.jednotkyVonk = Array.from({length: _pocetVonk}, (_, i) => ({
+      model: '',
+      serial: _serials[i] || ''
+    }));
+    servisZakaznik.jednotkyVnut = Array.from({length: _pocetVnut}, (_, i) => ({
+      model: '',
+      serial: _serials[_pocetVonk + i] || ''
+    }));
+  }
 
   // Nastav modely v kroku 2
   setTimeout(() => {
@@ -3170,6 +3224,7 @@ async function doServisUpload() {
       poznamky,
       checkboxy,
       podpisZakaznik: podpis,
+      gdprSuhlas: document.getElementById('sc_gdpr_servis')?.checked || false,
       logoB64,
       peciatkaB64
     });
@@ -3242,7 +3297,7 @@ function generujJednotky() {
 
   // Získaj existujúce hodnoty (pre zachovanie pri zmene počtu)
   const existValues = {};
-  container.querySelectorAll('input[id^="sj-"]').forEach(el => {
+  container.querySelectorAll('input[id^="sj-"], select[id^="sj-"]').forEach(el => {
     existValues[el.id] = el.value;
   });
 
@@ -3283,7 +3338,7 @@ function generujJednotky() {
   for (let i = 0; i < finalVnut; i++) {
     const prefillModelV = existValues['sj-vnut-'+i+'-model'] || (servisZakaznik?.jednotkyVnut?.[i]?.model) || '';
     const prefillSerialV = existValues['sj-vnut-'+i+'-serial'] || (servisZakaznik?.jednotkyVnut?.[i]?.serial) || '';
-    const prefillTypV = existValues['sj-vnut-'+i+'-typ'] || '';
+    const prefillTypV = existValues['sj-vnut-'+i+'-typ'] || (servisZakaznik?.jednotkyVnut?.[i]?.typ) || '';
     html += `
     <div style="background:#fff8f0; border-radius:10px; padding:14px; margin-bottom:10px; border:1px solid #fed7aa;">
       <div style="font-size:.75rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">🏠 Vnútorná jednotka ${finalVnut > 1 ? i+1 : ''}</div>
@@ -3365,6 +3420,41 @@ function toggleChladivoDoplnenie(cb) {
 
 function toggleInyServis(cb) {
   document.getElementById('iny-servis-detail').style.display = cb.checked ? '' : 'none';
+}
+
+// Fotky zo servisu (Iný servis) - viacero fotiek s náhľadmi
+let servisFotoCounter = 0;
+function pridatServisFoto() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.capture = 'environment';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (!window.servisPhotos) window.servisPhotos = {};
+      const key = 'servis_praca_' + (++servisFotoCounter);
+      window.servisPhotos[key] = { file, dataUrl: reader.result, label: 'Servis foto ' + servisFotoCounter };
+      // Náhľad
+      const cont = document.getElementById('iny-servis-fotky');
+      const wrap = document.createElement('div');
+      wrap.id = 'thumb_' + key;
+      wrap.style.cssText = 'position:relative;width:72px;height:72px;';
+      wrap.innerHTML = `<img src="${reader.result}" style="width:72px;height:72px;object-fit:cover;border-radius:8px;border:1.5px solid var(--border);">
+        <button onclick="odstranServisFoto('${key}')" style="position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:#dc2626;color:white;border:none;font-size:0.7rem;cursor:pointer;line-height:1;">✕</button>`;
+      cont.appendChild(wrap);
+      showToast('📷 Fotka pridaná');
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+function odstranServisFoto(key) {
+  if (window.servisPhotos) delete window.servisPhotos[key];
+  document.getElementById('thumb_' + key)?.remove();
 }
 
 // Vygeneruj polia Tlak+Teplota pre každú jednotku (rezim = 'chl' alebo 'kur')
