@@ -348,7 +348,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
   <button class="rezim-btn" onclick="spustiMontaz()">
     <div class="rezim-icon montaz">🔧</div>
     <div>
-      <div class="rezim-title">Montážny protokol klimatizácia</div>
+      <div class="rezim-title">Montážny protokol klimatizácie</div>
       <div class="rezim-sub">Nová inštalácia klimatizácie</div>
     </div>
   </button>
@@ -1914,7 +1914,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzg_unAv7wyxODhcyfOy_UhlVKTgg1vWIvutdBisfTcUKEiyrLffS4_8iD-iWpwQHaaBA/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzwtYI3MrVzNkmxDplXoB_aVTJ_cwg0Kvze6LOsfXNKDXgxEDKWyK6g7wdIIwSkS0iNSQ/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2095,11 +2095,20 @@ function clearCanvas(id) {
 function getCanvasDataUrl(id) {
   const canvas = document.getElementById(id);
   if (!canvas) return null;
-  // Check if empty
   const ctx = canvas.getContext('2d');
   const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-  const isEmpty = !data.some(v => v !== 0);
-  if (isEmpty) return null;
+  // Canvas s bielym pozadím má všetky pixely (255,255,255,255)
+  // Považujeme za prázdny ak sú všetky pixely buď čierne (0) alebo biele (255)
+  let hasNonWhiteNonTransparent = false;
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i+1], b = data[i+2], a = data[i+3];
+    // Pixel nie je biely ani priehľadný → niekto kreslil
+    if (a > 0 && !(r > 240 && g > 240 && b > 240)) {
+      hasNonWhiteNonTransparent = true;
+      break;
+    }
+  }
+  if (!hasNonWhiteNonTransparent) return null;
   return canvas.toDataURL('image/png');
 }
 
@@ -2239,7 +2248,7 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 
 // ══ LOGIN ══
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzg_unAv7wyxODhcyfOy_UhlVKTgg1vWIvutdBisfTcUKEiyrLffS4_8iD-iWpwQHaaBA/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzwtYI3MrVzNkmxDplXoB_aVTJ_cwg0Kvze6LOsfXNKDXgxEDKWyK6g7wdIIwSkS0iNSQ/exec';
 let prihlasenyUzivatel = null;
 
 function toggleHeslo(id, icon) {
@@ -3157,6 +3166,25 @@ async function doServisUpload() {
     const w = document.getElementById('gdpr-servis-warning');
     if (w) { w.style.display = ''; w.scrollIntoView({behavior:'smooth', block:'center'}); }
     showToast('⚠️ Zákazník musí potvrdiť súhlas GDPR', 3500);
+    return;
+  }
+
+  // Validácia: typ chladiva (ak je zaškrtnuté doplnenie)
+  if (document.getElementById('sc_chladivo_doplnenie')?.checked) {
+    const chladivoTyp = (document.getElementById('chladivo-typ')?.value || '').trim();
+    if (!chladivoTyp) {
+      showToast('⚠️ Zadaj typ chladiva pred odoslaním', 3500);
+      document.getElementById('chladivo-typ')?.focus();
+      document.getElementById('chladivo-typ')?.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+  }
+
+  // Validácia: podpis zákazníka nesmie byť prázdny
+  const podpisValidacia = getCanvasDataUrl('canvas-servis-zakaznik');
+  if (!podpisValidacia) {
+    showToast('⚠️ Zákazník musí podpísať protokol', 3500);
+    document.getElementById('canvas-servis-zakaznik')?.scrollIntoView({behavior:'smooth', block:'center'});
     return;
   }
   const datum = document.getElementById('servis-datum').value;
