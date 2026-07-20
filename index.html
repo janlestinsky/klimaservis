@@ -1415,20 +1415,19 @@ function updateMultisplitUnits() { updateUnits(); }
 function handleDynPhoto(input, key, label) {
   const file = input.files[0]; if (!file) return;
   photos[key] = {file, label};
-  const reader = new FileReader();
-  reader.onload = e => {
+  komprimujFotku(file).then(dataUrl => {
+    photos[key].dataUrl = dataUrl; // uložiť komprimovanú verziu
     const slotId = 'slot_' + key;
     const slot = document.getElementById(slotId);
     if (!slot) return;
     slot.classList.add('has-photo');
     slot.innerHTML = `
-      <img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
+      <img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
       <div class="ov">${label}</div>
       <div class="chk">✓</div>
       <input type="file" accept="image/*" capture="environment"
         onchange="handleDynPhoto(this,'${key}','${label}')">`;
-  };
-  reader.readAsDataURL(file);
+  });
   showToast('📸 ' + label);
 }
 
@@ -1870,13 +1869,19 @@ async function doUpload() {
     setStep('s3','done');
     setProg(40);
 
-    // Fotky
+    // Fotky — použij komprimovanú verziu ak existuje
     for (let i=0;i<photoKeys.length;i++) {
       const k=photoKeys[i];
       setStep('s'+(4+i),'active');
-      const b64 = await toBase64(photos[k].file);
-      const ext = photos[k].file.name.split('.').pop()||'jpg';
-      const r2 = await apiCall({type:'foto',zakaznik,nazov:`foto_${k}.${ext}`,mime:photos[k].file.type||'image/jpeg',obsah:b64});
+      let b64;
+      if (photos[k].dataUrl) {
+        // Použij už komprimovanú verziu (base64 bez prefixu)
+        b64 = photos[k].dataUrl.split(',')[1];
+      } else {
+        b64 = await toBase64(photos[k].file);
+      }
+      const ext = 'jpg'; // komprimované sú vždy JPEG
+      const r2 = await apiCall({type:'foto',zakaznik,nazov:`foto_${k}.${ext}`,mime:'image/jpeg',obsah:b64});
       if (!r2.ok) throw new Error(r2.error||`Chyba nahrávania foto: ${photos[k].label}`);
       setStep('s'+(4+i),'done');
       setProg(Math.round(40 + (i+1)/photoKeys.length*45));
@@ -1914,7 +1919,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzwtYI3MrVzNkmxDplXoB_aVTJ_cwg0Kvze6LOsfXNKDXgxEDKWyK6g7wdIIwSkS0iNSQ/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw6f4oMrxkpWar4EZZ5l5Zk4LQmy8Wudi8FRP5hKDRcx00qqkxPwEFAirz_-3LZ7fPYRg/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2248,7 +2253,7 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 
 // ══ LOGIN ══
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzwtYI3MrVzNkmxDplXoB_aVTJ_cwg0Kvze6LOsfXNKDXgxEDKWyK6g7wdIIwSkS0iNSQ/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw6f4oMrxkpWar4EZZ5l5Zk4LQmy8Wudi8FRP5hKDRcx00qqkxPwEFAirz_-3LZ7fPYRg/exec';
 let prihlasenyUzivatel = null;
 
 function toggleHeslo(id, icon) {
@@ -2954,6 +2959,18 @@ function goNextServis() {
       if (!t1i) { showToast('⚠️ Zadajte meno technika'); return; }
     }
   }
+  if (servisStep === 4) {
+    // Validácia: ak je zaškrtnuté doplnenie chladiva, musí byť zadaný typ
+    if (document.getElementById('sc_chladivo_doplnenie')?.checked) {
+      const chladivoTyp = (document.getElementById('chladivo-typ')?.value || '').trim();
+      if (!chladivoTyp) {
+        showToast('⚠️ Zadaj typ chladiva pred pokračovaním', 3000);
+        document.getElementById('chladivo-typ')?.focus();
+        document.getElementById('chladivo-typ')?.scrollIntoView({behavior:'smooth', block:'center'});
+        return;
+      }
+    }
+  }
   if (servisStep === 5) { doServisUpload(); return; }
   servisStep++;
   showServisStep(servisStep);
@@ -3423,25 +3440,42 @@ function generujJednotky() {
   container.innerHTML = html;
 }
 
+// ══ KOMPRESIA FOTIEK ══
+// Zmenší fotku na max 1200px a kvalitu JPEG 0.75 — rýchlejší upload, menšie súbory
+function komprimujFotku(file, maxSize = 1200, kvalita = 0.75) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > maxSize || h > maxSize) {
+          if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+          else       { w = Math.round(w * maxSize / h); h = maxSize; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', kvalita));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 function fotitPole(targetId, popisFotky) {
-  // Odfotiť štítok/pole - fotka sa uloží a pošle spolu s protokolom
   const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
-  input.capture = 'environment';
+  input.type = 'file'; input.accept = 'image/*'; input.capture = 'environment';
   input.onchange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (!window.servisPhotos) window.servisPhotos = {};
-      window.servisPhotos['foto_' + targetId] = { file, dataUrl: reader.result, label: popisFotky || targetId };
-      // Vizuálne označ input že má fotku
-      const el = document.getElementById(targetId);
-      if (el) { el.style.borderColor = '#22c55e'; el.style.background = '#f0fdf4'; }
-      showToast('📷 Fotka uložená (' + (popisFotky || targetId) + ')');
-    };
-    reader.readAsDataURL(file);
+    const dataUrl = await komprimujFotku(file);
+    if (!window.servisPhotos) window.servisPhotos = {};
+    window.servisPhotos['foto_' + targetId] = { file, dataUrl, label: popisFotky || targetId };
+    const el = document.getElementById(targetId);
+    if (el) { el.style.borderColor = '#22c55e'; el.style.background = '#f0fdf4'; }
+    showToast('📷 Fotka uložená (' + (popisFotky || targetId) + ')');
   };
   input.click();
 }
@@ -3474,28 +3508,22 @@ function toggleInyServis(cb) {
 let servisFotoCounter = 0;
 function pridatServisFoto() {
   const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
-  input.capture = 'environment';
-  input.onchange = (e) => {
+  input.type = 'file'; input.accept = 'image/*'; input.capture = 'environment';
+  input.onchange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (!window.servisPhotos) window.servisPhotos = {};
-      const key = 'servis_praca_' + (++servisFotoCounter);
-      window.servisPhotos[key] = { file, dataUrl: reader.result, label: 'Servis foto ' + servisFotoCounter };
-      // Náhľad
-      const cont = document.getElementById('iny-servis-fotky');
+    const dataUrl = await komprimujFotku(file);
+    if (!window.servisPhotos) window.servisPhotos = {};
+    const key = 'servis_praca_' + (++servisFotoCounter);
+    window.servisPhotos[key] = { file, dataUrl, label: 'Servis foto ' + servisFotoCounter };
+    const cont = document.getElementById('iny-servis-fotky');
       const wrap = document.createElement('div');
       wrap.id = 'thumb_' + key;
       wrap.style.cssText = 'position:relative;width:72px;height:72px;';
-      wrap.innerHTML = `<img src="${reader.result}" style="width:72px;height:72px;object-fit:cover;border-radius:8px;border:1.5px solid var(--border);">
+      wrap.innerHTML = `<img src="${dataUrl}" style="width:72px;height:72px;object-fit:cover;border-radius:8px;border:1.5px solid var(--border);">
         <button onclick="odstranServisFoto('${key}')" style="position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:#dc2626;color:white;border:none;font-size:0.7rem;cursor:pointer;line-height:1;">✕</button>`;
       cont.appendChild(wrap);
       showToast('📷 Fotka pridaná');
-    };
-    reader.readAsDataURL(file);
   };
   input.click();
 }
