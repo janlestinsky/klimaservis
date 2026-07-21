@@ -2976,20 +2976,24 @@ function goNextServis() {
       document.getElementById('servis-vyrobca')?.scrollIntoView({behavior:'smooth', block:'center'});
       return;
     }
-    // Validácia aspoň 1 jednotky — čítaj vždy z aktuálneho DOM
-    // Počkaj kým generujJednotky dobehne (je volaná async pri zobrazení kroku)
-    const vonkModel = (document.getElementById('sj-vonk-0-model')?.value || '').trim();
-    const vonkSerial = (document.getElementById('sj-vonk-0-serial')?.value || '').trim();
-    const vnutModel = (document.getElementById('sj-vnut-0-model')?.value || '').trim();
-    const vnutSerial = (document.getElementById('sj-vnut-0-serial')?.value || '').trim();
+    // Validácia jednotiek — každý typ musí mať aspoň model alebo SN
     const containerPrazdny = !document.getElementById('sj-vonk-0-model') && !document.getElementById('sj-vnut-0-model');
     if (containerPrazdny) {
       showToast('⚠️ Počkajte — formulár sa ešte načítava');
       return;
     }
-    if (!vonkModel && !vonkSerial && !vnutModel && !vnutSerial) {
-      showToast('⚠️ Zadajte aspoň model alebo sériové číslo jednej jednotky');
-      document.getElementById('servis-jednotky-detail')?.scrollIntoView({behavior:'smooth', block:'center'});
+    const vonkModel = (document.getElementById('sj-vonk-0-model')?.value || '').trim();
+    const vonkSerial = (document.getElementById('sj-vonk-0-serial')?.value || '').trim();
+    if (!vonkModel && !vonkSerial) {
+      showToast('⚠️ Zadajte model alebo sériové číslo vonkajšej jednotky');
+      document.getElementById('sj-vonk-0-model')?.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+    const vnutModel = (document.getElementById('sj-vnut-0-model')?.value || '').trim();
+    const vnutSerial = (document.getElementById('sj-vnut-0-serial')?.value || '').trim();
+    if (!vnutModel && !vnutSerial) {
+      showToast('⚠️ Zadajte model alebo sériové číslo vnútornej jednotky');
+      document.getElementById('sj-vnut-0-model')?.scrollIntoView({behavior:'smooth', block:'center'});
       return;
     }
   }
