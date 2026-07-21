@@ -117,8 +117,8 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .scan-manual input::placeholder{color:rgba(255,255,255,.35);}
 .scan-close{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.13);border:none;color:white;width:30px;height:30px;border-radius:50%;font-size:.95rem;cursor:pointer;z-index:2;}
 .info-box{background:rgba(232,80,10,.06);border:1px solid rgba(232,80,10,.2);border-radius:11px;padding:12px 13px;margin-bottom:12px;font-size:.78rem;color:var(--orange);display:flex;gap:9px;align-items:flex-start;}
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--deep);color:white;padding:10px 18px;border-radius:10px;font-size:.8rem;font-weight:500;z-index:2000;transition:transform .3s;white-space:nowrap;box-shadow:0 5px 18px rgba(0,0,0,.2);}
-.toast.show{transform:translateX(-50%) translateY(0);}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--deep);color:white;padding:10px 18px;border-radius:10px;font-size:.8rem;font-weight:500;z-index:2000;transition:opacity .3s;white-space:nowrap;box-shadow:0 5px 18px rgba(0,0,0,.2);display:none;opacity:0;}
+.toast.show{display:flex;align-items:center;opacity:1;}
 .btn-wide{width:100%;padding:14px;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;margin-top:8px;background:linear-gradient(135deg,var(--orange),#ff8c42);color:white;box-shadow:0 4px 13px rgba(232,80,10,.3);}
 .fhint a{color:var(--orange);}
 .typ-btn{flex:1;padding:11px;border:2px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:600;cursor:pointer;background:white;color:var(--muted);transition:all .2s;}
@@ -2252,15 +2252,15 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 function showToast(msg, ms) {
   ms = ms || (msg.includes('⚠️') ? 5000 : 2500);
   const t = document.getElementById('toast');
-  t.style.display = 'flex';
-  t.style.alignItems = 'center';
-  t.innerHTML = `<span style="flex:1">${msg}</span><span onclick="const t=document.getElementById('toast');t.classList.remove('show');setTimeout(()=>{t.style.display='none';},300);" style="margin-left:12px;cursor:pointer;font-size:1.1rem;line-height:1;opacity:0.8;">✕</span>`;
+  t.innerHTML = `<span style="flex:1">${msg}</span><span onclick="closeToast()" style="margin-left:12px;cursor:pointer;font-size:1.1rem;line-height:1;opacity:0.8;flex-shrink:0;">✕</span>`;
   t.classList.add('show');
   if (t._toastTimer) clearTimeout(t._toastTimer);
-  t._toastTimer = setTimeout(() => {
-    t.classList.remove('show');
-    setTimeout(() => { t.style.display = 'none'; }, 300);
-  }, ms);
+  t._toastTimer = setTimeout(closeToast, ms);
+}
+function closeToast() {
+  const t = document.getElementById('toast');
+  t.classList.remove('show');
+  if (t._toastTimer) clearTimeout(t._toastTimer);
 }
 
 // ══ LOGIN ══
@@ -3034,37 +3034,39 @@ function goNextServis() {
   if (servisStep === 5) { doServisUpload(); return; }
 
   // Po kroku 2: synchronizuj servisZakaznik.jednotky s aktuálnym DOM
-  // aby generujJednotky() pri návrate naspäť neprepisoval vymazané hodnoty
-  if (servisStep === 2 && servisZakaznik) {
-    const _vonk = [], _vnut = [];
-    let vi = 0;
-    while (document.getElementById(`sj-vonk-${vi}-model`) !== null) {
-      _vonk.push({
-        model: (document.getElementById(`sj-vonk-${vi}-model`)?.value || '').trim(),
-        serial: (document.getElementById(`sj-vonk-${vi}-serial`)?.value || '').trim()
-      });
-      vi++;
-    }
-    let ni = 0;
-    while (document.getElementById(`sj-vnut-${ni}-model`) !== null) {
-      _vnut.push({
-        typ: (document.getElementById(`sj-vnut-${ni}-typ`)?.value || '').trim(),
-        model: (document.getElementById(`sj-vnut-${ni}-model`)?.value || '').trim(),
-        serial: (document.getElementById(`sj-vnut-${ni}-serial`)?.value || '').trim()
-      });
-      ni++;
-    }
-    if (_vonk.length) servisZakaznik.jednotkyVonk = _vonk;
-    if (_vnut.length) servisZakaznik.jednotkyVnut = _vnut;
-    // Vymaž aj jednotkyJSON aby sa nepoužil pri ďalšom generujJednotky
-    servisZakaznik.jednotkyJSON = null;
-  }
+  if (servisStep === 2) syncJednotkyZDOM();
 
   servisStep++;
   showServisStep(servisStep);
 }
 
+function syncJednotkyZDOM() {
+  if (!servisZakaznik) return;
+  const _vonk = [], _vnut = [];
+  let vi = 0;
+  while (document.getElementById(`sj-vonk-${vi}-model`) !== null) {
+    _vonk.push({
+      model: (document.getElementById(`sj-vonk-${vi}-model`)?.value || '').trim(),
+      serial: (document.getElementById(`sj-vonk-${vi}-serial`)?.value || '').trim()
+    });
+    vi++;
+  }
+  let ni = 0;
+  while (document.getElementById(`sj-vnut-${ni}-model`) !== null) {
+    _vnut.push({
+      typ: (document.getElementById(`sj-vnut-${ni}-typ`)?.value || '').trim(),
+      model: (document.getElementById(`sj-vnut-${ni}-model`)?.value || '').trim(),
+      serial: (document.getElementById(`sj-vnut-${ni}-serial`)?.value || '').trim()
+    });
+    ni++;
+  }
+  servisZakaznik.jednotkyVonk = _vonk;
+  servisZakaznik.jednotkyVnut = _vnut;
+  servisZakaznik.jednotkyJSON = null;
+}
+
 function goBackServis() {
+  if (servisStep === 3) syncJednotkyZDOM(); // sync pred návratom na krok 2
   if (servisStep > 1) { servisStep--; showServisStep(servisStep); }
   else { zobrazRezim(); }
 }
