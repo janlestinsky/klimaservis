@@ -1919,7 +1919,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw6f4oMrxkpWar4EZZ5l5Zk4LQmy8Wudi8FRP5hKDRcx00qqkxPwEFAirz_-3LZ7fPYRg/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxUjw9MAhIngyrM23i7wz9k40N11DvdNKXWPvClI3RuH02JtdORdf2EdA7tDg2BmcY5yA/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2249,11 +2249,18 @@ const g = id => {
   return (el.value || '').trim();
 };
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function showToast(msg, ms) {
+  ms = ms || (msg.includes('⚠️') ? 5000 : 2500);
+  const t = document.getElementById('toast');
+  t.innerHTML = `<span>${msg}</span><span onclick="this.parentElement.classList.remove('show')" style="margin-left:10px;cursor:pointer;opacity:0.7;font-size:1rem;line-height:1;">✕</span>`;
+  t.classList.add('show');
+  if (t._toastTimer) clearTimeout(t._toastTimer);
+  t._toastTimer = setTimeout(() => t.classList.remove('show'), ms);
+}
 
 // ══ LOGIN ══
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw6f4oMrxkpWar4EZZ5l5Zk4LQmy8Wudi8FRP5hKDRcx00qqkxPwEFAirz_-3LZ7fPYRg/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxUjw9MAhIngyrM23i7wz9k40N11DvdNKXWPvClI3RuH02JtdORdf2EdA7tDg2BmcY5yA/exec';
 let prihlasenyUzivatel = null;
 
 function toggleHeslo(id, icon) {
@@ -2951,20 +2958,62 @@ function goNextServis() {
     if (!servisZakaznik) { showToast('⚠️ Vyberte zákazníka'); return; }
   }
   if (servisStep === 2) {
-    // Validácia technika na kroku 2
+    // Validácia technika
     const t1 = document.getElementById('servis-technik')?.value || '';
     if (!t1 || t1 === '') { showToast('⚠️ Vyberte aspoň 1 servisného technika'); return; }
     if (t1 === 'Iný') {
       const t1i = document.getElementById('servis-technik-iny')?.value?.trim() || '';
       if (!t1i) { showToast('⚠️ Zadajte meno technika'); return; }
     }
+    // Validácia výrobcu
+    if (!document.getElementById('servis-vyrobca')?.value) {
+      showToast('⚠️ Vyberte výrobcu klimatizácie');
+      document.getElementById('servis-vyrobca')?.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+    // Validácia aspoň 1 jednotky — model alebo SN
+    const vonkModel = document.getElementById('sj-vonk-0-model')?.value?.trim() || '';
+    const vonkSerial = document.getElementById('sj-vonk-0-serial')?.value?.trim() || '';
+    const vnutModel = document.getElementById('sj-vnut-0-model')?.value?.trim() || '';
+    const vnutSerial = document.getElementById('sj-vnut-0-serial')?.value?.trim() || '';
+    if (!vonkModel && !vonkSerial && !vnutModel && !vnutSerial) {
+      showToast('⚠️ Zadajte aspoň model alebo sériové číslo jednej jednotky');
+      document.getElementById('sj-vonk-0-model')?.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
   }
   if (servisStep === 4) {
-    // Validácia: ak je zaškrtnuté doplnenie chladiva, musí byť zadaný typ
+    // Validácia: aspoň 1 tlak musí byť zadaný (chladenie alebo kúrenie)
+    const chlChecked = document.getElementById('sc_tlak_chl')?.checked;
+    const kurChecked = document.getElementById('sc_tlak_kur')?.checked;
+    if (!chlChecked && !kurChecked) {
+      showToast('⚠️ Zaškrtnite aspoň 1 meranie tlaku (Chladenie alebo Kúrenie)');
+      document.getElementById('sc_tlak_chl')?.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+    // Overí či je aspoň 1 hodnota tlaku alebo teploty zadaná
+    let maHodnotu = false;
+    if (chlChecked) {
+      const pocet = parseInt(document.getElementById('tlak-chl-pocet')?.value || '1');
+      for (let i = 0; i < pocet; i++) {
+        if (document.getElementById(`tlak-chl-${i}-tlak`)?.value || document.getElementById(`tlak-chl-${i}-teplota`)?.value) { maHodnotu = true; break; }
+      }
+    }
+    if (!maHodnotu && kurChecked) {
+      const pocet = parseInt(document.getElementById('tlak-kur-pocet')?.value || '1');
+      for (let i = 0; i < pocet; i++) {
+        if (document.getElementById(`tlak-kur-${i}-tlak`)?.value || document.getElementById(`tlak-kur-${i}-teplota`)?.value) { maHodnotu = true; break; }
+      }
+    }
+    if (!maHodnotu) {
+      showToast('⚠️ Zadajte aspoň 1 hodnotu tlaku alebo teploty');
+      return;
+    }
+    // Validácia typ chladiva
     if (document.getElementById('sc_chladivo_doplnenie')?.checked) {
       const chladivoTyp = (document.getElementById('chladivo-typ')?.value || '').trim();
       if (!chladivoTyp) {
-        showToast('⚠️ Zadaj typ chladiva pred pokračovaním', 3000);
+        showToast('⚠️ Zadaj typ chladiva pred pokračovaním');
         document.getElementById('chladivo-typ')?.focus();
         document.getElementById('chladivo-typ')?.scrollIntoView({behavior:'smooth', block:'center'});
         return;
