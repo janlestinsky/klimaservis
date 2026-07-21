@@ -2252,10 +2252,15 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 function showToast(msg, ms) {
   ms = ms || (msg.includes('⚠️') ? 5000 : 2500);
   const t = document.getElementById('toast');
-  t.innerHTML = `<span>${msg}</span><span onclick="this.parentElement.classList.remove('show')" style="margin-left:10px;cursor:pointer;opacity:0.7;font-size:1rem;line-height:1;">✕</span>`;
+  t.style.display = 'flex';
+  t.style.alignItems = 'center';
+  t.innerHTML = `<span style="flex:1">${msg}</span><span onclick="const t=document.getElementById('toast');t.classList.remove('show');setTimeout(()=>{t.style.display='none';},300);" style="margin-left:12px;cursor:pointer;font-size:1.1rem;line-height:1;opacity:0.8;">✕</span>`;
   t.classList.add('show');
   if (t._toastTimer) clearTimeout(t._toastTimer);
-  t._toastTimer = setTimeout(() => t.classList.remove('show'), ms);
+  t._toastTimer = setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => { t.style.display = 'none'; }, 300);
+  }, ms);
 }
 
 // ══ LOGIN ══
@@ -2971,14 +2976,20 @@ function goNextServis() {
       document.getElementById('servis-vyrobca')?.scrollIntoView({behavior:'smooth', block:'center'});
       return;
     }
-    // Validácia aspoň 1 jednotky — model alebo SN
-    const vonkModel = document.getElementById('sj-vonk-0-model')?.value?.trim() || '';
-    const vonkSerial = document.getElementById('sj-vonk-0-serial')?.value?.trim() || '';
-    const vnutModel = document.getElementById('sj-vnut-0-model')?.value?.trim() || '';
-    const vnutSerial = document.getElementById('sj-vnut-0-serial')?.value?.trim() || '';
+    // Validácia aspoň 1 jednotky — čítaj vždy z aktuálneho DOM
+    // Počkaj kým generujJednotky dobehne (je volaná async pri zobrazení kroku)
+    const vonkModel = (document.getElementById('sj-vonk-0-model')?.value || '').trim();
+    const vonkSerial = (document.getElementById('sj-vonk-0-serial')?.value || '').trim();
+    const vnutModel = (document.getElementById('sj-vnut-0-model')?.value || '').trim();
+    const vnutSerial = (document.getElementById('sj-vnut-0-serial')?.value || '').trim();
+    const containerPrazdny = !document.getElementById('sj-vonk-0-model') && !document.getElementById('sj-vnut-0-model');
+    if (containerPrazdny) {
+      showToast('⚠️ Počkajte — formulár sa ešte načítava');
+      return;
+    }
     if (!vonkModel && !vonkSerial && !vnutModel && !vnutSerial) {
       showToast('⚠️ Zadajte aspoň model alebo sériové číslo jednej jednotky');
-      document.getElementById('sj-vonk-0-model')?.scrollIntoView({behavior:'smooth', block:'center'});
+      document.getElementById('servis-jednotky-detail')?.scrollIntoView({behavior:'smooth', block:'center'});
       return;
     }
   }
@@ -3021,6 +3032,34 @@ function goNextServis() {
     }
   }
   if (servisStep === 5) { doServisUpload(); return; }
+
+  // Po kroku 2: synchronizuj servisZakaznik.jednotky s aktuálnym DOM
+  // aby generujJednotky() pri návrate naspäť neprepisoval vymazané hodnoty
+  if (servisStep === 2 && servisZakaznik) {
+    const _vonk = [], _vnut = [];
+    let vi = 0;
+    while (document.getElementById(`sj-vonk-${vi}-model`) !== null) {
+      _vonk.push({
+        model: (document.getElementById(`sj-vonk-${vi}-model`)?.value || '').trim(),
+        serial: (document.getElementById(`sj-vonk-${vi}-serial`)?.value || '').trim()
+      });
+      vi++;
+    }
+    let ni = 0;
+    while (document.getElementById(`sj-vnut-${ni}-model`) !== null) {
+      _vnut.push({
+        typ: (document.getElementById(`sj-vnut-${ni}-typ`)?.value || '').trim(),
+        model: (document.getElementById(`sj-vnut-${ni}-model`)?.value || '').trim(),
+        serial: (document.getElementById(`sj-vnut-${ni}-serial`)?.value || '').trim()
+      });
+      ni++;
+    }
+    if (_vonk.length) servisZakaznik.jednotkyVonk = _vonk;
+    if (_vnut.length) servisZakaznik.jednotkyVnut = _vnut;
+    // Vymaž aj jednotkyJSON aby sa nepoužil pri ďalšom generujJednotky
+    servisZakaznik.jednotkyJSON = null;
+  }
+
   servisStep++;
   showServisStep(servisStep);
 }
