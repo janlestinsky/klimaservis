@@ -599,7 +599,6 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
           <option value="Miroslav Paška">Miroslav Paška</option>
           <option value="Jaroslav Brna">Jaroslav Brna</option>
           <option value="Adam Brziak">Adam Brziak</option>
-          <option value="Ľuboš Hamza">Ľuboš Hamza</option>
           <option value="Iný">Iný...</option>
         </select>
         <input type="text" id="servis-technik-iny" placeholder="Meno iného technika" style="display:none; margin-top:8px; width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; box-sizing:border-box;">
@@ -610,7 +609,6 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
           <option value="Miroslav Paška">Miroslav Paška</option>
           <option value="Jaroslav Brna">Jaroslav Brna</option>
           <option value="Adam Brziak">Adam Brziak</option>
-          <option value="Ľuboš Hamza">Ľuboš Hamza</option>
           <option value="Iný">Iný...</option>
         </select>
         <input type="text" id="servis-technik2-iny" placeholder="Meno iného technika" style="display:none; margin-top:8px; width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; box-sizing:border-box;">
@@ -793,7 +791,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
             <input type="number" id="chladivo-doplnene-g" step="10" placeholder="napr. 150" style="width:100%;padding:9px 12px;border:1.5px solid #86efac;border-radius:9px;font-size:0.95rem;font-weight:700;color:#166534;box-sizing:border-box;">
           </div>
           <div class="field" style="margin:0; flex:1;"><label style="font-size:0.8rem;">Typ chladiva</label>
-            <input type="text" id="chladivo-typ" list="chladivo-typy-list" placeholder="napr. R-32 alebo zadaj ručne" style="width:100%;padding:10px 12px;border:1.5px solid #86efac;border-radius:9px;font-size:0.85rem;background:white;box-sizing:border-box;">
+            <input type="text" id="chladivo-typ" list="chladivo-typy-list" placeholder="napr. R-32 alebo zadaj ručne" autocomplete="off" style="width:100%;padding:10px 12px;border:1.5px solid #86efac;border-radius:9px;font-size:0.85rem;background:white;box-sizing:border-box;">
             <datalist id="chladivo-typy-list">
               <option value="R-32"></option><option value="R-410A"></option><option value="R-22"></option>
               <option value="R-134a"></option><option value="R-290"></option><option value="R-407C"></option>
@@ -897,7 +895,6 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
           <label class="tech-item"><input type="checkbox" value="Miroslav Paška"><div class="tech-check">✓</div> Miroslav Paška</label>
           <label class="tech-item"><input type="checkbox" value="Jaroslav Brna"><div class="tech-check">✓</div> Jaroslav Brna</label>
           <label class="tech-item"><input type="checkbox" value="Adam Brziak"><div class="tech-check">✓</div> Adam Brziak</label>
-          <label class="tech-item"><input type="checkbox" value="Ľuboš Hamza"><div class="tech-check">✓</div> Ľuboš Hamza</label>
           <label class="tech-item"><input type="checkbox" value="__iny__" id="cb-iny"><div class="tech-check">✓</div> Iný</label>
         </div>
       </div>
@@ -938,10 +935,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
         </label>
 
         <div id="dic-fields-">
-          <div class="two-col">
-            <div class="field"><label>DIČ</label><input type="text" id="firma-dic" placeholder="napr. 2020123456"></div>
-            <div class="field"><label>IČ DPH</label><input type="text" id="firma-icdph" placeholder="napr. SK2020123456"></div>
-          </div>
+          <div class="field"><label>IČ DPH</label><input type="text" id="firma-icdph" placeholder="napr. SK2020123456"></div>
         </div>
         <div class="field"><label>Kontaktná osoba <span class="req">*</span></label><input type="text" id="firma-kontakt" placeholder="Meno a priezvisko"></div>
         <div class="field"><label>Telefón <span class="req">*</span></label><input type="tel" id="firma-telefon" placeholder="+421 900 000 000"></div>
@@ -1095,11 +1089,15 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
         </div>
         <div class="two-col">
           <div class="field">
-            <label>Doplnené chladivo (g)</label>
-            <input type="number" id="sp_vnut_chladivo_g" placeholder="napr. 150" oninput="updateCelkomChladivo()">
+            <label>Doplnené chladivo (g) <span class="req">*</span></label>
+            <input type="number" id="sp_vnut_chladivo_g" placeholder="napr. 150" oninput="updateCelkomChladivo(); document.getElementById('sp_vnut_chladivo_nedopl').checked=false;">
+            <label class="nem-label" style="margin-top:5px;">
+              <input type="checkbox" id="sp_vnut_chladivo_nedopl" class="nem-cb" onchange="if(this.checked){document.getElementById('sp_vnut_chladivo_g').value='';}updateCelkomChladivo();">
+              <div class="nem-check">✓</div>Chladivo nedopĺňané
+            </label>
           </div>
           <div class="field">
-            <label>Dĺžka CU potrubia (m)</label>
+            <label>Dĺžka CU potrubia (m) <span class="req">*</span></label>
             <input type="number" step="0.1" id="sp_vnut_potrubie" placeholder="napr. 5.5">
           </div>
         </div>
@@ -1223,6 +1221,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
     <div style="padding:0 16px 16px;">
       <button class="btn-wide" onclick="downloadPDFLocal()" style="background:linear-gradient(135deg,var(--cold),var(--accent));margin-bottom:8px;">📄 Stiahnuť PDF protokol</button>
       <button class="btn-wide" onclick="resetApp()">➕ Nový protokol</button>
+      <button class="btn-wide" onclick="zobrazRezim()" style="background:var(--ice);color:var(--deep);border:1.5px solid var(--border);margin-top:8px;">🏠 Návrat na hlavné menu</button>
     </div>
   </div>
 
@@ -1380,11 +1379,15 @@ function unitCardHTML(prefix, index, label, showTlaky, showChladivo) {
       </div>
       <div class="two-col">
         <div class="field">
-          <label>Doplnené chladivo (g)</label>
-          <input type="number" id="${p}_chladivo_g" placeholder="napr. 150" oninput="updateCelkomChladivo()">
+          <label>Doplnené chladivo (g) <span class="req">*</span></label>
+          <input type="number" id="${p}_chladivo_g" placeholder="napr. 150" oninput="updateCelkomChladivo(); document.getElementById('${p}_chladivo_nedopl').checked=false;">
+          <label class="nem-label" style="margin-top:5px;">
+            <input type="checkbox" id="${p}_chladivo_nedopl" class="nem-cb" onchange="if(this.checked){document.getElementById('${p}_chladivo_g').value='';}updateCelkomChladivo();">
+            <div class="nem-check">✓</div>Chladivo nedopĺňané
+          </label>
         </div>
         <div class="field">
-          <label>Dĺžka CU potrubia (m)</label>
+          <label>Dĺžka CU potrubia (m) <span class="req">*</span></label>
           <input type="number" step="0.1" id="${p}_potrubie" placeholder="napr. 5.5">
         </div>
       </div>` : ''}
@@ -1919,7 +1922,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0ofznRNIUlmg6bklJRbTCLiHkVcNgBb4uup1tbKG3wL8JyKIsLmVuw6mPRNwqp9dNmg/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBWirEvus4KpW5mfht5YIfu59M8GKTTz8v1uZhNamMm8TfoXmDlnTEqu4cHSE1SDwjAg/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2177,6 +2180,25 @@ function goNextMontaz() {
   if (currentStep===1 && !val0()) return;
   if (currentStep===2 && !val1()) return;
   if (currentStep===3 && !val2()) return;
+  if (currentStep===4) {
+    // Povinné foto vnútornej a vonkajšej jednotky
+    if (!document.getElementById('slot-vnutorna')?.classList.contains('has-photo')) {
+      showToast('⚠️ Odfotte vnútornú jednotku'); document.getElementById('slot-vnutorna')?.scrollIntoView({behavior:'smooth',block:'center'}); return;
+    }
+    if (!document.getElementById('slot-vonkajsia')?.classList.contains('has-photo')) {
+      showToast('⚠️ Odfotte vonkajšiu jednotku'); document.getElementById('slot-vonkajsia')?.scrollIntoView({behavior:'smooth',block:'center'}); return;
+    }
+  }
+  if (currentStep===5) {
+    // GDPR checkbox povinný
+    if (!document.getElementById('sc_gdpr_montaz')?.checked) {
+      showToast('⚠️ Zákazník musí potvrdiť súhlas GDPR'); document.getElementById('sc_gdpr_montaz')?.scrollIntoView({behavior:'smooth',block:'center'}); return;
+    }
+    // Podpis zákazníka povinný
+    if (!getCanvasDataUrl('canvas-zakaznik')) {
+      showToast('⚠️ Zákazník musí podpísať protokol'); document.getElementById('canvas-zakaznik')?.scrollIntoView({behavior:'smooth',block:'center'}); return;
+    }
+  }
   if (currentStep===6) { doUpload(); return; }
   currentStep++; showStep(currentStep);
 }
@@ -2207,11 +2229,57 @@ function val2() {
   if (!vyrobca) { showToast('⚠️ Vyberte výrobcu'); return false; }
   if (!chladivo){ showToast('⚠️ Vyberte typ chladiva'); return false; }
   if (typSystem === 'multisplit') {
-    if (!document.getElementById('multisplit-pocet').value) {
-      showToast('⚠️ Vyberte počet vnútorných jednotiek'); return false;
-    }
-    if (!document.getElementById('multisplit-vonkajsie').value) {
-      showToast('⚠️ Vyberte počet vonkajších jednotiek'); return false;
+    if (!document.getElementById('multisplit-pocet').value) { showToast('⚠️ Vyberte počet vnútorných jednotiek'); return false; }
+    if (!document.getElementById('multisplit-vonkajsie').value) { showToast('⚠️ Vyberte počet vonkajších jednotiek'); return false; }
+  }
+
+  // Helper na validáciu jednej jednotky
+  function valUnit(prefix, nazov) {
+    const model = (document.getElementById(prefix+'_model')?.value||'').trim();
+    const serial = (document.getElementById(prefix+'_serial')?.value||'').trim();
+    const fotoSlot = document.getElementById('slot_'+prefix+'_stit') || document.getElementById('slot-'+prefix+'-stit');
+    const maFoto = fotoSlot?.classList.contains('has-photo');
+    if (!model) { showToast('⚠️ Zadajte model — ' + nazov); document.getElementById(prefix+'_model')?.scrollIntoView({behavior:'smooth',block:'center'}); return false; }
+    if (!serial && !maFoto) { showToast('⚠️ Zadajte SN alebo odfotte štítok — ' + nazov); document.getElementById(prefix+'_serial')?.scrollIntoView({behavior:'smooth',block:'center'}); return false; }
+
+    // Tlak — ak nie je "nemerané", musí byť hodnota
+    const kurNem = document.getElementById(prefix+'_kurenie_nem')?.checked;
+    const chlNem = document.getElementById(prefix+'_chladenie_nem')?.checked;
+    const kurVal = (document.getElementById(prefix+'_kurenie')?.value||'').trim();
+    const chlVal = (document.getElementById(prefix+'_chladenie')?.value||'').trim();
+    if (!kurNem && !kurVal) { showToast('⚠️ Zadajte tlak kúrenie alebo zaškrtnite Nemerané — ' + nazov); document.getElementById(prefix+'_kurenie')?.scrollIntoView({behavior:'smooth',block:'center'}); return false; }
+    if (!chlNem && !chlVal) { showToast('⚠️ Zadajte tlak chladenie alebo zaškrtnite Nemerané — ' + nazov); document.getElementById(prefix+'_chladenie')?.scrollIntoView({behavior:'smooth',block:'center'}); return false; }
+
+    // Chladivo — buď gramáž alebo checkbox "nedopĺňané"
+    const chlG = (document.getElementById(prefix+'_chladivo_g')?.value||'').trim();
+    const chlNedopl = document.getElementById(prefix+'_chladivo_nedopl')?.checked;
+    if (!chlG && !chlNedopl) { showToast('⚠️ Zadajte množstvo chladiva alebo zaškrtnite Nedopĺňané — ' + nazov); document.getElementById(prefix+'_chladivo_g')?.scrollIntoView({behavior:'smooth',block:'center'}); return false; }
+
+    // Dĺžka potrubia
+    const potrub = (document.getElementById(prefix+'_potrubie')?.value||'').trim();
+    if (!potrub) { showToast('⚠️ Zadajte dĺžku CU potrubia — ' + nazov); document.getElementById(prefix+'_potrubie')?.scrollIntoView({behavior:'smooth',block:'center'}); return false; }
+
+    return true;
+  }
+
+  if (typSystem === 'split') {
+    if (!valUnit('sp_vnut', 'Vnútorná jednotka')) return false;
+    // Vonkajšia — len model + SN
+    const vonkModel = (document.getElementById('sp_vonk_model')?.value||'').trim();
+    const vonkSerial = (document.getElementById('sp_vonk_serial')?.value||'').trim();
+    const vonkFoto = document.getElementById('slot-sp-vonk-stit')?.classList.contains('has-photo');
+    if (!vonkModel) { showToast('⚠️ Zadajte model vonkajšej jednotky'); document.getElementById('sp_vonk_model')?.scrollIntoView({behavior:'smooth',block:'center'}); return false; }
+    if (!vonkSerial && !vonkFoto) { showToast('⚠️ Zadajte SN alebo odfotte štítok — Vonkajšia jednotka'); document.getElementById('sp_vonk_serial')?.scrollIntoView({behavior:'smooth',block:'center'}); return false; }
+  } else {
+    const pocetV = parseInt(document.getElementById('multisplit-pocet')?.value)||0;
+    for (let i=1;i<=pocetV;i++) { if (!valUnit('ms_vnut_'+i, 'Vnútorná jednotka '+i)) return false; }
+    const pocetVonk = parseInt(document.getElementById('multisplit-vonkajsie')?.value)||0;
+    for (let i=1;i<=pocetVonk;i++) {
+      const vm = (document.getElementById('ms_vonk_'+i+'_model')?.value||'').trim();
+      const vs = (document.getElementById('ms_vonk_'+i+'_serial')?.value||'').trim();
+      const vf = document.getElementById('slot_ms_vonk_'+i+'_stit')?.classList.contains('has-photo');
+      if (!vm) { showToast('⚠️ Zadajte model vonkajšej jednotky '+i); return false; }
+      if (!vs && !vf) { showToast('⚠️ Zadajte SN alebo odfotte štítok — Vonkajšia '+i); return false; }
     }
   }
   return true;
@@ -2265,7 +2333,7 @@ function closeToast() {
 
 // ══ LOGIN ══
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0ofznRNIUlmg6bklJRbTCLiHkVcNgBb4uup1tbKG3wL8JyKIsLmVuw6mPRNwqp9dNmg/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBWirEvus4KpW5mfht5YIfu59M8GKTTz8v1uZhNamMm8TfoXmDlnTEqu4cHSE1SDwjAg/exec';
 let prihlasenyUzivatel = null;
 
 function toggleHeslo(id, icon) {
@@ -2936,7 +3004,14 @@ function showServisStep(n) {
   const secId = 'sv' + n;
   document.getElementById(secId)?.classList.add('visible');
   if (n === 2) { setTimeout(generujJednotky, 50); }
-  if (n === 4) { setTimeout(generujTlakMerania, 50); }
+  if (n === 4) {
+    setTimeout(generujTlakMerania, 50);
+    // Chladivo vždy prázdne — technik zadá ak treba
+    document.getElementById('chladivo-doplnene-g').value = '';
+    document.getElementById('chladivo-typ').value = '';
+    document.getElementById('sc_chladivo_doplnenie').checked = false;
+    document.getElementById('chladivo-doplnenie-detail').style.display = 'none';
+  }
   const btnBack = document.getElementById('btn-back');
   const btnNext = document.getElementById('btn-next');
   btnBack.style.display = n < 6 ? 'block' : 'none';
@@ -3039,6 +3114,10 @@ function goNextServis() {
 
 function syncJednotkyZDOM() {
   if (!servisZakaznik) return;
+  // Len synchronizuj ak existujú DOM polia (krok 2 bol zobrazený)
+  const hasVonk = document.getElementById('sj-vonk-0-model') !== null;
+  const hasVnut = document.getElementById('sj-vnut-0-model') !== null;
+  if (!hasVonk && !hasVnut) return; // polia ešte neboli vygenerované
   const _vonk = [], _vnut = [];
   let vi = 0;
   while (document.getElementById(`sj-vonk-${vi}-model`) !== null) {
@@ -3459,34 +3538,7 @@ function generujJednotky() {
 
   let html = '';
 
-  // VONKAJŠIE JEDNOTKY
-  for (let i = 0; i < finalVonk; i++) {
-    const prefillModel = existValues['sj-vonk-'+i+'-model'] || (servisZakaznik?.jednotkyVonk?.[i]?.model) || '';
-    const prefillSerial = existValues['sj-vonk-'+i+'-serial'] || (servisZakaznik?.jednotkyVonk?.[i]?.serial) || '';
-    const prefillTyp = existValues['sj-vonk-'+i+'-typ'] || '';
-    html += `
-    <div style="background:#f0f7fa; border-radius:10px; padding:14px; margin-bottom:10px; border:1px solid var(--border);">
-      <div style="font-size:.75rem;font-weight:700;color:var(--deep);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">🏗️ Vonkajšia jednotka ${finalVonk > 1 ? i+1 : ''}</div>
-      <div style="display:grid; grid-template-columns:1fr; gap:8px;">
-        <div class="field" style="margin:0;">
-          <label style="font-size:0.8rem;">Model</label>
-          <div style="display:flex; gap:6px;">
-            <input type="text" id="sj-vonk-${i}-model" value="${prefillModel}" placeholder="napr. RXB25C" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; box-sizing:border-box;">
-            <button onclick="fotitPole('sj-vonk-${i}-model','Model vonkajšia ${i+1}')" style="padding:9px 12px; background:var(--deep); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem;">📷</button>
-          </div>
-        </div>
-        <div class="field" style="margin:0;">
-          <label style="font-size:0.8rem;">Sériové číslo</label>
-          <div style="display:flex; gap:6px;">
-            <input type="text" id="sj-vonk-${i}-serial" value="${prefillSerial}" placeholder="napr. SN123456" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; font-family:monospace; box-sizing:border-box;">
-            <button onclick="fotitPole('sj-vonk-${i}-serial','SN vonkajšia ${i+1}')" style="padding:9px 12px; background:var(--deep); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem;">📷</button>
-          </div>
-        </div>
-      </div>
-    </div>`;
-  }
-
-  // VNÚTORNÉ JEDNOTKY
+  // VNÚTORNÉ JEDNOTKY — zobrazené ako prvé
   for (let i = 0; i < finalVnut; i++) {
     const prefillModelV = existValues['sj-vnut-'+i+'-model'] || (servisZakaznik?.jednotkyVnut?.[i]?.model) || '';
     const prefillSerialV = existValues['sj-vnut-'+i+'-serial'] || (servisZakaznik?.jednotkyVnut?.[i]?.serial) || '';
@@ -3518,6 +3570,33 @@ function generujJednotky() {
           <div style="display:flex; gap:6px;">
             <input type="text" id="sj-vnut-${i}-serial" value="${prefillSerialV}" placeholder="napr. SN789012" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; font-family:monospace; box-sizing:border-box;">
             <button onclick="fotitPole('sj-vnut-${i}-serial','SN vnútorná ${i+1}')" style="padding:9px 12px; background:var(--orange); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem;">📷</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // VONKAJŠIE JEDNOTKY — zobrazené ako druhé
+  for (let i = 0; i < finalVonk; i++) {
+    const prefillModel = existValues['sj-vonk-'+i+'-model'] || (servisZakaznik?.jednotkyVonk?.[i]?.model) || '';
+    const prefillSerial = existValues['sj-vonk-'+i+'-serial'] || (servisZakaznik?.jednotkyVonk?.[i]?.serial) || '';
+    const prefillTyp = existValues['sj-vonk-'+i+'-typ'] || '';
+    html += `
+    <div style="background:#f0f7fa; border-radius:10px; padding:14px; margin-bottom:10px; border:1px solid var(--border);">
+      <div style="font-size:.75rem;font-weight:700;color:var(--deep);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">🏗️ Vonkajšia jednotka ${finalVonk > 1 ? i+1 : ''}</div>
+      <div style="display:grid; grid-template-columns:1fr; gap:8px;">
+        <div class="field" style="margin:0;">
+          <label style="font-size:0.8rem;">Model</label>
+          <div style="display:flex; gap:6px;">
+            <input type="text" id="sj-vonk-${i}-model" value="${prefillModel}" placeholder="napr. RXB25C" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; box-sizing:border-box;">
+            <button onclick="fotitPole('sj-vonk-${i}-model','Model vonkajšia ${i+1}')" style="padding:9px 12px; background:var(--deep); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem;">📷</button>
+          </div>
+        </div>
+        <div class="field" style="margin:0;">
+          <label style="font-size:0.8rem;">Sériové číslo</label>
+          <div style="display:flex; gap:6px;">
+            <input type="text" id="sj-vonk-${i}-serial" value="${prefillSerial}" placeholder="napr. SN123456" style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:0.85rem; font-family:monospace; box-sizing:border-box;">
+            <button onclick="fotitPole('sj-vonk-${i}-serial','SN vonkajšia ${i+1}')" style="padding:9px 12px; background:var(--deep); color:white; border:none; border-radius:9px; cursor:pointer; font-size:1rem;">📷</button>
           </div>
         </div>
       </div>
