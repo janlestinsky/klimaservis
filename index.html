@@ -2976,26 +2976,19 @@ function goNextServis() {
       document.getElementById('servis-vyrobca')?.scrollIntoView({behavior:'smooth', block:'center'});
       return;
     }
-    // Validácia jednotiek — každý typ musí mať aspoň model alebo SN
+    // Validácia jednotiek — model aj SN povinné pre každú jednotku
     const containerPrazdny = !document.getElementById('sj-vonk-0-model') && !document.getElementById('sj-vnut-0-model');
-    if (containerPrazdny) {
-      showToast('⚠️ Počkajte — formulár sa ešte načítava');
-      return;
-    }
+    if (containerPrazdny) { showToast('⚠️ Počkajte — formulár sa ešte načítava'); return; }
+
     const vonkModel = (document.getElementById('sj-vonk-0-model')?.value || '').trim();
     const vonkSerial = (document.getElementById('sj-vonk-0-serial')?.value || '').trim();
-    if (!vonkModel && !vonkSerial) {
-      showToast('⚠️ Zadajte model alebo sériové číslo vonkajšej jednotky');
-      document.getElementById('sj-vonk-0-model')?.scrollIntoView({behavior:'smooth', block:'center'});
-      return;
-    }
     const vnutModel = (document.getElementById('sj-vnut-0-model')?.value || '').trim();
     const vnutSerial = (document.getElementById('sj-vnut-0-serial')?.value || '').trim();
-    if (!vnutModel && !vnutSerial) {
-      showToast('⚠️ Zadajte model alebo sériové číslo vnútornej jednotky');
-      document.getElementById('sj-vnut-0-model')?.scrollIntoView({behavior:'smooth', block:'center'});
-      return;
-    }
+
+    if (!vonkModel) { showToast('⚠️ Zadajte model vonkajšej jednotky'); document.getElementById('sj-vonk-0-model')?.focus(); document.getElementById('sj-vonk-0-model')?.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+    if (!vonkSerial) { showToast('⚠️ Zadajte sériové číslo vonkajšej jednotky'); document.getElementById('sj-vonk-0-serial')?.focus(); document.getElementById('sj-vonk-0-serial')?.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+    if (!vnutModel) { showToast('⚠️ Zadajte model vnútornej jednotky'); document.getElementById('sj-vnut-0-model')?.focus(); document.getElementById('sj-vnut-0-model')?.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+    if (!vnutSerial) { showToast('⚠️ Zadajte sériové číslo vnútornej jednotky'); document.getElementById('sj-vnut-0-serial')?.focus(); document.getElementById('sj-vnut-0-serial')?.scrollIntoView({behavior:'smooth',block:'center'}); return; }
   }
   if (servisStep === 4) {
     // Validácia: aspoň 1 tlak musí byť zadaný (chladenie alebo kúrenie)
