@@ -1488,6 +1488,8 @@ function generujFotoGrid() {
   }
   grid.innerHTML = html;
 }
+
+function vymazFoto(key, label) {
   delete photos[key];
   const slotId = 'slot_' + key;
   const slot = document.getElementById(slotId);
@@ -1599,11 +1601,28 @@ function handlePhoto(input, key, label) {
 
 function vymazFotoStaticky(key, label) {
   delete photos[key];
-  const slot = document.getElementById('slot-'+key);
+  // Regeneruj celý foto grid (zachová ostatné fotky)
+  if (document.getElementById('foto-grid-jednotky')) {
+    generujFotoGrid();
+  } else {
+    const slot = document.getElementById('slot-'+key);
+    if (!slot) return;
+    slot.classList.remove('has-photo');
+    slot.innerHTML = `<div class="ph"><div class="ic">📷</div><span>${label}</span></div>
+      <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'${key}','${label}')">`;
+  }
+  showToast('🗑️ Fotka vymazaná');
+}
+
+function vymazFoto(key, label) {
+  delete photos[key];
+  const slotId = 'slot_' + key;
+  const slot = document.getElementById(slotId);
   if (!slot) return;
   slot.classList.remove('has-photo');
   slot.innerHTML = `<div class="ov">${label}</div>
-    <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'${key}','${label}')">`;
+    <input type="file" accept="image/*" capture="environment"
+      onchange="handleDynPhoto(this,'${key}','${label}')">`;
   showToast('🗑️ Fotka vymazaná');
 }
 
