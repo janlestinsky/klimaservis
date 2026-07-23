@@ -938,7 +938,10 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
         </label>
 
         <div id="dic-fields-">
-          <div class="field"><label>IČ DPH</label><input type="text" id="firma-icdph" placeholder="napr. SK2020123456"></div>
+          <div class="two-col">
+            <div class="field"><label>DIČ</label><input type="text" id="firma-dic" placeholder="napr. 2020123456"></div>
+            <div class="field"><label>IČ DPH</label><input type="text" id="firma-icdph" placeholder="napr. SK2020123456"></div>
+          </div>
         </div>
         <div class="field"><label>Kontaktná osoba <span class="req">*</span></label><input type="text" id="firma-kontakt" placeholder="Meno a priezvisko"></div>
         <div class="field"><label>Telefón <span class="req">*</span></label><input type="tel" id="firma-telefon" placeholder="+421 900 000 000"></div>
@@ -1144,15 +1147,12 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
   <div class="section" id="sec4">
     <div class="sec-hdr"><div class="sec-icon">📸</div><div><h2>Foto z montáže</h2><p>Krok 4 z 6</p></div></div>
     <div class="card">
+      <div class="photo-grid" id="foto-grid-jednotky">
+        <!-- Dynamicky generované podľa počtu jednotiek -->
+      </div>
+    </div>
+    <div class="card">
       <div class="photo-grid">
-        <div class="photo-slot" id="slot-vnutorna">
-          <div class="ph"><div class="ic">🏠</div><span>Vnútorná<br>jednotka</span></div>
-          <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'vnutorna','Vnútorná jednotka')">
-        </div>
-        <div class="photo-slot" id="slot-vonkajsia">
-          <div class="ph"><div class="ic">🏗️</div><span>Vonkajšia<br>jednotka</span></div>
-          <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'vonkajsia','Vonkajšia jednotka')">
-        </div>
         <div class="photo-slot" id="slot-detail">
           <div class="ph"><div class="ic">🔍</div><span>Detail<br>(voliteľné)</span></div>
           <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'detail','Detail')">
@@ -1422,7 +1422,7 @@ function handleDynPhoto(input, key, label) {
   const file = input.files[0]; if (!file) return;
   photos[key] = {file, label};
   komprimujFotku(file).then(dataUrl => {
-    photos[key].dataUrl = dataUrl; // uložiť komprimovanú verziu
+    photos[key].dataUrl = dataUrl;
     const slotId = 'slot_' + key;
     const slot = document.getElementById(slotId);
     if (!slot) return;
@@ -1431,10 +1431,72 @@ function handleDynPhoto(input, key, label) {
       <img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
       <div class="ov">${label}</div>
       <div class="chk">✓</div>
+      <button onclick="vymazFoto('${key}','${label}')" style="position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(220,38,38,0.85);color:white;border:none;font-size:0.9rem;cursor:pointer;z-index:10;line-height:1;">✕</button>
       <input type="file" accept="image/*" capture="environment"
         onchange="handleDynPhoto(this,'${key}','${label}')">`;
   });
   showToast('📸 ' + label);
+}
+
+// Generuj foto sloty pre krok 4 — 1 slot pre každú jednotku
+function generujFotoGrid() {
+  const grid = document.getElementById('foto-grid-jednotky');
+  if (!grid) return;
+
+  let pocetVnut = 1, pocetVonk = 1;
+  if (typSystem === 'multisplit') {
+    pocetVnut = parseInt(document.getElementById('multisplit-pocet')?.value) || 1;
+    pocetVonk = parseInt(document.getElementById('multisplit-vonkajsie')?.value) || 1;
+  }
+
+  let html = '';
+  // Vnútorné jednotky
+  for (let i = 1; i <= pocetVnut; i++) {
+    const key = pocetVnut > 1 ? 'vnutorna'+i : 'vnutorna';
+    const label = pocetVnut > 1 ? 'Vnútorná jednotka ' + i : 'Vnútorná jednotka';
+    const slotId = 'slot-' + key;
+    const hasFoto = photos[key]?.dataUrl;
+    html += `<div class="photo-slot ${hasFoto?'has-photo':''}" id="${slotId}">`;
+    if (hasFoto) {
+      html += `<img src="${hasFoto}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
+        <div class="ov">${label}</div><div class="chk">✓</div>
+        <button onclick="vymazFotoStaticky('${key}','${label}')" style="position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(220,38,38,0.85);color:white;border:none;font-size:0.9rem;cursor:pointer;z-index:10;line-height:1;">✕</button>
+        <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'${key}','${label}')">`;
+    } else {
+      html += `<div class="ph"><div class="ic">🏠</div><span>${label.replace(' ','<br>')}</span></div>
+        <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'${key}','${label}')">`;
+    }
+    html += `</div>`;
+  }
+  // Vonkajšie jednotky
+  for (let i = 1; i <= pocetVonk; i++) {
+    const key = pocetVonk > 1 ? 'vonkajsia'+i : 'vonkajsia';
+    const label = pocetVonk > 1 ? 'Vonkajšia jednotka ' + i : 'Vonkajšia jednotka';
+    const slotId = 'slot-' + key;
+    const hasFoto = photos[key]?.dataUrl;
+    html += `<div class="photo-slot ${hasFoto?'has-photo':''}" id="${slotId}">`;
+    if (hasFoto) {
+      html += `<img src="${hasFoto}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
+        <div class="ov">${label}</div><div class="chk">✓</div>
+        <button onclick="vymazFotoStaticky('${key}','${label}')" style="position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(220,38,38,0.85);color:white;border:none;font-size:0.9rem;cursor:pointer;z-index:10;line-height:1;">✕</button>
+        <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'${key}','${label}')">`;
+    } else {
+      html += `<div class="ph"><div class="ic">🏗️</div><span>${label.replace(' ','<br>')}</span></div>
+        <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'${key}','${label}')">`;
+    }
+    html += `</div>`;
+  }
+  grid.innerHTML = html;
+}
+  delete photos[key];
+  const slotId = 'slot_' + key;
+  const slot = document.getElementById(slotId);
+  if (!slot) return;
+  slot.classList.remove('has-photo');
+  slot.innerHTML = `<div class="ov">${label}</div>
+    <input type="file" accept="image/*" capture="environment"
+      onchange="handleDynPhoto(this,'${key}','${label}')">`;
+  showToast('🗑️ Fotka vymazaná');
 }
 
 let scanTargetId = null;
@@ -1522,15 +1584,27 @@ function getModel() {
 function handlePhoto(input, key, label) {
   const file = input.files[0]; if (!file) return;
   photos[key] = {file,label};
-  const reader = new FileReader();
-  reader.onload = e => {
+  komprimujFotku(file).then(dataUrl => {
+    photos[key].dataUrl = dataUrl;
     const slot = document.getElementById('slot-'+key);
+    if (!slot) return;
     slot.classList.add('has-photo');
-    slot.innerHTML = `<img src="${e.target.result}"><div class="ov">${label}</div><div class="chk">✓</div>
+    slot.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
+      <div class="ov">${label}</div><div class="chk">✓</div>
+      <button onclick="vymazFotoStaticky('${key}','${label}')" style="position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(220,38,38,0.85);color:white;border:none;font-size:0.9rem;cursor:pointer;z-index:10;line-height:1;">✕</button>
       <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'${key}','${label}')">`;
-  };
-  reader.readAsDataURL(file);
+  });
   showToast('📸 '+label);
+}
+
+function vymazFotoStaticky(key, label) {
+  delete photos[key];
+  const slot = document.getElementById('slot-'+key);
+  if (!slot) return;
+  slot.classList.remove('has-photo');
+  slot.innerHTML = `<div class="ov">${label}</div>
+    <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'${key}','${label}')">`;
+  showToast('🗑️ Fotka vymazaná');
 }
 
 // ══ REVIEW ══
@@ -2171,6 +2245,7 @@ function showStep(n) {
     btnNext.className = 'btn btn-primary';
   }
   if (n === 5) initSignatureCanvases();
+  if (n === 4) setTimeout(generujFotoGrid, 50);
   document.getElementById('nav-buttons').style.display = 'flex';
   for (let i=1;i<=6;i++) {
     const el = document.getElementById('p'+i);
@@ -2184,30 +2259,20 @@ function goNextMontaz() {
   if (currentStep===2 && !val1()) return;
   if (currentStep===3 && !val2()) return;
   if (currentStep===4) {
-    // Povinné foto — každá vnútorná a vonkajšia jednotka
-    if (typSystem === 'split') {
-      if (!document.getElementById('slot-vnutorna')?.classList.contains('has-photo')) {
-        showToast('⚠️ Odfotte vnútornú jednotku'); document.getElementById('slot-vnutorna')?.scrollIntoView({behavior:'smooth',block:'center'}); return;
+    const pocetVnut = typSystem === 'multisplit' ? (parseInt(document.getElementById('multisplit-pocet')?.value)||1) : 1;
+    const pocetVonk = typSystem === 'multisplit' ? (parseInt(document.getElementById('multisplit-vonkajsie')?.value)||1) : 1;
+    for (let i=1;i<=pocetVnut;i++) {
+      const key = pocetVnut > 1 ? 'vnutorna'+i : 'vnutorna';
+      if (!document.getElementById('slot-'+key)?.classList.contains('has-photo')) {
+        const label = pocetVnut > 1 ? 'Vnútorná jednotka '+i : 'Vnútorná jednotka';
+        showToast('⚠️ Odfotte ' + label.toLowerCase()); document.getElementById('slot-'+key)?.scrollIntoView({behavior:'smooth',block:'center'}); return;
       }
-      if (!document.getElementById('slot-vonkajsia')?.classList.contains('has-photo')) {
-        showToast('⚠️ Odfotte vonkajšiu jednotku'); document.getElementById('slot-vonkajsia')?.scrollIntoView({behavior:'smooth',block:'center'}); return;
-      }
-    } else {
-      // Multisplit — foto pre každú vnútornú jednotku
-      const pocetVnut = parseInt(document.getElementById('multisplit-pocet')?.value)||0;
-      for (let i=1;i<=pocetVnut;i++) {
-        const slot = document.getElementById('slot_ms_vnut_'+i+'_stit');
-        if (!slot?.classList.contains('has-photo')) {
-          showToast('⚠️ Odfotte štítok vnútornej jednotky '+i); slot?.scrollIntoView({behavior:'smooth',block:'center'}); return;
-        }
-      }
-      // Foto pre každú vonkajšiu jednotku
-      const pocetVonk = parseInt(document.getElementById('multisplit-vonkajsie')?.value)||0;
-      for (let i=1;i<=pocetVonk;i++) {
-        const slot = document.getElementById('slot_ms_vonk_'+i+'_stit');
-        if (!slot?.classList.contains('has-photo')) {
-          showToast('⚠️ Odfotte štítok vonkajšej jednotky '+i); slot?.scrollIntoView({behavior:'smooth',block:'center'}); return;
-        }
+    }
+    for (let i=1;i<=pocetVonk;i++) {
+      const key = pocetVonk > 1 ? 'vonkajsia'+i : 'vonkajsia';
+      if (!document.getElementById('slot-'+key)?.classList.contains('has-photo')) {
+        const label = pocetVonk > 1 ? 'Vonkajšia jednotka '+i : 'Vonkajšia jednotka';
+        showToast('⚠️ Odfotte ' + label.toLowerCase()); document.getElementById('slot-'+key)?.scrollIntoView({behavior:'smooth',block:'center'}); return;
       }
     }
   }
@@ -2238,12 +2303,13 @@ function val1() {
       showToast('⚠️ Vyplňte všetky povinné polia firmy');
       return false;
     }
-    // IČ DPH — musí byť vyplnené ALEBO zaškrtnutý checkbox "Nemá pridelené"
+    // DIČ / IČ DPH — musí byť aspoň jedno ALEBO zaškrtnutý checkbox
     const bezDic = document.getElementById('cb-bez-dic-')?.checked;
+    const dic = (document.getElementById('firma-dic')?.value || '').trim();
     const icDph = (document.getElementById('firma-icdph')?.value || '').trim();
-    if (!bezDic && !icDph) {
-      showToast('⚠️ Zadajte IČ DPH alebo zaškrtnite „Neviem DIČ / IČ DPH"');
-      document.getElementById('firma-icdph')?.scrollIntoView({behavior:'smooth', block:'center'});
+    if (!bezDic && !dic && !icDph) {
+      showToast('⚠️ Zadajte DIČ alebo IČ DPH, alebo zaškrtnite „Neviem DIČ / IČ DPH"');
+      document.getElementById('firma-dic')?.scrollIntoView({behavior:'smooth', block:'center'});
       return false;
     }
   } else {
