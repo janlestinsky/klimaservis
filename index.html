@@ -412,7 +412,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
 
         <label class="firma-toggle" style="margin-bottom:13px;">
           <input type="checkbox" id="cb-bez-dic-am-" onchange="toggleBezDic('am-', this.checked)">
-          <div class="firma-check">✓</div> Nemá pridelené DIČ / IČ DPH
+          <div class="firma-check">✓</div> Neviem DIČ / IČ DPH
         </label>
 
         <div id="dic-fields-am-">
@@ -599,6 +599,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
           <option value="Miroslav Paška">Miroslav Paška</option>
           <option value="Jaroslav Brna">Jaroslav Brna</option>
           <option value="Adam Brziak">Adam Brziak</option>
+          <option value="Peter Leštinský">Peter Leštinský</option>
           <option value="Iný">Iný...</option>
         </select>
         <input type="text" id="servis-technik-iny" placeholder="Meno iného technika" style="display:none; margin-top:8px; width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; box-sizing:border-box;">
@@ -609,6 +610,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
           <option value="Miroslav Paška">Miroslav Paška</option>
           <option value="Jaroslav Brna">Jaroslav Brna</option>
           <option value="Adam Brziak">Adam Brziak</option>
+          <option value="Peter Leštinský">Peter Leštinský</option>
           <option value="Iný">Iný...</option>
         </select>
         <input type="text" id="servis-technik2-iny" placeholder="Meno iného technika" style="display:none; margin-top:8px; width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:0.95rem; box-sizing:border-box;">
@@ -895,6 +897,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
           <label class="tech-item"><input type="checkbox" value="Miroslav Paška"><div class="tech-check">✓</div> Miroslav Paška</label>
           <label class="tech-item"><input type="checkbox" value="Jaroslav Brna"><div class="tech-check">✓</div> Jaroslav Brna</label>
           <label class="tech-item"><input type="checkbox" value="Adam Brziak"><div class="tech-check">✓</div> Adam Brziak</label>
+          <label class="tech-item"><input type="checkbox" value="Peter Leštinský"><div class="tech-check">✓</div> Peter Leštinský</label>
           <label class="tech-item"><input type="checkbox" value="__iny__" id="cb-iny"><div class="tech-check">✓</div> Iný</label>
         </div>
       </div>
@@ -931,7 +934,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
 
         <label class="firma-toggle" style="margin-bottom:13px;">
           <input type="checkbox" id="cb-bez-dic-" onchange="toggleBezDic('', this.checked)">
-          <div class="firma-check">✓</div> Nemá pridelené DIČ / IČ DPH
+          <div class="firma-check">✓</div> Neviem DIČ / IČ DPH
         </label>
 
         <div id="dic-fields-">
@@ -1541,8 +1544,8 @@ function buildReview() {
     ? [
         ['Firma', zakObj.priezvisko],
         ['IČO', zakObj.ico || '–'],
-        ['DIČ', zakObj.dic || '–'],
-        ['IČ DPH', zakObj.icDph || '–'],
+        ...(zakObj.dic ? [['DIČ', zakObj.dic]] : []),
+        ...(zakObj.icDph ? [['IČ DPH', zakObj.icDph]] : []),
         ['Kontakt', zakObj.kontakt || '–'],
         ['Adresa', zakObj.adresa],
         ['Telefón', zakObj.telefon],
@@ -1922,7 +1925,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwhZ_DxeO5ASm22nOgueBT_ZqZHj9xbsMNYoeM_Dg7D5SnnWZNsRkVvK7NRnY3AiVqcfA/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzPxLT802xCq5kyFG1oXlkZrvNzW3RmVtEXjAID7QyGkfeGzmYwqL1v-gyVv-GMz33IQ/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2181,12 +2184,31 @@ function goNextMontaz() {
   if (currentStep===2 && !val1()) return;
   if (currentStep===3 && !val2()) return;
   if (currentStep===4) {
-    // Povinné foto vnútornej a vonkajšej jednotky
-    if (!document.getElementById('slot-vnutorna')?.classList.contains('has-photo')) {
-      showToast('⚠️ Odfotte vnútornú jednotku'); document.getElementById('slot-vnutorna')?.scrollIntoView({behavior:'smooth',block:'center'}); return;
-    }
-    if (!document.getElementById('slot-vonkajsia')?.classList.contains('has-photo')) {
-      showToast('⚠️ Odfotte vonkajšiu jednotku'); document.getElementById('slot-vonkajsia')?.scrollIntoView({behavior:'smooth',block:'center'}); return;
+    // Povinné foto — každá vnútorná a vonkajšia jednotka
+    if (typSystem === 'split') {
+      if (!document.getElementById('slot-vnutorna')?.classList.contains('has-photo')) {
+        showToast('⚠️ Odfotte vnútornú jednotku'); document.getElementById('slot-vnutorna')?.scrollIntoView({behavior:'smooth',block:'center'}); return;
+      }
+      if (!document.getElementById('slot-vonkajsia')?.classList.contains('has-photo')) {
+        showToast('⚠️ Odfotte vonkajšiu jednotku'); document.getElementById('slot-vonkajsia')?.scrollIntoView({behavior:'smooth',block:'center'}); return;
+      }
+    } else {
+      // Multisplit — foto pre každú vnútornú jednotku
+      const pocetVnut = parseInt(document.getElementById('multisplit-pocet')?.value)||0;
+      for (let i=1;i<=pocetVnut;i++) {
+        const slot = document.getElementById('slot_ms_vnut_'+i+'_stit');
+        if (!slot?.classList.contains('has-photo')) {
+          showToast('⚠️ Odfotte štítok vnútornej jednotky '+i); slot?.scrollIntoView({behavior:'smooth',block:'center'}); return;
+        }
+      }
+      // Foto pre každú vonkajšiu jednotku
+      const pocetVonk = parseInt(document.getElementById('multisplit-vonkajsie')?.value)||0;
+      for (let i=1;i<=pocetVonk;i++) {
+        const slot = document.getElementById('slot_ms_vonk_'+i+'_stit');
+        if (!slot?.classList.contains('has-photo')) {
+          showToast('⚠️ Odfotte štítok vonkajšej jednotky '+i); slot?.scrollIntoView({behavior:'smooth',block:'center'}); return;
+        }
+      }
     }
   }
   if (currentStep===5) {
@@ -2220,7 +2242,7 @@ function val1() {
     const bezDic = document.getElementById('cb-bez-dic-')?.checked;
     const icDph = (document.getElementById('firma-icdph')?.value || '').trim();
     if (!bezDic && !icDph) {
-      showToast('⚠️ Zadajte IČ DPH alebo zaškrtnite „Nemá pridelené DIČ / IČ DPH"');
+      showToast('⚠️ Zadajte IČ DPH alebo zaškrtnite „Neviem DIČ / IČ DPH"');
       document.getElementById('firma-icdph')?.scrollIntoView({behavior:'smooth', block:'center'});
       return false;
     }
@@ -2341,7 +2363,7 @@ function closeToast() {
 
 // ══ LOGIN ══
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwhZ_DxeO5ASm22nOgueBT_ZqZHj9xbsMNYoeM_Dg7D5SnnWZNsRkVvK7NRnY3AiVqcfA/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzPxLT802xCq5kyFG1oXlkZrvNzW3RmVtEXjAID7QyGkfeGzmYwqL1v-gyVv-GMz33IQ/exec';
 let prihlasenyUzivatel = null;
 
 function toggleHeslo(id, icon) {
