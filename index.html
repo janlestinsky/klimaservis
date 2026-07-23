@@ -1922,7 +1922,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBWirEvus4KpW5mfht5YIfu59M8GKTTz8v1uZhNamMm8TfoXmDlnTEqu4cHSE1SDwjAg/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyD5n-5tWUQ49cTBIq9LmWf1OAwcpvaBj3sMHwC9elw0Ynxrai9vva3t89eWfj7PI5XPw/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2216,6 +2216,14 @@ function val1() {
       showToast('⚠️ Vyplňte všetky povinné polia firmy');
       return false;
     }
+    // IČ DPH — musí byť vyplnené ALEBO zaškrtnutý checkbox "Nemá pridelené"
+    const bezDic = document.getElementById('cb-bez-dic-')?.checked;
+    const icDph = (document.getElementById('firma-icdph')?.value || '').trim();
+    if (!bezDic && !icDph) {
+      showToast('⚠️ Zadajte IČ DPH alebo zaškrtnite „Nemá pridelené DIČ / IČ DPH"');
+      document.getElementById('firma-icdph')?.scrollIntoView({behavior:'smooth', block:'center'});
+      return false;
+    }
   } else {
     for (const id of ['meno','priezvisko','adresa','telefon']) {
       if (!g(id)) { showToast('⚠️ Vyplňte všetky povinné polia'); document.getElementById(id).focus(); return false; }
@@ -2333,7 +2341,7 @@ function closeToast() {
 
 // ══ LOGIN ══
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBWirEvus4KpW5mfht5YIfu59M8GKTTz8v1uZhNamMm8TfoXmDlnTEqu4cHSE1SDwjAg/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyD5n-5tWUQ49cTBIq9LmWf1OAwcpvaBj3sMHwC9elw0Ynxrai9vva3t89eWfj7PI5XPw/exec';
 let prihlasenyUzivatel = null;
 
 function toggleHeslo(id, icon) {
@@ -3103,7 +3111,16 @@ function goNextServis() {
       }
     }
   }
-  if (servisStep === 5) { doServisUpload(); return; }
+  if (servisStep === 5) {
+    // Validácia: aspoň 2 fotky — vnútorná a vonkajšia jednotka
+    const fotoKeys = Object.keys(window.servisPhotos || {});
+    if (fotoKeys.length < 2) {
+      showToast('⚠️ Pridajte aspoň 2 fotky — vnútornú a vonkajšiu jednotku');
+      document.getElementById('iny-servis-fotky')?.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+    doServisUpload(); return;
+  }
 
   // Po kroku 2: synchronizuj servisZakaznik.jednotky s aktuálnym DOM
   if (servisStep === 2) syncJednotkyZDOM();
