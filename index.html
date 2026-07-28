@@ -204,6 +204,58 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
   </div>
 </div>
 
+    <button onclick="zobrazLogin()" style="width:100%; padding:10px; background:transparent; color:#5a7a88; border:none; font-size:13px; cursor:pointer; margin-top:12px;">← Späť na prihlásenie</button>
+  </div>
+</div>
+
+<!-- PODPISOVÁ STRÁNKA — zobrazí sa keď URL obsahuje ?podpis=TOKEN -->
+<div id="podpis-screen" style="display:none; min-height:100vh; background:#f0f4f8; padding:20px;">
+  <div style="max-width:480px; margin:0 auto;">
+    <div style="text-align:center; margin-bottom:24px;">
+      <img src="logo.jpg" alt="ELWORK" style="height:40px; width:auto;">
+      <h2 style="font-family:'Syne',sans-serif; color:#0d3d52; margin:12px 0 4px;">Podpísanie protokolu</h2>
+      <p style="color:#5a7a88; font-size:0.85rem; margin:0;">Prosím skontrolujte a podpíšte nižšie</p>
+    </div>
+
+    <div id="podpis-loading" class="card" style="text-align:center; padding:32px;">
+      <div class="spinner"></div>
+      <p style="margin-top:12px; color:#5a7a88;">Načítavam protokol...</p>
+    </div>
+
+    <div id="podpis-error" class="card" style="display:none; text-align:center; background:#fee2e2;">
+      <div style="font-size:2rem;">⚠️</div>
+      <p id="podpis-error-text" style="color:#dc2626; font-weight:600; margin:8px 0 0;"></p>
+    </div>
+
+    <div id="podpis-content" style="display:none;">
+      <div class="card" id="podpis-zakaznik-info" style="margin-bottom:12px;"></div>
+
+      <div class="card">
+        <div style="font-size:.75rem; font-weight:700; color:var(--deep); text-transform:uppercase; letter-spacing:.05em; margin-bottom:10px;">✍️ Váš podpis</div>
+        <p style="font-size:0.82rem; color:var(--muted); margin:0 0 10px;">Podpíšte sa prstom alebo myšou do poľa nižšie:</p>
+        <canvas id="canvas-podpis-zakaznik" style="width:100%; height:160px; border:2px solid var(--border); border-radius:12px; background:white; touch-action:none; display:block; cursor:crosshair;"></canvas>
+        <button onclick="clearCanvas('canvas-podpis-zakaznik')" style="width:100%; margin-top:8px; padding:9px; background:var(--ice); border:1.5px solid var(--border); border-radius:9px; font-size:.8rem; font-weight:600; cursor:pointer; color:var(--muted);">🗑️ Vymazať podpis</button>
+      </div>
+
+      <div class="card" style="background:#fffbeb; border:1.5px solid #fbbf24;">
+        <label class="chk-row" style="border:none; padding:4px 0; align-items:flex-start;">
+          <input type="checkbox" id="podpis-gdpr-cb">
+          <div class="chk-box" style="flex-shrink:0; margin-top:2px;">✓</div>
+          <span style="font-size:0.78rem; line-height:1.5;">Súhlasím so spracovaním svojich osobných údajov spoločnosťou ELWORK, s.r.o. v súlade s GDPR (EÚ 2016/679) a zákonom č. 18/2018 Z. z. o ochrane osobných údajov.</span>
+        </label>
+      </div>
+
+      <button id="podpis-odoslat-btn" onclick="odoslatPodpis()" style="width:100%; padding:16px; background:linear-gradient(135deg,var(--orange),#ff8c42); color:white; border:none; border-radius:12px; font-size:1rem; font-weight:700; cursor:pointer; margin-top:4px;">✍️ Odoslať podpis</button>
+    </div>
+
+    <div id="podpis-success" class="card" style="display:none; text-align:center;">
+      <div style="font-size:3rem; margin-bottom:12px;">✅</div>
+      <h3 style="color:var(--deep); margin:0 0 8px;">Protokol bol podpísaný!</h3>
+      <p style="color:var(--muted); font-size:0.85rem;">Ďakujeme. Váš podpis bol úspešne uložený. Podpísaný dokument dostanete emailom.</p>
+    </div>
+  </div>
+</div>
+
 <div id="login-screen" style="display:flex; position:fixed; inset:0; background:#0d3d52; z-index:9999; align-items:center; justify-content:center;">
   <div style="background:#fff; border-radius:16px; padding:36px 32px; width:100%; max-width:380px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
     <div style="text-align:center; margin-bottom:28px;">
@@ -409,6 +461,14 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
           <div id="nazov-results-am-" style="margin-top:6px;"></div>
         </div>
         <div class="field"><label>Adresa firmy <span class="req">*</span></label><input type="text" id="am-firma-adresa" placeholder="Hlavná 12, Bratislava"></div>
+
+        <label class="firma-toggle" style="margin-bottom:8px;">
+          <input type="checkbox" id="cb-ina-adresa-am-" onchange="toggleInaAdresa('am-', this.checked)">
+          <div class="firma-check">✓</div> Adresa inštalácie je iná ako adresa firmy
+        </label>
+        <div id="ina-adresa-fields-am-" style="display:none;">
+          <div class="field"><label>Adresa inštalácie <span class="req">*</span></label><input type="text" id="am-firma-inst-adresa" placeholder="napr. Priemyselná 5, Martin"></div>
+        </div>
 
         <label class="firma-toggle" style="margin-bottom:13px;">
           <input type="checkbox" id="cb-bez-dic-am-" onchange="toggleBezDic('am-', this.checked)">
@@ -852,8 +912,17 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
 
     <div class="card">
       <div style="font-size:.75rem;font-weight:700;color:var(--cold);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">✍️ Podpis zákazníka</div>
-      <canvas id="canvas-servis-zakaznik" style="width:100%;height:180px;border:2px solid var(--border);border-radius:12px;background:white;touch-action:none;display:block;cursor:crosshair;"></canvas>
-      <button onclick="clearCanvas('canvas-servis-zakaznik')" style="flex:1;padding:9px;background:var(--ice);border:1.5px solid var(--border);border-radius:9px;font-size:.8rem;font-weight:600;cursor:pointer;color:var(--muted);margin-top:8px;width:100%;">🗑️ Vymazať</button>
+
+      <label class="chk-row" style="border:none; padding:4px 0; margin-bottom:12px; align-items:flex-start;">
+        <input type="checkbox" id="sc_servis_zakaznik_nepritomny" onchange="toggleZakaznikNepritomny(this, 'servis')">
+        <div class="chk-box" style="flex-shrink:0; margin-top:2px;">✓</div>
+        <span style="font-size:0.82rem; line-height:1.5; color:var(--text);">Zákazník nebol prítomný — protokol mu bude zaslaný emailom na elektronické podpísanie</span>
+      </label>
+
+      <div id="podpis-canvas-servis">
+        <canvas id="canvas-servis-zakaznik" style="width:100%;height:180px;border:2px solid var(--border);border-radius:12px;background:white;touch-action:none;display:block;cursor:crosshair;"></canvas>
+        <button onclick="clearCanvas('canvas-servis-zakaznik')" style="flex:1;padding:9px;background:var(--ice);border:1.5px solid var(--border);border-radius:9px;font-size:.8rem;font-weight:600;cursor:pointer;color:var(--muted);margin-top:8px;width:100%;">🗑️ Vymazať</button>
+      </div>
     </div>
     <div class="card">
       <div style="font-size:.75rem;font-weight:700;color:var(--cold);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">🔵 Pečiatka ELWORK</div>
@@ -931,6 +1000,14 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
           <div id="nazov-results-" style="margin-top:6px;"></div>
         </div>
         <div class="field"><label>Adresa firmy <span class="req">*</span></label><input type="text" id="firma-adresa" placeholder="Hlavná 12, Bratislava"></div>
+
+        <label class="firma-toggle" style="margin-bottom:8px;">
+          <input type="checkbox" id="cb-ina-adresa-" onchange="toggleInaAdresa('', this.checked)">
+          <div class="firma-check">✓</div> Adresa inštalácie je iná ako adresa firmy
+        </label>
+        <div id="ina-adresa-fields-" style="display:none;">
+          <div class="field"><label>Adresa inštalácie <span class="req">*</span></label><input type="text" id="firma-inst-adresa" placeholder="napr. Priemyselná 5, Martin"></div>
+        </div>
 
         <label class="firma-toggle" style="margin-bottom:13px;">
           <input type="checkbox" id="cb-bez-dic-" onchange="toggleBezDic('', this.checked)">
@@ -1182,9 +1259,18 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
     <div class="card">
       <div style="font-size:.75rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">✍️ Podpis zákazníka</div>
       <div style="font-size:.8rem;color:var(--muted);margin-bottom:8px;">Zákazník potvrdzuje prevzatie a správnosť montáže</div>
-      <canvas id="canvas-zakaznik" style="width:100%;height:180px;border:2px solid var(--border);border-radius:12px;background:white;touch-action:none;display:block;cursor:crosshair;"></canvas>
-      <div style="display:flex;gap:8px;margin-top:8px;">
-        <button onclick="clearCanvas('canvas-zakaznik')" style="flex:1;padding:9px;background:var(--ice);border:1.5px solid var(--border);border-radius:9px;font-size:.8rem;font-weight:600;cursor:pointer;color:var(--muted);">🗑️ Vymazať</button>
+
+      <label class="chk-row" style="border:none; padding:4px 0; margin-bottom:12px; align-items:flex-start;">
+        <input type="checkbox" id="sc_zakaznik_nepritomny" onchange="toggleZakaznikNepritomny(this, 'montaz')">
+        <div class="chk-box" style="flex-shrink:0; margin-top:2px;">✓</div>
+        <span style="font-size:0.82rem; line-height:1.5; color:var(--text);">Zákazník nebol prítomný — protokol mu bude zaslaný emailom na elektronické podpísanie</span>
+      </label>
+
+      <div id="podpis-canvas-montaz">
+        <canvas id="canvas-zakaznik" style="width:100%;height:180px;border:2px solid var(--border);border-radius:12px;background:white;touch-action:none;display:block;cursor:crosshair;"></canvas>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button onclick="clearCanvas('canvas-zakaznik')" style="flex:1;padding:9px;background:var(--ice);border:1.5px solid var(--border);border-radius:9px;font-size:.8rem;font-weight:600;cursor:pointer;color:var(--muted);">🗑️ Vymazať</button>
+        </div>
       </div>
     </div>
 
@@ -1638,6 +1724,7 @@ function buildReview() {
         ['Firma', zakObj.priezvisko],
         ['IČO', zakObj.ico || '–'],
         ...(zakObj.dic ? [['DIČ', zakObj.dic]] : []),
+        ...(zakObj.instAdresa ? [['Adresa inštalácie', zakObj.instAdresa]] : []),
         ...(zakObj.icDph ? [['IČ DPH', zakObj.icDph]] : []),
         ['Kontakt', zakObj.kontakt || '–'],
         ['Adresa', zakObj.adresa],
@@ -1891,7 +1978,8 @@ function fileToDataUrl(file) {
 async function doUpload() {
   const datum = new Date().toLocaleDateString('sk-SK', {day:'2-digit',month:'2-digit',year:'numeric'});
   const technici = getTechnici();
-  const podpisZakaznik = getCanvasDataUrl('canvas-zakaznik');
+  const zakaznikNepritomnyMontaz = document.getElementById('sc_zakaznik_nepritomny')?.checked || false;
+  const podpisZakaznik = zakaznikNepritomnyMontaz ? null : getCanvasDataUrl('canvas-zakaznik');
   const podpisTechnik = getCanvasDataUrl('canvas-technik');
   const zakaznik = buildZakaznikObject('', datum);
   const chladivo_celkom = document.getElementById('chladivo_celkom')?.value || '';
@@ -1990,7 +2078,7 @@ async function doUpload() {
     const emailStepId = 's'+(4+photoKeys.length);
     setStep(emailStepId,'active');
     try {
-      const emailResult = await apiCall({type:'email', zakaznik, klima, technici, pdfZakaznikB64, pdfZakaznikDriveId: rPdfZakaznik.pdfId});
+      const emailResult = await apiCall({type:'email', zakaznik, klima, technici, pdfZakaznikB64, pdfZakaznikDriveId: rPdfZakaznik.pdfId, podpisZakaznik, folderId: r1.folderId});
       if (!emailResult.ok) {
         console.error('Email API chyba:', emailResult.error);
         showToast('⚠️ Email chyba: ' + (emailResult.error || 'neznáma'));
@@ -2018,7 +2106,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzPxLT802xCq5kyFG1oXlkZrvNzW3RmVtEXjAID7QyGkfeGzmYwqL1v-gyVv-GMz33IQ/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJ6leaSjsOZeoOzneRiaKQ8DlgrNJ5kIhmDO6IUcbmHemI0pqszG3Tf7IHiUTPwun33Q/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2300,9 +2388,11 @@ function goNextMontaz() {
     if (!document.getElementById('sc_gdpr_montaz')?.checked) {
       showToast('⚠️ Zákazník musí potvrdiť súhlas GDPR'); document.getElementById('sc_gdpr_montaz')?.scrollIntoView({behavior:'smooth',block:'center'}); return;
     }
-    // Podpis zákazníka povinný
-    if (!getCanvasDataUrl('canvas-zakaznik')) {
-      showToast('⚠️ Zákazník musí podpísať protokol'); document.getElementById('canvas-zakaznik')?.scrollIntoView({behavior:'smooth',block:'center'}); return;
+    // Podpis zákazníka — povinný len ak bol zákazník prítomný
+    if (!document.getElementById('sc_zakaznik_nepritomny')?.checked) {
+      if (!getCanvasDataUrl('canvas-zakaznik')) {
+        showToast('⚠️ Zákazník musí podpísať protokol'); document.getElementById('canvas-zakaznik')?.scrollIntoView({behavior:'smooth',block:'center'}); return;
+      }
     }
   }
   if (currentStep===6) { doUpload(); return; }
@@ -2321,6 +2411,16 @@ function val1() {
     if (!firma.nazov || !firma.adresa || !firma.telefon || !firma.kontakt || !firma.email) {
       showToast('⚠️ Vyplňte všetky povinné polia firmy');
       return false;
+    }
+    // Adresa inštalácie — ak zaškrtnutá, musí byť vyplnená
+    const inaAdresaChecked = document.getElementById('cb-ina-adresa-')?.checked;
+    if (inaAdresaChecked) {
+      const instAdresa = (document.getElementById('firma-inst-adresa')?.value || '').trim();
+      if (!instAdresa) {
+        showToast('⚠️ Zadajte adresu inštalácie');
+        document.getElementById('firma-inst-adresa')?.scrollIntoView({behavior:'smooth', block:'center'});
+        return false;
+      }
     }
     // DIČ / IČ DPH — musí byť aspoň jedno ALEBO zaškrtnutý checkbox
     const bezDic = document.getElementById('cb-bez-dic-')?.checked;
@@ -2446,9 +2546,88 @@ function closeToast() {
   if (t._toastTimer) clearTimeout(t._toastTimer);
 }
 
+// ══ PODPISOVÁ STRÁNKA ══
+let _podpisToken = null;
+
+async function zobrazPodpisovuStranku(token) {
+  _podpisToken = token;
+  document.getElementById('podpis-screen').style.display = '';
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=UTF-8'},
+      body: 'data=' + encodeURIComponent(JSON.stringify({type: 'getPodpisData', token}))
+    });
+    const data = await res.json();
+
+    if (!data.ok) {
+      document.getElementById('podpis-loading').style.display = 'none';
+      const errEl = document.getElementById('podpis-error');
+      errEl.style.display = '';
+      document.getElementById('podpis-error-text').textContent = data.error || 'Chyba pri načítaní';
+      return;
+    }
+
+    // Zobraz info o zákazníkovi
+    const z = data.zakaznik || {};
+    document.getElementById('podpis-zakaznik-info').innerHTML = `
+      <div style="font-size:.75rem;font-weight:700;color:var(--deep);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">👤 Zákazník</div>
+      <div class="rv-item"><span class="rk">Meno</span><span class="rv">${z.meno||''} ${z.priezvisko||''}</span></div>
+      <div class="rv-item"><span class="rk">Adresa</span><span class="rv">${z.adresa||'–'}</span></div>
+      <div class="rv-item"><span class="rk">Typ protokolu</span><span class="rv">${data.typ === 'servis' ? 'Servisný protokol' : 'Montážny protokol'}</span></div>
+    `;
+
+    document.getElementById('podpis-loading').style.display = 'none';
+    document.getElementById('podpis-content').style.display = '';
+    setTimeout(() => initCanvas('canvas-podpis-zakaznik'), 100);
+
+  } catch(e) {
+    document.getElementById('podpis-loading').style.display = 'none';
+    document.getElementById('podpis-error').style.display = '';
+    document.getElementById('podpis-error-text').textContent = 'Chyba spojenia so serverom';
+  }
+}
+
+async function odoslatPodpis() {
+  if (!document.getElementById('podpis-gdpr-cb')?.checked) {
+    showToast('⚠️ Potvrďte súhlas so spracovaním osobných údajov'); return;
+  }
+  const podpis = getCanvasDataUrl('canvas-podpis-zakaznik');
+  if (!podpis) {
+    showToast('⚠️ Prosím podpíšte sa do poľa vyššie'); return;
+  }
+
+  const btn = document.getElementById('podpis-odoslat-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Odosielam...';
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=UTF-8'},
+      body: 'data=' + encodeURIComponent(JSON.stringify({type: 'ulozPodpis', token: _podpisToken, podpis}))
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+      document.getElementById('podpis-content').style.display = 'none';
+      document.getElementById('podpis-success').style.display = '';
+    } else {
+      showToast('⚠️ Chyba: ' + (data.error || 'Neznáma chyba'));
+      btn.disabled = false;
+      btn.textContent = '✍️ Odoslať podpis';
+    }
+  } catch(e) {
+    showToast('⚠️ Chyba spojenia');
+    btn.disabled = false;
+    btn.textContent = '✍️ Odoslať podpis';
+  }
+}
+
 // ══ LOGIN ══
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzPxLT802xCq5kyFG1oXlkZrvNzW3RmVtEXjAID7QyGkfeGzmYwqL1v-gyVv-GMz33IQ/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJ6leaSjsOZeoOzneRiaKQ8DlgrNJ5kIhmDO6IUcbmHemI0pqszG3Tf7IHiUTPwun33Q/exec';
 let prihlasenyUzivatel = null;
 
 function toggleHeslo(id, icon) {
@@ -2668,8 +2847,16 @@ function skontrolujAdmin() {
 
 window.addEventListener('load', skontrolujPrihlasenie);
 
+// Detekcia podpisového tokenu v URL
 window.addEventListener('load', () => {
-  // Ak je už prihlásený v tejto session
+  const urlParams = new URLSearchParams(window.location.search);
+  const podpisToken = urlParams.get('podpis');
+  if (podpisToken) {
+    // Skry login, zobraz podpisovú stránku
+    document.getElementById('login-screen').style.display = 'none';
+    zobrazPodpisovuStranku(podpisToken);
+    return;
+  }
   if (sessionStorage.getItem('klima_auth') === '1') {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('setup-screen').style.display = 'none';
@@ -2702,6 +2889,22 @@ function toggleFirma(prefix, checked) {
   const fyzickaDiv = document.getElementById('fyzicka-fields-' + prefix);
   if (firmaDiv) firmaDiv.style.display = checked ? '' : 'none';
   if (fyzickaDiv) fyzickaDiv.style.display = checked ? 'none' : '';
+}
+
+function toggleZakaznikNepritomny(cb, typ) {
+  if (typ === 'montaz') {
+    document.getElementById('podpis-canvas-montaz').style.display = cb.checked ? 'none' : '';
+  } else {
+    document.getElementById('podpis-canvas-servis').style.display = cb.checked ? 'none' : '';
+  }
+}
+
+function toggleInaAdresa(prefix, checked) {
+  document.getElementById('ina-adresa-fields-' + prefix).style.display = checked ? '' : 'none';
+  if (!checked) {
+    const el = document.getElementById((prefix||'') + 'firma-inst-adresa');
+    if (el) el.value = '';
+  }
 }
 
 function toggleBezDic(prefix, checked) {
@@ -2760,12 +2963,14 @@ function buildZakaznikObject(prefix, datum) {
     return {
       meno: '', priezvisko: firma.nazov, isFirma: true,
       ico: firma.ico, dic: firma.dic, icDph: firma.icDph, kontakt: firma.kontakt,
-      adresa: firma.adresa, telefon: firma.telefon, email: firma.email, datum
+      adresa: firma.adresa, instAdresa: firma.instAdresa || '',
+      telefon: firma.telefon, email: firma.email, datum
     };
   }
   return {
     meno: g(prefix+'meno'), priezvisko: g(prefix+'priezvisko'), isFirma: false,
-    adresa: g(prefix+'adresa'), telefon: g(prefix+'telefon'), email: g(prefix+'email'), datum
+    adresa: g(prefix+'adresa'), instAdresa: '',
+    telefon: g(prefix+'telefon'), email: g(prefix+'email'), datum
   };
 }
 
@@ -2825,10 +3030,16 @@ function getFirmaData(prefix) {
   const cb = document.getElementById(prefix + 'cb-firma');
   const isFirma = cb ? cb.checked : false;
   if (!isFirma) return null;
+  const inaAdresa = document.getElementById(prefix + 'cb-ina-adresa-' + prefix)?.checked ||
+                    document.getElementById('cb-ina-adresa-' + prefix)?.checked || false;
+  const instAdresa = inaAdresa
+    ? (document.getElementById(prefix + 'firma-inst-adresa')?.value.trim() || '')
+    : '';
   return {
     isFirma: true,
     nazov: document.getElementById(prefix + 'firma-nazov')?.value.trim() || '',
     adresa: document.getElementById(prefix + 'firma-adresa')?.value.trim() || '',
+    instAdresa,
     ico: document.getElementById(prefix + 'ico')?.value.trim() || '',
     dic: document.getElementById(prefix + 'firma-dic')?.value.trim() || '',
     icDph: document.getElementById(prefix + 'firma-icdph')?.value.trim() || '',
@@ -3487,12 +3698,15 @@ async function doServisUpload() {
     }
   }
 
-  // Validácia: podpis zákazníka nesmie byť prázdny
-  const podpisValidacia = getCanvasDataUrl('canvas-servis-zakaznik');
-  if (!podpisValidacia) {
-    showToast('⚠️ Zákazník musí podpísať protokol', 3500);
-    document.getElementById('canvas-servis-zakaznik')?.scrollIntoView({behavior:'smooth', block:'center'});
-    return;
+  // Validácia: podpis zákazníka — povinný len ak bol prítomný
+  const zakaznikNepritomny = document.getElementById('sc_servis_zakaznik_nepritomny')?.checked || false;
+  if (!zakaznikNepritomny) {
+    const podpisValidacia = getCanvasDataUrl('canvas-servis-zakaznik');
+    if (!podpisValidacia) {
+      showToast('⚠️ Zákazník musí podpísať protokol', 3500);
+      document.getElementById('canvas-servis-zakaznik')?.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
   }
   const datum = document.getElementById('servis-datum').value;
   const datumFmt = datum ? datum.split('-').reverse().join('.') : new Date().toLocaleDateString('sk-SK');
@@ -3504,7 +3718,7 @@ async function doServisUpload() {
   if (technik2 === 'Iný') { technik2 = (document.getElementById('servis-technik2-iny')||{}).value || ''; }
   const technikFull = technik2 ? technik + ', ' + technik2 : technik;
   const poznamky = document.getElementById('servis-poznamky').value || '';
-  const podpis = getCanvasDataUrl('canvas-servis-zakaznik');
+  const podpis = zakaznikNepritomny ? null : getCanvasDataUrl('canvas-servis-zakaznik');
   let logoB64 = null;
   try {
     const logoImgEl = document.querySelector('header img');
@@ -3579,6 +3793,7 @@ async function doServisUpload() {
       poznamky,
       checkboxy,
       podpisZakaznik: podpis,
+      zakaznikNepritomny,
       gdprSuhlas: document.getElementById('sc_gdpr_servis')?.checked || false,
       logoB64,
       peciatkaB64
