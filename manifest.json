@@ -1,0 +1,25 @@
+{
+  "name": "ELWORK Portál",
+  "short_name": "ELWORK",
+  "description": "Montážne a servisné protokoly ELWORK",
+  "start_url": "/klimaservis/",
+  "scope": "/klimaservis/",
+  "display": "standalone",
+  "background_color": "#0d3d52",
+  "theme_color": "#0d3d52",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}
