@@ -2042,62 +2042,37 @@ async function doUpload() {
     setStep('s1','done');
     setProg(10);
 
-    // Získaj logo a pečiatku
-    // Logo - get as base64 if possible
-  let logoB64 = null;
-  try {
-    const logoImg = document.querySelector('header img');
-    if (logoImg && logoImg.src) {
-      if (logoImg.src.startsWith('data:')) {
-        logoB64 = logoImg.src;
-      } else {
-        // Convert external URL to base64
-        const logoResp = await fetch(logoImg.src);
-        const logoBlob = await logoResp.blob();
-        logoB64 = await new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(logoBlob); });
-      }
-    }
-  } catch(le) { logoB64 = null; }
-    // Pečiatka - konvertuj na base64
-  let peciatkaB64 = null;
-  try {
-    const pecSrc = PECIATKA_B64 || 'peciatka.jpg';
-    if (pecSrc.startsWith('data:')) {
-      peciatkaB64 = pecSrc;
-    } else {
-      const pecResp = await fetch(pecSrc);
-      const pecBlob = await pecResp.blob();
-      peciatkaB64 = await new Promise(res => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(pecBlob); });
-    }
-  } catch(pe) { peciatkaB64 = null; }
+    // Použij cachovane logo a pečiatku (načítané pri štarte)
+    const logoB64 = _logoB64Cache || null;
+    const peciatkaB64 = _peciatkaB64Cache || null;
 
-    // Generuj PDF na serveri (plná slovenčina)
+    // Generuj oba PDF paralelne (firma + zákazník súčasne)
     setStep('s2','active');
     const gdprSuhlas = document.getElementById('sc_gdpr_montaz')?.checked || false;
-    const rPdfFirma = await apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, logoB64, peciatkaB64, gdprSuhlas, showTechnici: true, nazov:'protokol_firma.pdf'});
+    const [rPdfFirma, rPdfZakaznik] = await Promise.all([
+      apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, logoB64, peciatkaB64, gdprSuhlas, showTechnici: true, nazov:'protokol_firma.pdf', folderId: r1.folderId}),
+      apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, logoB64, peciatkaB64, gdprSuhlas, showTechnici: false, nazov:'protokol_zakaznik.pdf', folderId: r1.folderId})
+    ]);
     if (!rPdfFirma.ok) throw new Error(rPdfFirma.error||'Chyba generovania PDF');
-    const rPdfZakaznik = await apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, logoB64, peciatkaB64, gdprSuhlas, showTechnici: false, nazov:'protokol_zakaznik.pdf'});
     const pdfZakaznikB64 = null;
     setStep('s2','done');
     setStep('s3','done');
     setProg(40);
 
-    // Fotky — použij komprimovanú verziu ak existuje
-    for (let i=0;i<photoKeys.length;i++) {
-      const k=photoKeys[i];
-      setStep('s'+(4+i),'active');
-      let b64;
-      if (photos[k].dataUrl) {
-        // Použij už komprimovanú verziu (base64 bez prefixu)
-        b64 = photos[k].dataUrl.split(',')[1];
-      } else {
-        b64 = await toBase64(photos[k].file);
-      }
-      const ext = 'jpg'; // komprimované sú vždy JPEG
-      const r2 = await apiCall({type:'foto',zakaznik,nazov:`foto_${k}.${ext}`,mime:'image/jpeg',obsah:b64});
-      if (!r2.ok) throw new Error(r2.error||`Chyba nahrávania foto: ${photos[k].label}`);
-      setStep('s'+(4+i),'done');
-      setProg(Math.round(40 + (i+1)/photoKeys.length*45));
+    // Fotky — nahrávaj všetky paralelne
+    if (photoKeys.length > 0) {
+      setStep('s'+(4),'active');
+      await Promise.all(photoKeys.map(async (k, i) => {
+        let b64;
+        if (photos[k].dataUrl) {
+          b64 = photos[k].dataUrl.split(',')[1];
+        } else {
+          b64 = await toBase64(photos[k].file);
+        }
+        await apiCall({type:'foto', zakaznik, nazov:`foto_${k}.jpg`, mime:'image/jpeg', obsah:b64, folderId: r1.folderId});
+        setStep('s'+(4+i),'done');
+      }));
+      setProg(85);
     }
 
     // Emaily
@@ -2132,7 +2107,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnYWhtuVqt0DFpb8XvGq0QfjsVaHk27CdCr5y0vjRvLvofK8-qKp4FMI4xzoWABfAGFw/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbClxqCQ4F5lOWVWaUocAYG_66p3jT9Pcj_FW9bbFSZhGdXHId7kCJPDvDgDUIgTwOqw/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2527,22 +2502,54 @@ function val2() {
 }
 
 function resetApp(){
-  ['meno','priezvisko','adresa','telefon','email','chladivo','chladivo_celkom','poznamky','ico','firma-nazov','firma-adresa','firma-dic','firma-icdph','firma-kontakt','firma-telefon','firma-email'].forEach(id=>{const el=document.getElementById(id);if(el){el.value='';el.disabled=false;el.style.background='';el.style.color='';} });
+  // Vymaž všetky textové polia
+  ['meno','priezvisko','adresa','telefon','email','chladivo','chladivo_celkom','poznamky','ico',
+   'firma-nazov','firma-adresa','firma-dic','firma-icdph','firma-kontakt','firma-telefon','firma-email',
+   'firma-inst-adresa','datum_montaze'
+  ].forEach(id=>{const el=document.getElementById(id);if(el){el.value='';el.disabled=false;el.style.background='';el.style.color='';} });
+
+  // Reset firma checkbox
   const cbFirma = document.getElementById('cb-firma'); if (cbFirma) { cbFirma.checked = false; toggleFirma('', false); }
+  const cbInaAdresa = document.getElementById('cb-ina-adresa-'); if (cbInaAdresa) { cbInaAdresa.checked = false; toggleInaAdresa('', false); }
+  const cbBezDic = document.getElementById('cb-bez-dic-'); if (cbBezDic) { cbBezDic.checked = false; }
+
+  // Reset zákazník neprítomný
+  const cbNeprit = document.getElementById('sc_zakaznik_nepritomny'); if (cbNeprit) { cbNeprit.checked = false; toggleZakaznikNepritomny({checked:false}, 'montaz'); }
+
+  // Reset GDPR
+  const cbGdpr = document.getElementById('sc_gdpr_montaz'); if (cbGdpr) cbGdpr.checked = false;
+
+  // Reset klimatizácia
   document.getElementById('vyrobca').value='';
-  document.getElementById('model').value='';
+  try { document.getElementById('model').value=''; } catch(e){}
+
+  // Reset technici
   document.querySelectorAll('#technici-list input[type=checkbox]').forEach(cb=>cb.checked=false);
   document.getElementById('iny-technik-wrap').style.display='none';
   document.getElementById('iny-technik').value='';
+
+  // Reset všetky checkboxy (tlaky, merania)
+  document.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    if(cb.id && (cb.id.startsWith('sc_') || cb.id.startsWith('cb-'))) cb.checked=false;
+  });
+  document.querySelectorAll('input[type=radio]').forEach(rb=>{ if(rb.name==='typ-system') rb.checked = rb.value==='split'; });
+
+  // Reset foto sloty
   const defs={vnutorna:['🏠','Vnútorná<br>jednotka','Vnútorná jednotka'],vonkajsia:['🏗️','Vonkajšia<br>jednotka','Vonkajšia jednotka'],detail:['🔍','Detail<br>(voliteľné)','Detail'],stit:['🏷️','Štítok /<br>sér. číslo','Štítok']};
   Object.entries(defs).forEach(([k,[ic,lbl,lab]])=>{
     const slot=document.getElementById('slot-'+k); if(!slot)return;
     slot.classList.remove('has-photo');
     slot.innerHTML=`<div class="ph"><div class="ic">${ic}</div><span>${lbl}</span></div><input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this,'${k}','${lab}')">`;
   });
+  // Reset dynamický foto grid
+  const fotoGrid = document.getElementById('foto-grid-jednotky'); if(fotoGrid) fotoGrid.innerHTML='';
+
+  // Reset podpisy
   clearCanvas('canvas-zakaznik');
   clearCanvas('canvas-technik');
   Object.keys(photos).forEach(k=>delete photos[k]);
+
+  // Reset UI
   document.getElementById('nav-buttons').style.display='flex';
   document.getElementById('up-state').innerHTML='';
   currentStep=1; showStep(1);
@@ -2681,6 +2688,32 @@ if ('serviceWorker' in navigator) {
 
 // Ukladá protokoly keď nie je internet, odosiela keď sa obnoví
 
+// Nacachuj logo a pečiatku pri štarte — raz, nie pri každom uploade
+let _logoB64Cache = null;
+let _peciatkaB64Cache = null;
+
+async function nacachujAssets() {
+  try {
+    const logoImg = document.querySelector('header img');
+    if (logoImg?.src && !logoImg.src.startsWith('data:')) {
+      const r = await fetch(logoImg.src);
+      const b = await r.blob();
+      _logoB64Cache = await new Promise(res => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(b); });
+    }
+  } catch(e) {}
+  try {
+    const pecSrc = PECIATKA_B64 || 'peciatka.jpg';
+    if (!pecSrc.startsWith('data:')) {
+      const r = await fetch(pecSrc);
+      const b = await r.blob();
+      _peciatkaB64Cache = await new Promise(res => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(b); });
+    } else {
+      _peciatkaB64Cache = pecSrc;
+    }
+  } catch(e) {}
+}
+window.addEventListener('load', () => { setTimeout(nacachujAssets, 1500); });
+
 const OFFLINE_DB_NAME = 'elwork_offline';
 const OFFLINE_STORE = 'protokoly';
 
@@ -2783,7 +2816,7 @@ function jeOnline() { return navigator.onLine; }
 
 // ══ LOGIN ══
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnYWhtuVqt0DFpb8XvGq0QfjsVaHk27CdCr5y0vjRvLvofK8-qKp4FMI4xzoWABfAGFw/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbClxqCQ4F5lOWVWaUocAYG_66p3jT9Pcj_FW9bbFSZhGdXHId7kCJPDvDgDUIgTwOqw/exec';
 let prihlasenyUzivatel = null;
 
 function toggleHeslo(id, icon) {
@@ -4321,20 +4354,59 @@ function updateJednotkyCount() {
 function resetServis() {
   servisZakaznik = null;
   servisStep = 1;
+
+  // Reset vyhľadávanie
   document.getElementById('servis-search').value = '';
   document.getElementById('search-results').innerHTML = '';
   document.getElementById('servis-zakaznik-card').style.display = 'none';
   document.getElementById('novy-zakaznik-card').style.display = 'none';
   document.getElementById('btn-novy-zakaznik').textContent = '➕ Zadať nového zákazníka (bez predchádzajúcej montáže)';
+
+  // Reset nový zákazník polia
   ['nz-meno','nz-priezvisko','nz-adresa','nz-telefon','nz-email','nz-model'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
-  document.getElementById('servis-technik').value = '';
-  document.getElementById('servis-poznamky').value = '';
-  document.getElementById('servis-up-state').innerHTML = '';
+
+  // Reset techniku
+  const st = document.getElementById('servis-technik'); if(st) st.value='';
+  const st2 = document.getElementById('servis-technik2'); if(st2) st2.value='';
+
   // Reset checkboxy
   document.querySelectorAll('#servis-app input[type=checkbox]').forEach(cb => cb.checked = false);
+  document.querySelectorAll('#servis-app input[type=radio]').forEach(rb => {
+    if(rb.name==='servis-typ') rb.checked = rb.value==='split';
+  });
+
+  // Reset chladivo a iný servis
+  const chladivoG = document.getElementById('chladivo-doplnene-g'); if(chladivoG) chladivoG.value='';
+  const chladivoTyp = document.getElementById('chladivo-typ'); if(chladivoTyp) chladivoTyp.value='';
+  const inyServisPopis = document.getElementById('iny-servis-popis'); if(inyServisPopis) inyServisPopis.value='';
+  document.getElementById('chladivo-doplnenie-detail').style.display='none';
+  document.getElementById('iny-servis-detail').style.display='none';
+
+  // Reset tlak
+  const tlakChl = document.getElementById('tlak-chl-detail'); if(tlakChl) tlakChl.style.display='none';
+  const tlakKur = document.getElementById('tlak-kur-detail'); if(tlakKur) tlakKur.style.display='none';
+  const tlakPoz = document.getElementById('tlak-poznamky'); if(tlakPoz) tlakPoz.value='';
+
+  // Reset výrobca a jednotky
+  const vyrobca = document.getElementById('servis-vyrobca'); if(vyrobca) vyrobca.value='';
+  const jContainer = document.getElementById('servis-jednotky-container'); if(jContainer) jContainer.innerHTML='';
+
+  // Reset poznámky
+  const poz = document.getElementById('servis-poznamky'); if(poz) poz.value='';
+
+  // Reset fotky
+  window.servisPhotos = {};
+  const fotoDiv = document.getElementById('iny-servis-fotky'); if(fotoDiv) fotoDiv.innerHTML='';
+
+  // Reset GDPR a podpis
+  const gdpr = document.getElementById('sc_gdpr_servis'); if(gdpr) gdpr.checked=false;
+  const neprit = document.getElementById('sc_servis_zakaznik_nepritomny'); if(neprit) { neprit.checked=false; }
+  const podpisCanvas = document.getElementById('podpis-canvas-servis'); if(podpisCanvas) podpisCanvas.style.display='';
   clearCanvas('canvas-servis-zakaznik');
+
+  document.getElementById('servis-up-state').innerHTML = '';
   zobrazRezim();
 }
 
