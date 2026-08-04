@@ -2107,7 +2107,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZPRJ7i3GBvZrRjG5_LY2e3-qELYZH9e25DQisS_Ef-SFIxIvyl-88XVK3TYel0ACLrQ/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzpReMf_OJZ_89v_rhlMccD14kxzwDcmfjq_dvHs3aigq9NO8Rv2ZDCiuK_foXJ2VR8-Q/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2816,7 +2816,7 @@ function jeOnline() { return navigator.onLine; }
 
 // ══ LOGIN ══
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZPRJ7i3GBvZrRjG5_LY2e3-qELYZH9e25DQisS_Ef-SFIxIvyl-88XVK3TYel0ACLrQ/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzpReMf_OJZ_89v_rhlMccD14kxzwDcmfjq_dvHs3aigq9NO8Rv2ZDCiuK_foXJ2VR8-Q/exec';
 let prihlasenyUzivatel = null;
 
 function toggleHeslo(id, icon) {
