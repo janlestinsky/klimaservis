@@ -363,7 +363,6 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
       <span class="header-title">Montážny protokol</span>
       <span id="app-version" style="font-size:0.65rem;color:#aab4bd;margin-left:4px;">v1.0</span>
       <span id="prihlaseny-info" style="font-size:0.72rem; color:var(--muted); display:flex; align-items:center; gap:8px;">
-        <span id="offline-badge" onclick="odosliCakajuce()" style="display:none; background:#f97316; color:white; border-radius:6px; padding:3px 8px; font-size:0.68rem; font-weight:600; cursor:pointer;"></span>
         <span>Prihlásený: <strong id="prihlaseny-meno" style="color:var(--deep);">—</strong></span>
         <button onclick="odhlasitSa()" style="background:none; border:1px solid #dde4e8; border-radius:6px; padding:3px 8px; font-size:0.68rem; font-weight:600; color:#5a7a88; cursor:pointer; white-space:nowrap;">🔓 Odhlásiť</button>
       </span>
@@ -1997,23 +1996,6 @@ async function doUpload() {
   const klima = {vyrobca:g('vyrobca'),chladivo:g('chladivo'),chladivo_celkom,poznamky:g('poznamky'),typSystem,tlaky:getTlaky(),vonkajsie:getVonkajsieJednotky(),datum_montaze:(g('datum_montaze') ? g('datum_montaze').split('-').reverse().join('.') : ''),vonkajsie_pocet:vonkPocet2};
   const photoKeys = Object.keys(photos);
 
-  // ── OFFLINE kontrola ──
-  if (!jeOnline()) {
-    // Ulož do fronty bez fotiek (base64 by bolo príliš veľké pre IndexedDB)
-    const offlinePayload = { type: 'protokol', zakaznik, klima, technici, datum };
-    await ulozDoFronty(offlinePayload);
-    aktualizujFrontaBadge();
-    document.getElementById('up-state').innerHTML = `
-      <div class="up-box" style="text-align:center;">
-        <div style="font-size:2.5rem;margin-bottom:12px;">📴</div>
-        <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--deep);margin-bottom:8px;">Bez internetu</div>
-        <p style="color:var(--muted);font-size:0.85rem;">Základné údaje protokolu boli uložené do fronty. Odošlú sa automaticky keď bude dostupný internet.<br><br>⚠️ Fotky je potrebné pridať po obnovení pripojenia.</p>
-        <button onclick="zobrazRezim()" style="margin-top:16px;padding:12px 24px;background:var(--deep);color:white;border:none;border-radius:10px;font-size:0.9rem;font-weight:600;cursor:pointer;">🏠 Späť na menu</button>
-      </div>`;
-    showStep(7);
-    return;
-  }
-
   const steps = [
     {id:'s1',label:'Vytváram priečinok na Google Disku'},
     {id:'s2',label:'Generujem PDF protokoly (server)'},
@@ -2638,10 +2620,23 @@ async function odoslatPodpis() {
   if (!document.getElementById('podpis-gdpr-cb')?.checked) {
     showToast('⚠️ Potvrďte súhlas so spracovaním osobných údajov'); return;
   }
-  const podpis = getCanvasDataUrl('canvas-podpis-zakaznik');
-  if (!podpis) {
+  const podpisRaw = getCanvasDataUrl('canvas-podpis-zakaznik');
+  if (!podpisRaw) {
     showToast('⚠️ Prosím podpíšte sa do poľa vyššie'); return;
   }
+  // Zmenši podpis — max 400px šírka, kvalita 0.7
+  const podpis = await new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const maxW = 400;
+      const scale = Math.min(1, maxW / img.width);
+      const cv = document.createElement('canvas');
+      cv.width = img.width * scale; cv.height = img.height * scale;
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+      resolve(cv.toDataURL('image/jpeg', 0.7));
+    };
+    img.src = podpisRaw;
+  });
 
   const btn = document.getElementById('podpis-odoslat-btn');
   btn.disabled = true;
@@ -2653,7 +2648,18 @@ async function odoslatPodpis() {
       headers: {'Content-Type': 'text/plain;charset=UTF-8'},
       body: 'data=' + encodeURIComponent(JSON.stringify({type: 'ulozPodpis', token: _podpisToken, podpis}))
     });
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch(je) {
+      // GAS vrátil HTML namiesto JSON
+      console.error('GAS odpoveď nie je JSON:', text.substring(0, 200));
+      showToast('⚠️ Chyba servera — skúste znova');
+      btn.disabled = false;
+      btn.textContent = '✍️ Odoslať podpis';
+      return;
+    }
 
     if (data.ok) {
       document.getElementById('podpis-content').style.display = 'none';
@@ -2664,41 +2670,23 @@ async function odoslatPodpis() {
       btn.textContent = '✍️ Odoslať podpis';
     }
   } catch(e) {
-    showToast('⚠️ Chyba spojenia');
+    console.error('odoslatPodpis fetch error:', e);
+    showToast('⚠️ Chyba spojenia: ' + e.message);
     btn.disabled = false;
     btn.textContent = '✍️ Odoslať podpis';
   }
 }
 
-// Registrácia Service Workera — umožňuje offline použitie
+// Service Worker odstránený — aplikácia beží vždy online (rýchlejšie, vždy aktuálna verzia)
+// Odregistruj existujúce SW a vymaž cache u technikov ktorí majú starú verziu
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/klimaservis/sw.js')
-      .then(reg => {
-        console.log('SW zaregistrovaný:', reg.scope);
-        // Skontroluj či je update
-        reg.addEventListener('updatefound', () => {
-          const newSW = reg.installing;
-          newSW.addEventListener('statechange', () => {
-            if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-              // Zisti novú verziu z SW
-              newSW.postMessage({type: 'GET_VERSION'});
-            }
-          });
-        });
-
-        // Prijmi správu od SW s verziou
-        navigator.serviceWorker.addEventListener('message', event => {
-          if (event.data?.type === 'VERSION') {
-            showToast('🔄 Dostupná nová verzia ' + event.data.version + ' — zatvorte a znova otvorte aplikáciu');
-          }
-        });
-      })
-      .catch(err => console.warn('SW registrácia zlyhala:', err));
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    regs.forEach(reg => reg.unregister());
   });
+  if (window.caches) {
+    caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+  }
 }
-
-// Ukladá protokoly keď nie je internet, odosiela keď sa obnoví
 
 // Nacachuj logo a pečiatku pri štarte — raz, nie pri každom uploade
 let _logoB64Cache = null;
@@ -2726,105 +2714,6 @@ async function nacachujAssets() {
 }
 window.addEventListener('load', () => { setTimeout(nacachujAssets, 1500); });
 
-const OFFLINE_DB_NAME = 'elwork_offline';
-const OFFLINE_STORE = 'protokoly';
-
-function openOfflineDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(OFFLINE_DB_NAME, 1);
-    req.onupgradeneeded = e => {
-      const db = e.target.result;
-      if (!db.objectStoreNames.contains(OFFLINE_STORE)) {
-        db.createObjectStore(OFFLINE_STORE, {keyPath: 'id', autoIncrement: true});
-      }
-    };
-    req.onsuccess = e => resolve(e.target.result);
-    req.onerror = () => reject(req.error);
-  });
-}
-
-async function ulozDoFronty(payload) {
-  const db = await openOfflineDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(OFFLINE_STORE, 'readwrite');
-    const store = tx.objectStore(OFFLINE_STORE);
-    const req = store.add({
-      payload: JSON.stringify(payload),
-      cas: new Date().toISOString(),
-      popis: payload.zakaznik
-        ? (payload.zakaznik.meno||'') + ' ' + (payload.zakaznik.priezvisko||'')
-        : 'Protokol'
-    });
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
-}
-
-async function getFronta() {
-  const db = await openOfflineDB();
-  return new Promise((resolve) => {
-    const tx = db.transaction(OFFLINE_STORE, 'readonly');
-    const req = tx.objectStore(OFFLINE_STORE).getAll();
-    req.onsuccess = () => resolve(req.result || []);
-    req.onerror = () => resolve([]);
-  });
-}
-
-async function vymazZFronty(id) {
-  const db = await openOfflineDB();
-  return new Promise((resolve) => {
-    const tx = db.transaction(OFFLINE_STORE, 'readwrite');
-    tx.objectStore(OFFLINE_STORE).delete(id);
-    tx.oncomplete = resolve;
-  });
-}
-
-async function aktualizujFrontaBadge() {
-  const fronta = await getFronta();
-  const badge = document.getElementById('offline-badge');
-  if (badge) {
-    badge.textContent = fronta.length > 0 ? '📤 ' + fronta.length + ' čakajúcich' : '';
-    badge.style.display = fronta.length > 0 ? '' : 'none';
-  }
-}
-
-async function odosliCakajuce() {
-  if (!navigator.onLine) return;
-  const fronta = await getFronta();
-  if (fronta.length === 0) return;
-
-  showToast('📤 Odosielam ' + fronta.length + ' čakajúcich protokolov...');
-  let uspesne = 0;
-  for (const zaznam of fronta) {
-    try {
-      const payload = JSON.parse(zaznam.payload);
-      const res = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: {'Content-Type': 'text/plain;charset=UTF-8'},
-        body: 'data=' + encodeURIComponent(JSON.stringify(payload))
-      });
-      const r = await res.json();
-      if (r.ok) {
-        await vymazZFronty(zaznam.id);
-        uspesne++;
-      }
-    } catch(e) { console.warn('Offline odoslanie zlyhalo:', e); }
-  }
-  if (uspesne > 0) showToast('✅ Odoslaných ' + uspesne + ' protokolov');
-  aktualizujFrontaBadge();
-}
-
-// Sleduj stav pripojenia
-window.addEventListener('online', () => {
-  showToast('🌐 Pripojenie obnovené — odosielam čakajúce protokoly');
-  setTimeout(odosliCakajuce, 1500);
-});
-window.addEventListener('offline', () => {
-  showToast('📴 Bez internetu — protokoly sa uložia lokálne', 5000);
-});
-
-// Helper — zisti či je internet
-function jeOnline() { return navigator.onLine; }
 
 // ══ LOGIN ══
 
@@ -3077,7 +2966,6 @@ let servisZakaznik = null;
 let servisStep = 1;
 
 function zobrazRezim() {
-  aktualizujFrontaBadge();
   document.getElementById('setup-screen').style.display = 'none';
   document.getElementById('admin-dashboard').style.display = 'none';
   document.getElementById('main-app').style.display = 'none';
@@ -3967,24 +3855,6 @@ async function doServisUpload() {
   ].forEach(id => {
     checkboxy[id] = document.getElementById('sc_'+id)?.checked || false;
   });
-
-  // ── OFFLINE kontrola ──
-  if (!jeOnline()) {
-    const offlinePayload = {
-      type: 'servis', zakaznik: servisZakaznik, datum: datumFmt, technik: technikFull,
-      poznamky, checkboxy, tlak: tlakData
-    };
-    await ulozDoFronty(offlinePayload);
-    aktualizujFrontaBadge();
-    document.getElementById('servis-up-state').innerHTML = `
-      <div class="up-box" style="text-align:center;">
-        <div style="font-size:2.5rem;margin-bottom:12px;">📴</div>
-        <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--deep);margin-bottom:8px;">Bez internetu</div>
-        <p style="color:var(--muted);font-size:0.85rem;">Servisný protokol bol uložený do fronty. Odošle sa automaticky keď bude dostupný internet.</p>
-        <button onclick="resetServis();zobrazRezim();" style="margin-top:16px;padding:12px 24px;background:var(--deep);color:white;border:none;border-radius:10px;font-size:0.9rem;font-weight:600;cursor:pointer;">🏠 Späť na menu</button>
-      </div>`;
-    return;
-  }
 
   document.getElementById('servis-up-state').innerHTML = `
     <div class="up-box">
