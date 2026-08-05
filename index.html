@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#0d3d52">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default"> 
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="ELWORK">
 <link rel="apple-touch-icon" href="logo.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -1351,7 +1351,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
 
 <script>
 // ══ TYP SYSTÉMU ══
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpLy7Gkk_rQW6-las5QPUylLtUuf4ynxzImbBrWJOFxSdpT1e_yrk1Vx36pYeIBHy88Q/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyb761QYrBV2NpXWCHlKs3Wl3ynKbcU4-8HWr2nfKrOey5jCDjG5hqD_KmD8hCxvSgxSQ/exec';
 let typSystem = 'split';
 
 function setTyp(typ) {
@@ -2119,7 +2119,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpLy7Gkk_rQW6-las5QPUylLtUuf4ynxzImbBrWJOFxSdpT1e_yrk1Vx36pYeIBHy88Q/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyb761QYrBV2NpXWCHlKs3Wl3ynKbcU4-8HWr2nfKrOey5jCDjG5hqD_KmD8hCxvSgxSQ/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
