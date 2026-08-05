@@ -1351,7 +1351,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
 
 <script>
 // ══ TYP SYSTÉMU ══
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby2ntNrQ5TOUo_y4r8d_9Cggw_eE4QtilUL1VwdPEpynxGHfl9BW15-JdWrI3UyFRPfuA/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpLy7Gkk_rQW6-las5QPUylLtUuf4ynxzImbBrWJOFxSdpT1e_yrk1Vx36pYeIBHy88Q/exec';
 let typSystem = 'split';
 
 function setTyp(typ) {
@@ -2047,14 +2047,25 @@ async function doUpload() {
     const logoB64 = _logoB64Cache || null;
     const peciatkaB64 = _peciatkaB64Cache || null;
 
-    // Generuj oba PDF paralelne (firma + zákazník súčasne)
+    // Generuj PDF na serveri
     setStep('s2','active');
     const gdprSuhlas = document.getElementById('sc_gdpr_montaz')?.checked || false;
-    const [rPdfFirma, rPdfZakaznik] = await Promise.all([
-      apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, logoB64, peciatkaB64, gdprSuhlas, showTechnici: true, nazov:'protokol_firma.pdf', folderId: r1.folderId}),
-      apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, logoB64, peciatkaB64, gdprSuhlas, showTechnici: false, nazov:'protokol_zakaznik.pdf', folderId: r1.folderId})
-    ]);
-    if (!rPdfFirma.ok) throw new Error(rPdfFirma.error||'Chyba generovania PDF');
+
+    // Ak zákazník nie je prítomný
+    // Zákaznícka kópia sa vygeneruje po podpísaní s podpisom
+    let rPdfZakaznik = { ok: true, pdfId: null };
+    if (zakaznikNepritomnyMontaz) {
+      const rPdfFirma = await apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, logoB64, peciatkaB64, gdprSuhlas, showTechnici: true, nazov:'protokol_firma.pdf', folderId: r1.folderId});
+      if (!rPdfFirma.ok) throw new Error(rPdfFirma.error||'Chyba generovania PDF');
+    } else {
+      // Zákazník prítomný — generuj oba PDF paralelne
+      const [rPdfFirma, rPdfZakaznikResult] = await Promise.all([
+        apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, logoB64, peciatkaB64, gdprSuhlas, showTechnici: true, nazov:'protokol_firma.pdf', folderId: r1.folderId}),
+        apiCall({type:'pdf', zakaznik, klima, technici, podpisZakaznik, logoB64, peciatkaB64, gdprSuhlas, showTechnici: false, nazov:'protokol_zakaznik.pdf', folderId: r1.folderId})
+      ]);
+      if (!rPdfFirma.ok) throw new Error(rPdfFirma.error||'Chyba generovania PDF');
+      rPdfZakaznik = rPdfZakaznikResult;
+    }
     const pdfZakaznikB64 = null;
     setStep('s2','done');
     setStep('s3','done');
@@ -2108,7 +2119,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby2ntNrQ5TOUo_y4r8d_9Cggw_eE4QtilUL1VwdPEpynxGHfl9BW15-JdWrI3UyFRPfuA/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpLy7Gkk_rQW6-las5QPUylLtUuf4ynxzImbBrWJOFxSdpT1e_yrk1Vx36pYeIBHy88Q/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
