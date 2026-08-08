@@ -1426,7 +1426,7 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
 
 <script>
 // ══ TYP SYSTÉMU ══
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwhlLQDRZ7ODkq5crYkRlwYCpCvHzlRTEtYPlII56ZwYWjA2yJgeA2Bgp8vkdRrbLBfwQ/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzCDd5HOH68-ntnFnBIaWeY2pU6BsPI666V0O2DoeqzqfEt4JZtW-frmV-0mApR3uiXiQ/exec';
 let typSystem = 'split';
 
 function setTyp(typ) {
@@ -2177,7 +2177,7 @@ async function doUpload() {
 }
 
 async function apiCall(payload) {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwhlLQDRZ7ODkq5crYkRlwYCpCvHzlRTEtYPlII56ZwYWjA2yJgeA2Bgp8vkdRrbLBfwQ/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzCDd5HOH68-ntnFnBIaWeY2pU6BsPI666V0O2DoeqzqfEt4JZtW-frmV-0mApR3uiXiQ/exec';
   const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
   const r = await fetch(SCRIPT_URL, {
     method: 'POST',
@@ -2642,19 +2642,130 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 // ══ PSČ AUTOCOMPLETE ══
 // Obec → PSČ (hlavné PSČ pre danú obec)
 const OBEC_MAP = {
-  'žilina':'01001','bytča':'01401','martin':'03601','vrútky':'03801','ružomberok':'03401',
-  'turčianske teplice':'03901','námestovo':'02901','dolný kubín':'02601','trstená':'02801',
-  'považská bystrica':'01701','dubnica nad váhom':'01841','čadca':'02201',
-  'kysucké nové mesto':'02301','rajec':'01501','liptovský mikuláš':'03101',
-  'liptovský hrádok':'03201','bratislava':'81101','pezinok':'90201','senec':'90301',
-  'malacky':'90401','prešov':'08001','košice':'04001','banská bystrica':'97001',
-  'zvolen':'96001','detva':'96201','trenčín':'91101','nové mesto nad váhom':'91501',
-  'piešťany':'92101','topoľčany':'95501','nitra':'94901','zlaté moravce':'94601',
-  'spišská nová ves':'05001','poprad':'05801','kežmarok':'06001','vranov nad topľou':'07901',
-  'michalovce':'07101','humenné':'06601','snina':'06901','stará ľubovňa':'09001',
-  'rožňava':'04901','rimavská sobota':'04801','veľký krtíš':'98001','lučenec':'99001',
-  'bardejov':'09201','levoča':'08901','gelnica':'05501','šaľa':'93101',
-  'valča':'03841','turany':'03832','kláštor pod znievom':'03852','dražkovce':'03604',
+  "banská bystrica":"97401",
+  "banská štiavnica":"96901",
+  "bardejov":"08501",
+  "belá":"02702",
+  "bratislava":"81101",
+  "bratislava-dúbravka":"84101",
+  "bratislava-nové mesto":"83101",
+  "bratislava-petržalka":"85101",
+  "bratislava-rača":"83106",
+  "bratislava-ružinov":"82101",
+  "bratislava-staré mesto":"81101",
+  "bratislava-vajnory":"83107",
+  "bratislava-záhorská bystrica":"84108",
+  "brezno":"97701",
+  "bystrička":"03615",
+  "bytča":"01401",
+  "detva":"96212",
+  "dolný kubín":"02601",
+  "dražkovce":"03604",
+  "dubnica nad váhom":"01841",
+  "dunajská streda":"92901",
+  "fiľakovo":"98601",
+  "folkušová":"03833",
+  "galanta":"92401",
+  "gbely":"90845",
+  "gelnica":"05601",
+  "hlohovec":"92001",
+  "holíč":"90851",
+  "humenné":"06601",
+  "hurbanovo":"94701",
+  "ilava":"01901",
+  "kežmarok":"06001",
+  "kláštor pod znievom":"03852",
+  "komárno":"94501",
+  "košice":"04001",
+  "krompachy":"05342",
+  "krásno nad kysucou":"02302",
+  "kysucké nové mesto":"02401",
+  "lednica":"01806",
+  "leopoldov":"92041",
+  "levice":"93401",
+  "levoča":"05401",
+  "lipany":"08271",
+  "liptovský hrádok":"03201",
+  "liptovský mikuláš":"03101",
+  "lučenec":"98401",
+  "malacky":"90101",
+  "martin":"03601",
+  "michalovce":"07101",
+  "modra":"90001",
+  "moldava nad bodvou":"04501",
+  "myjava":"90701",
+  "nemšová":"91451",
+  "nitra":"94901",
+  "nová baňa":"96801",
+  "nové mesto nad váhom":"91501",
+  "nové zámky":"94001",
+  "námestovo":"02901",
+  "pezinok":"90201",
+  "piešťany":"92101",
+  "podbrezová":"97651",
+  "podolínec":"06403",
+  "poltár":"98701",
+  "poprad":"05801",
+  "považská bystrica":"01701",
+  "prešov":"08001",
+  "priekopa":"03608",
+  "púchov":"02001",
+  "rajec":"01501",
+  "revúca":"05001",
+  "rimavská sobota":"97901",
+  "rožňava":"04801",
+  "ružomberok":"03401",
+  "sabinov":"08301",
+  "senec":"90301",
+  "senica":"90501",
+  "skalica":"90901",
+  "sklabiňa":"03822",
+  "smolenice":"91904",
+  "snina":"06901",
+  "sobrance":"07301",
+  "spišská belá":"05901",
+  "spišská nová ves":"05201",
+  "spišská stará ves":"06101",
+  "spišské podhradie":"05304",
+  "stará turá":"91601",
+  "stará ľubovňa":"06401",
+  "strečno":"01353",
+  "stropkov":"09101",
+  "stupava":"90031",
+  "sučany":"03852",
+  "svit":"05921",
+  "svätý jur":"90021",
+  "tatranská lomnica":"05960",
+  "terchová":"01306",
+  "topoľčany":"95501",
+  "tornaľa":"98201",
+  "trebišov":"07501",
+  "trenčín":"91101",
+  "trnava":"91701",
+  "trstená":"02801",
+  "turany":"03832",
+  "turzovka":"02355",
+  "turčianske teplice":"03901",
+  "tvrdošín":"02744",
+  "valča":"03841",
+  "veľký krtíš":"99001",
+  "vranov nad topľou":"09301",
+  "vrbové":"92203",
+  "vráble":"95212",
+  "vrútky":"03801",
+  "vysoké tatry":"06201",
+  "zlaté moravce":"95301",
+  "zuberec":"02737",
+  "zvolen":"96001",
+  "záhorská ves":"90064",
+  "čadca":"02201",
+  "červeník":"92022",
+  "šaľa":"92701",
+  "štós":"04454",
+  "štúrovo":"94301",
+  "šurany":"94201",
+  "žiar nad hronom":"96501",
+  "žilina":"01001"
 };
 
 // Datalist pre obec autocomplete
@@ -4443,43 +4554,81 @@ function goBack() {
 </script>
 
 <datalist id="obec-datalist">
-  <option value="Bratislava"><option value="Košice"><option value="Prešov">
-  <option value="Žilina"><option value="Banská Bystrica"><option value="Nitra">
-  <option value="Trnava"><option value="Trenčín"><option value="Martin">
-  <option value="Ružomberok"><option value="Poprad"><option value="Zvolen">
-  <option value="Považská Bystrica"><option value="Michalovce"><option value="Nové Zámky">
-  <option value="Spišská Nová Ves"><option value="Komárno"><option value="Levice">
-  <option value="Prievidza"><option value="Topoľčany"><option value="Lučenec">
-  <option value="Rimavská Sobota"><option value="Piešťany"><option value="Dubnica nad Váhom">
-  <option value="Čadca"><option value="Dolný Kubín"><option value="Námestovo">
-  <option value="Turčianske Teplice"><option value="Vrútky"><option value="Bytča">
-  <option value="Kysucké Nové Mesto"><option value="Liptovský Mikuláš"><option value="Rožňava">
-  <option value="Humenné"><option value="Vranov nad Topľou"><option value="Bardejov">
-  <option value="Stará Ľubovňa"><option value="Kežmarok"><option value="Snina">
-  <option value="Pezinok"><option value="Senec"><option value="Malacky">
-  <option value="Zvolen"><option value="Detva"><option value="Veľký Krtíš">
-  <option value="Zlaté Moravce"><option value="Šaľa"><option value="Levoča">
-  <option value="Gelnica"><option value="Valča"><option value="Turany">
+  <option value="Banská Bystrica"><option value="Banská Štiavnica"><option value="Bardejov">
+  <option value="Bratislava"><option value="Brezno"><option value="Bytča">
+  <option value="Čadca"><option value="Detva"><option value="Dolný Kubín">
+  <option value="Dubnica nad Váhom"><option value="Dunajská Streda"><option value="Fiľakovo">
+  <option value="Galanta"><option value="Gbely"><option value="Gelnica">
+  <option value="Hlohovec"><option value="Holíč"><option value="Humenné">
+  <option value="Hurbanovo"><option value="Ilava"><option value="Kežmarok">
+  <option value="Kláštor pod Znievom"><option value="Komárno"><option value="Košice">
+  <option value="Krásno nad Kysucou"><option value="Krompachy"><option value="Kysucké Nové Mesto">
+  <option value="Leopoldov"><option value="Levice"><option value="Levoča">
+  <option value="Lipany"><option value="Liptovský Hrádok"><option value="Liptovský Mikuláš">
+  <option value="Lučenec"><option value="Malacky"><option value="Martin">
+  <option value="Michalovce"><option value="Modra"><option value="Moldava nad Bodvou">
+  <option value="Myjava"><option value="Námestovo"><option value="Nemšová">
+  <option value="Nitra"><option value="Nové Mesto nad Váhom"><option value="Nové Zámky">
+  <option value="Partizánske"><option value="Pezinok"><option value="Piešťany">
+  <option value="Podbrezová"><option value="Podolínec"><option value="Poltár">
+  <option value="Poprad"><option value="Považská Bystrica"><option value="Prešov">
+  <option value="Priekopa"><option value="Púchov"><option value="Rajec">
+  <option value="Rača"><option value="Revúca"><option value="Rimavská Sobota">
+  <option value="Rožňava"><option value="Ružomberok"><option value="Sabinov">
+  <option value="Šaľa"><option value="Skalica"><option value="Senica">
+  <option value="Senec"><option value="Snina"><option value="Sobrance">
+  <option value="Spišská Belá"><option value="Spišská Nová Ves"><option value="Spišská Stará Ves">
+  <option value="Spišské Podhradie"><option value="Stará Ľubovňa"><option value="Stará Turá">
+  <option value="Strečno"><option value="Stropkov"><option value="Štúrovo">
+  <option value="Štós"><option value="Stupava"><option value="Sučany">
+  <option value="Svit"><option value="Svätý Jur"><option value="Šurany">
+  <option value="Tatranská Lomnica"><option value="Topoľčany"><option value="Tornaľa">
+  <option value="Trebišov"><option value="Trenčín"><option value="Trnava">
+  <option value="Trstená"><option value="Turany"><option value="Turčianske Teplice">
+  <option value="Turzovka"><option value="Tvrdošín"><option value="Valča">
+  <option value="Veľký Krtíš"><option value="Vranov nad Topľou"><option value="Vráble">
+  <option value="Vrbové"><option value="Vrútky"><option value="Vysoké Tatry">
+  <option value="Záhorská Ves"><option value="Žiar nad Hronom"><option value="Žilina">
+  <option value="Zlaté Moravce"><option value="Zvolen"><option value="Zuberec">
 </datalist>
 </body>
 </html><!-- PSČ autocomplete vložíme pred 
 <datalist id="obec-datalist">
-  <option value="Bratislava"><option value="Košice"><option value="Prešov">
-  <option value="Žilina"><option value="Banská Bystrica"><option value="Nitra">
-  <option value="Trnava"><option value="Trenčín"><option value="Martin">
-  <option value="Ružomberok"><option value="Poprad"><option value="Zvolen">
-  <option value="Považská Bystrica"><option value="Michalovce"><option value="Nové Zámky">
-  <option value="Spišská Nová Ves"><option value="Komárno"><option value="Levice">
-  <option value="Prievidza"><option value="Topoľčany"><option value="Lučenec">
-  <option value="Rimavská Sobota"><option value="Piešťany"><option value="Dubnica nad Váhom">
-  <option value="Čadca"><option value="Dolný Kubín"><option value="Námestovo">
-  <option value="Turčianske Teplice"><option value="Vrútky"><option value="Bytča">
-  <option value="Kysucké Nové Mesto"><option value="Liptovský Mikuláš"><option value="Rožňava">
-  <option value="Humenné"><option value="Vranov nad Topľou"><option value="Bardejov">
-  <option value="Stará Ľubovňa"><option value="Kežmarok"><option value="Snina">
-  <option value="Pezinok"><option value="Senec"><option value="Malacky">
-  <option value="Zvolen"><option value="Detva"><option value="Veľký Krtíš">
-  <option value="Zlaté Moravce"><option value="Šaľa"><option value="Levoča">
-  <option value="Gelnica"><option value="Valča"><option value="Turany">
+  <option value="Banská Bystrica"><option value="Banská Štiavnica"><option value="Bardejov">
+  <option value="Bratislava"><option value="Brezno"><option value="Bytča">
+  <option value="Čadca"><option value="Detva"><option value="Dolný Kubín">
+  <option value="Dubnica nad Váhom"><option value="Dunajská Streda"><option value="Fiľakovo">
+  <option value="Galanta"><option value="Gbely"><option value="Gelnica">
+  <option value="Hlohovec"><option value="Holíč"><option value="Humenné">
+  <option value="Hurbanovo"><option value="Ilava"><option value="Kežmarok">
+  <option value="Kláštor pod Znievom"><option value="Komárno"><option value="Košice">
+  <option value="Krásno nad Kysucou"><option value="Krompachy"><option value="Kysucké Nové Mesto">
+  <option value="Leopoldov"><option value="Levice"><option value="Levoča">
+  <option value="Lipany"><option value="Liptovský Hrádok"><option value="Liptovský Mikuláš">
+  <option value="Lučenec"><option value="Malacky"><option value="Martin">
+  <option value="Michalovce"><option value="Modra"><option value="Moldava nad Bodvou">
+  <option value="Myjava"><option value="Námestovo"><option value="Nemšová">
+  <option value="Nitra"><option value="Nové Mesto nad Váhom"><option value="Nové Zámky">
+  <option value="Partizánske"><option value="Pezinok"><option value="Piešťany">
+  <option value="Podbrezová"><option value="Podolínec"><option value="Poltár">
+  <option value="Poprad"><option value="Považská Bystrica"><option value="Prešov">
+  <option value="Priekopa"><option value="Púchov"><option value="Rajec">
+  <option value="Rača"><option value="Revúca"><option value="Rimavská Sobota">
+  <option value="Rožňava"><option value="Ružomberok"><option value="Sabinov">
+  <option value="Šaľa"><option value="Skalica"><option value="Senica">
+  <option value="Senec"><option value="Snina"><option value="Sobrance">
+  <option value="Spišská Belá"><option value="Spišská Nová Ves"><option value="Spišská Stará Ves">
+  <option value="Spišské Podhradie"><option value="Stará Ľubovňa"><option value="Stará Turá">
+  <option value="Strečno"><option value="Stropkov"><option value="Štúrovo">
+  <option value="Štós"><option value="Stupava"><option value="Sučany">
+  <option value="Svit"><option value="Svätý Jur"><option value="Šurany">
+  <option value="Tatranská Lomnica"><option value="Topoľčany"><option value="Tornaľa">
+  <option value="Trebišov"><option value="Trenčín"><option value="Trnava">
+  <option value="Trstená"><option value="Turany"><option value="Turčianske Teplice">
+  <option value="Turzovka"><option value="Tvrdošín"><option value="Valča">
+  <option value="Veľký Krtíš"><option value="Vranov nad Topľou"><option value="Vráble">
+  <option value="Vrbové"><option value="Vrútky"><option value="Vysoké Tatry">
+  <option value="Záhorská Ves"><option value="Žiar nad Hronom"><option value="Žilina">
+  <option value="Zlaté Moravce"><option value="Zvolen"><option value="Zuberec">
 </datalist>
 </body> -->
