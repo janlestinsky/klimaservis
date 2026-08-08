@@ -468,14 +468,26 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
           <div class="ico-lookup-status" id="nazov-status-am-"></div>
           <div id="nazov-results-am-" style="margin-top:6px;"></div>
         </div>
-        <div class="field"><label>Adresa firmy <span class="req">*</span></label><input type="text" id="am-firma-adresa" placeholder="Hlavná 12, Bratislava"></div>
+        <div class="field"><label>Adresa firmy <span class="req">*</span></label>
+          <input type="text" id="am-firma-adresa_ulica" placeholder="Hlavná 12" style="margin-bottom:6px;">
+          <div style="display:grid;grid-template-columns:120px 1fr;gap:8px;">
+            <input type="text" id="am-firma-adresa_psc" placeholder="PSČ" maxlength="5" style="font-family:monospace;">
+            <input type="text" id="am-firma-adresa_obec" placeholder="Obec / Mesto" list="obec-datalist" oninput="obecLookup(this,document.getElementById('am-firma-adresa_psc'))">
+          </div>
+        </div>
 
         <label class="firma-toggle" style="margin-bottom:8px;">
           <input type="checkbox" id="cb-ina-adresa-am-" onchange="toggleInaAdresa('am-', this.checked)">
           <div class="firma-check">✓</div> Adresa inštalácie je iná ako adresa firmy
         </label>
         <div id="ina-adresa-fields-am-" style="display:none;">
-          <div class="field"><label>Adresa inštalácie <span class="req">*</span></label><input type="text" id="am-firma-inst-adresa" placeholder="napr. Priemyselná 5, Martin"></div>
+          <div class="field"><label>Adresa inštalácie <span class="req">*</span></label>
+          <input type="text" id="am-firma-inst-adresa_ulica" placeholder="Priemyselná 5" style="margin-bottom:6px;">
+          <div style="display:grid;grid-template-columns:120px 1fr;gap:8px;">
+            <input type="text" id="am-firma-inst-adresa_psc" placeholder="PSČ" maxlength="5" style="font-family:monospace;">
+            <input type="text" id="am-firma-inst-adresa_obec" placeholder="Obec / Mesto" list="obec-datalist" oninput="obecLookup(this,document.getElementById('am-firma-inst-adresa_psc'))">
+          </div>
+        </div>
         </div>
 
         <label class="firma-toggle" style="margin-bottom:13px;">
@@ -499,7 +511,13 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
         <div class="field"><label>Meno <span class="req">*</span></label><input type="text" id="am-meno" placeholder="Ján"></div>
         <div class="field"><label>Priezvisko <span class="req">*</span></label><input type="text" id="am-priezvisko" placeholder="Novák"></div>
       </div>
-      <div class="field"><label>Adresa <span class="req">*</span></label><input type="text" id="am-adresa" placeholder="Hlavná 12, Bratislava"></div>
+      <div class="field"><label>Adresa <span class="req">*</span></label>
+          <input type="text" id="am-adresa_ulica" placeholder="Hlavná 12" style="margin-bottom:6px;">
+          <div style="display:grid;grid-template-columns:120px 1fr;gap:8px;">
+            <input type="text" id="am-adresa_psc" placeholder="PSČ" maxlength="5" style="font-family:monospace;">
+            <input type="text" id="am-adresa_obec" placeholder="Obec / Mesto" list="obec-datalist" oninput="obecLookup(this,document.getElementById('am-adresa_psc'))">
+          </div>
+        </div>
       <div class="field"><label>Telefón <span class="req">*</span></label><input type="tel" id="am-telefon" placeholder="+421 900 000 000"></div>
       <div class="field"><label>Email</label><input type="email" id="am-email" placeholder="zakaznik@email.sk"></div>
       </div>
@@ -567,7 +585,13 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
         <div class="field"><label>Meno <span class="req">*</span></label><input type="text" id="as-nz-meno" placeholder="Ján"></div>
         <div class="field"><label>Priezvisko <span class="req">*</span></label><input type="text" id="as-nz-priezvisko" placeholder="Novák"></div>
       </div>
-      <div class="field"><label>Adresa <span class="req">*</span></label><input type="text" id="as-nz-adresa" placeholder="Hlavná 12, Bratislava"></div>
+      <div class="field"><label>Adresa <span class="req">*</span></label>
+          <input type="text" id="as-nz-adresa_ulica" placeholder="Hlavná 12" style="margin-bottom:6px;">
+          <div style="display:grid;grid-template-columns:120px 1fr;gap:8px;">
+            <input type="text" id="as-nz-adresa_psc" placeholder="PSČ" maxlength="5" style="font-family:monospace;">
+            <input type="text" id="as-nz-adresa_obec" placeholder="Obec / Mesto" list="obec-datalist" oninput="obecLookup(this,document.getElementById('as-nz-adresa_psc'))">
+          </div>
+        </div>
       <div class="field"><label>Telefón <span class="req">*</span></label><input type="tel" id="as-nz-telefon" placeholder="+421 900 000 000"></div>
       <div class="field"><label>Email</label><input type="email" id="as-nz-email" placeholder="zakaznik@email.sk"></div>
       <div class="field"><label>Typ alarmu</label><input type="text" id="as-nz-typ" placeholder="napr. JA-103K"></div>
@@ -642,7 +666,13 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
         <div class="field"><label>Meno <span class="req">*</span></label><input type="text" id="nz-meno" placeholder="Ján"></div>
         <div class="field"><label>Priezvisko <span class="req">*</span></label><input type="text" id="nz-priezvisko" placeholder="Novák"></div>
       </div>
-      <div class="field"><label>Adresa <span class="req">*</span></label><input type="text" id="nz-adresa" placeholder="Hlavná 12, Bratislava"></div>
+      <div class="field"><label>Adresa <span class="req">*</span></label>
+          <input type="text" id="nz-adresa_ulica" placeholder="Hlavná 12" style="margin-bottom:6px;">
+          <div style="display:grid;grid-template-columns:120px 1fr;gap:8px;">
+            <input type="text" id="nz-adresa_psc" placeholder="PSČ" maxlength="5" style="font-family:monospace;">
+            <input type="text" id="nz-adresa_obec" placeholder="Obec / Mesto" list="obec-datalist" oninput="obecLookup(this,document.getElementById('nz-adresa_psc'))">
+          </div>
+        </div>
       <div class="field"><label>Telefón <span class="req">*</span></label><input type="tel" id="nz-telefon" placeholder="+421 900 000 000"></div>
       <div class="field"><label>Email</label><input type="email" id="nz-email" placeholder="zakaznik@email.sk"></div>
       <div class="field"><label>Typ klimatizácie / Model</label><input type="text" id="nz-model" placeholder="napr. Daikin FTXB25C"></div>
@@ -1007,14 +1037,26 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
           <div class="ico-lookup-status" id="nazov-status-"></div>
           <div id="nazov-results-" style="margin-top:6px;"></div>
         </div>
-        <div class="field"><label>Adresa firmy <span class="req">*</span></label><input type="text" id="firma-adresa" placeholder="Hlavná 12, Bratislava"></div>
+        <div class="field"><label>Adresa firmy <span class="req">*</span></label>
+          <input type="text" id="firma-adresa_ulica" placeholder="Hlavná 12" style="margin-bottom:6px;">
+          <div style="display:grid;grid-template-columns:120px 1fr;gap:8px;">
+            <input type="text" id="firma-adresa_psc" placeholder="PSČ" maxlength="5" style="font-family:monospace;">
+            <input type="text" id="firma-adresa_obec" placeholder="Obec / Mesto" list="obec-datalist" oninput="obecLookup(this,document.getElementById('firma-adresa_psc'))">
+          </div>
+        </div>
 
         <label class="firma-toggle" style="margin-bottom:8px;">
           <input type="checkbox" id="cb-ina-adresa-" onchange="toggleInaAdresa('', this.checked)">
           <div class="firma-check">✓</div> Adresa inštalácie je iná ako adresa firmy
         </label>
         <div id="ina-adresa-fields-" style="display:none;">
-          <div class="field"><label>Adresa inštalácie <span class="req">*</span></label><input type="text" id="firma-inst-adresa" placeholder="napr. Priemyselná 5, Martin"></div>
+          <div class="field"><label>Adresa inštalácie <span class="req">*</span></label>
+          <input type="text" id="firma-inst-adresa_ulica" placeholder="Priemyselná 5" style="margin-bottom:6px;">
+          <div style="display:grid;grid-template-columns:120px 1fr;gap:8px;">
+            <input type="text" id="firma-inst-adresa_psc" placeholder="PSČ" maxlength="5" style="font-family:monospace;">
+            <input type="text" id="firma-inst-adresa_obec" placeholder="Obec / Mesto" list="obec-datalist" oninput="obecLookup(this,document.getElementById('firma-inst-adresa_psc'))">
+          </div>
+        </div>
         </div>
 
         <label class="firma-toggle" style="margin-bottom:13px;">
@@ -1038,7 +1080,13 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
         <div class="field"><label>Meno <span class="req">*</span></label><input type="text" id="meno" placeholder="Ján" autocomplete="given-name"></div>
         <div class="field"><label>Priezvisko <span class="req">*</span></label><input type="text" id="priezvisko" placeholder="Novák" autocomplete="family-name"></div>
       </div>
-      <div class="field"><label>Adresa / Ulica <span class="req">*</span></label><input type="text" id="adresa" placeholder="Hlavná 12, Bratislava"></div>
+      <div class="field"><label>Adresa / Ulica <span class="req">*</span></label>
+          <input type="text" id="adresa_ulica" placeholder="Hlavná 12" style="margin-bottom:6px;">
+          <div style="display:grid;grid-template-columns:120px 1fr;gap:8px;">
+            <input type="text" id="adresa_psc" placeholder="PSČ" maxlength="5" style="font-family:monospace;">
+            <input type="text" id="adresa_obec" placeholder="Obec / Mesto" list="obec-datalist" oninput="obecLookup(this,document.getElementById('adresa_psc'))">
+          </div>
+        </div>
       <div class="field"><label>Telefónne číslo <span class="req">*</span></label><input type="tel" id="telefon" placeholder="+421 900 000 000"></div>
       <div class="field"><label>Email zákazníka</label><input type="email" id="email" placeholder="zakaznik@email.sk"></div>
       </div>
@@ -2427,9 +2475,10 @@ function val1() {
       return false;
     }
   } else {
-    for (const id of ['meno','priezvisko','adresa','telefon']) {
+    for (const id of ['meno','priezvisko','telefon']) {
       if (!g(id)) { showToast('⚠️ Vyplňte všetky povinné polia'); document.getElementById(id).focus(); return false; }
     }
+    if (!getFullAdresa('adresa_')) { showToast('⚠️ Zadajte adresu'); document.getElementById('adresa_ulica')?.focus(); return false; }
   }
   return true;
 }
@@ -2497,9 +2546,11 @@ function val2() {
 
 function resetApp(){
   // Vymaž všetky textové polia
-  ['meno','priezvisko','adresa','telefon','email','chladivo','chladivo_celkom','poznamky','ico',
-   'firma-nazov','firma-adresa','firma-dic','firma-icdph','firma-kontakt','firma-telefon','firma-email',
-   'firma-inst-adresa','datum_montaze'
+  ['meno','priezvisko','telefon','email','chladivo','chladivo_celkom','poznamky','ico',
+   'firma-nazov','firma-dic','firma-icdph','firma-kontakt','firma-telefon','firma-email',
+   'adresa_ulica','adresa_psc','adresa_obec',
+   'firma-adresa_ulica','firma-adresa_psc','firma-adresa_obec',
+   'firma-inst-adresa_ulica','firma-inst-adresa_psc','firma-inst-adresa_obec'
   ].forEach(id=>{const el=document.getElementById(id);if(el){el.value='';el.disabled=false;el.style.background='';el.style.color='';} });
 
   // Reset firma checkbox
@@ -2559,6 +2610,45 @@ const g = id => {
   return (el.value || '').trim();
 };
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+// ══ PSČ AUTOCOMPLETE ══
+// Obec → PSČ (hlavné PSČ pre danú obec)
+const OBEC_MAP = {
+  'žilina':'01001','bytča':'01401','martin':'03601','vrútky':'03801','ružomberok':'03401',
+  'turčianske teplice':'03901','námestovo':'02901','dolný kubín':'02601','trstená':'02801',
+  'považská bystrica':'01701','dubnica nad váhom':'01841','čadca':'02201',
+  'kysucké nové mesto':'02301','rajec':'01501','liptovský mikuláš':'03101',
+  'liptovský hrádok':'03201','bratislava':'81101','pezinok':'90201','senec':'90301',
+  'malacky':'90401','prešov':'08001','košice':'04001','banská bystrica':'97001',
+  'zvolen':'96001','detva':'96201','trenčín':'91101','nové mesto nad váhom':'91501',
+  'piešťany':'92101','topoľčany':'95501','nitra':'94901','zlaté moravce':'94601',
+  'spišská nová ves':'05001','poprad':'05801','kežmarok':'06001','vranov nad topľou':'07901',
+  'michalovce':'07101','humenné':'06601','snina':'06901','stará ľubovňa':'09001',
+  'rožňava':'04901','rimavská sobota':'04801','veľký krtíš':'98001','lučenec':'99001',
+  'bardejov':'09201','levoča':'08901','gelnica':'05501','šaľa':'93101',
+  'valča':'03841','turany':'03832','kláštor pod znievom':'03852','dražkovce':'03604',
+};
+
+// Datalist pre obec autocomplete
+function getObecDatalist() {
+  return Object.keys(OBEC_MAP).map(o => o.charAt(0).toUpperCase()+o.slice(1)).sort();
+}
+
+function obecLookup(obecInput, pscInput) {
+  const q = (obecInput.value || '').trim().toLowerCase();
+  if (q.length >= 2 && pscInput) {
+    const psc = OBEC_MAP[q];
+    if (psc) pscInput.value = psc;
+  }
+}
+
+function getFullAdresa(prefix) {
+  const ul = (document.getElementById(prefix+'ulica')?.value||'').trim();
+  const psc = (document.getElementById(prefix+'psc')?.value||'').trim();
+  const obec = (document.getElementById(prefix+'obec')?.value||'').trim();
+  const parts = [ul, psc && obec ? psc+' '+obec : (psc||obec)].filter(Boolean);
+  return parts.join(', ');
+}
+
 function showToast(msg, ms) {
   ms = ms || (msg.includes('⚠️') ? 5000 : 2500);
   const t = document.getElementById('toast');
@@ -3066,7 +3156,7 @@ function buildZakaznikObject(prefix, datum) {
   }
   return {
     meno: g(prefix+'meno'), priezvisko: g(prefix+'priezvisko'), isFirma: false,
-    adresa: g(prefix+'adresa'), instAdresa: '',
+    adresa: getFullAdresa('adresa_'), instAdresa: '',
     telefon: g(prefix+'telefon'), email: g(prefix+'email'), datum
   };
 }
@@ -3135,8 +3225,9 @@ function getFirmaData(prefix) {
   return {
     isFirma: true,
     nazov: document.getElementById(prefix + 'firma-nazov')?.value.trim() || '',
-    adresa: document.getElementById(prefix + 'firma-adresa')?.value.trim() || '',
-    instAdresa,
+    adresa: getFullAdresa(prefix + 'firma-adresa_'),
+    instAdresa: document.getElementById('cb-ina-adresa-' + prefix)?.checked
+      ? getFullAdresa(prefix + 'firma-inst-adresa_') : '',
     ico: document.getElementById(prefix + 'ico')?.value.trim() || '',
     dic: document.getElementById(prefix + 'firma-dic')?.value.trim() || '',
     icDph: document.getElementById(prefix + 'firma-icdph')?.value.trim() || '',
@@ -3218,7 +3309,7 @@ async function ulozAlarmMontaz() {
   } else {
     meno = document.getElementById('am-meno').value.trim();
     priezvisko = document.getElementById('am-priezvisko').value.trim();
-    adresa = document.getElementById('am-adresa').value.trim();
+    adresa = getFullAdresa('am-adresa_');
     telefon = document.getElementById('am-telefon').value.trim();
     email = document.getElementById('am-email').value.trim();
     if (!meno || !priezvisko || !adresa || !telefon) {
@@ -3336,7 +3427,7 @@ function toggleNovyAlarmZakaznik() {
 function potvrdNovehoAlarmZakaznika() {
   const meno = document.getElementById('as-nz-meno').value.trim();
   const priezvisko = document.getElementById('as-nz-priezvisko').value.trim();
-  const adresa = document.getElementById('as-nz-adresa').value.trim();
+  const adresa = getFullAdresa('as-nz-adresa_');
   const telefon = document.getElementById('as-nz-telefon').value.trim();
   const email = document.getElementById('as-nz-email').value.trim();
   const typ = document.getElementById('as-nz-typ').value.trim();
@@ -3597,7 +3688,7 @@ function toggleNovyZakaznik() {
 function potvrdNovehoZakaznika() {
   const meno = document.getElementById('nz-meno').value.trim();
   const priezvisko = document.getElementById('nz-priezvisko').value.trim();
-  const adresa = document.getElementById('nz-adresa').value.trim();
+  const adresa = getFullAdresa('nz-adresa_');
   const telefon = document.getElementById('nz-telefon').value.trim();
   const email = document.getElementById('nz-email').value.trim();
   const model = document.getElementById('nz-model').value.trim();
@@ -4310,5 +4401,45 @@ function goBack() {
   goBackMontaz();
 }
 </script>
+
+<datalist id="obec-datalist">
+  <option value="Bratislava"><option value="Košice"><option value="Prešov">
+  <option value="Žilina"><option value="Banská Bystrica"><option value="Nitra">
+  <option value="Trnava"><option value="Trenčín"><option value="Martin">
+  <option value="Ružomberok"><option value="Poprad"><option value="Zvolen">
+  <option value="Považská Bystrica"><option value="Michalovce"><option value="Nové Zámky">
+  <option value="Spišská Nová Ves"><option value="Komárno"><option value="Levice">
+  <option value="Prievidza"><option value="Topoľčany"><option value="Lučenec">
+  <option value="Rimavská Sobota"><option value="Piešťany"><option value="Dubnica nad Váhom">
+  <option value="Čadca"><option value="Dolný Kubín"><option value="Námestovo">
+  <option value="Turčianske Teplice"><option value="Vrútky"><option value="Bytča">
+  <option value="Kysucké Nové Mesto"><option value="Liptovský Mikuláš"><option value="Rožňava">
+  <option value="Humenné"><option value="Vranov nad Topľou"><option value="Bardejov">
+  <option value="Stará Ľubovňa"><option value="Kežmarok"><option value="Snina">
+  <option value="Pezinok"><option value="Senec"><option value="Malacky">
+  <option value="Zvolen"><option value="Detva"><option value="Veľký Krtíš">
+  <option value="Zlaté Moravce"><option value="Šaľa"><option value="Levoča">
+  <option value="Gelnica"><option value="Valča"><option value="Turany">
+</datalist>
 </body>
-</html>
+</html><!-- PSČ autocomplete vložíme pred 
+<datalist id="obec-datalist">
+  <option value="Bratislava"><option value="Košice"><option value="Prešov">
+  <option value="Žilina"><option value="Banská Bystrica"><option value="Nitra">
+  <option value="Trnava"><option value="Trenčín"><option value="Martin">
+  <option value="Ružomberok"><option value="Poprad"><option value="Zvolen">
+  <option value="Považská Bystrica"><option value="Michalovce"><option value="Nové Zámky">
+  <option value="Spišská Nová Ves"><option value="Komárno"><option value="Levice">
+  <option value="Prievidza"><option value="Topoľčany"><option value="Lučenec">
+  <option value="Rimavská Sobota"><option value="Piešťany"><option value="Dubnica nad Váhom">
+  <option value="Čadca"><option value="Dolný Kubín"><option value="Námestovo">
+  <option value="Turčianske Teplice"><option value="Vrútky"><option value="Bytča">
+  <option value="Kysucké Nové Mesto"><option value="Liptovský Mikuláš"><option value="Rožňava">
+  <option value="Humenné"><option value="Vranov nad Topľou"><option value="Bardejov">
+  <option value="Stará Ľubovňa"><option value="Kežmarok"><option value="Snina">
+  <option value="Pezinok"><option value="Senec"><option value="Malacky">
+  <option value="Zvolen"><option value="Detva"><option value="Veľký Krtíš">
+  <option value="Zlaté Moravce"><option value="Šaľa"><option value="Levoča">
+  <option value="Gelnica"><option value="Valča"><option value="Turany">
+</datalist>
+</body> -->
