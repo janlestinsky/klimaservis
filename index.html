@@ -673,6 +673,20 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
             <input type="text" id="nz-adresa_obec" placeholder="Obec / Mesto" list="obec-datalist" oninput="obecLookup(this,document.getElementById('nz-adresa_psc'))">
           </div>
         </div>
+
+        <label class="firma-toggle" style="margin-bottom:8px;">
+          <input type="checkbox" id="cb-ina-adresa-nz" onchange="document.getElementById('ina-adresa-nz-fields').style.display=this.checked?'':'none'">
+          <div class="firma-check">✓</div> Adresa inštalácie je iná ako adresa zákazníka
+        </label>
+        <div id="ina-adresa-nz-fields" style="display:none;">
+          <div class="field"><label>Adresa inštalácie</label>
+            <input type="text" id="nz-inst-adresa_ulica" placeholder="Priemyselná 5" style="margin-bottom:6px;">
+            <div style="display:grid;grid-template-columns:120px 1fr;gap:8px;">
+              <input type="text" id="nz-inst-adresa_psc" placeholder="PSČ" maxlength="5" style="font-family:monospace;">
+              <input type="text" id="nz-inst-adresa_obec" placeholder="Obec / Mesto" list="obec-datalist" oninput="obecLookup(this,document.getElementById('nz-inst-adresa_psc'))">
+            </div>
+          </div>
+        </div>
       <div class="field"><label>Telefón <span class="req">*</span></label><input type="tel" id="nz-telefon" placeholder="+421 900 000 000"></div>
       <div class="field"><label>Email</label><input type="email" id="nz-email" placeholder="zakaznik@email.sk"></div>
       <div class="field"><label>Typ klimatizácie / Model</label><input type="text" id="nz-model" placeholder="napr. Daikin FTXB25C"></div>
@@ -1085,6 +1099,20 @@ input[type=checkbox].nem-cb:checked + .nem-check{background:var(--orange);border
           <div style="display:grid;grid-template-columns:120px 1fr;gap:8px;">
             <input type="text" id="adresa_psc" placeholder="PSČ" maxlength="5" style="font-family:monospace;">
             <input type="text" id="adresa_obec" placeholder="Obec / Mesto" list="obec-datalist" oninput="obecLookup(this,document.getElementById('adresa_psc'))">
+          </div>
+        </div>
+
+        <label class="firma-toggle" style="margin-bottom:8px;">
+          <input type="checkbox" id="cb-ina-adresa-fyz" onchange="toggleInaAdresaFyz(this.checked)">
+          <div class="firma-check">✓</div> Adresa inštalácie je iná ako adresa zákazníka
+        </label>
+        <div id="ina-adresa-fyz-fields" style="display:none;">
+          <div class="field"><label>Adresa inštalácie <span class="req">*</span></label>
+            <input type="text" id="inst-adresa_ulica" placeholder="Priemyselná 5" style="margin-bottom:6px;">
+            <div style="display:grid;grid-template-columns:120px 1fr;gap:8px;">
+              <input type="text" id="inst-adresa_psc" placeholder="PSČ" maxlength="5" style="font-family:monospace;">
+              <input type="text" id="inst-adresa_obec" placeholder="Obec / Mesto" list="obec-datalist" oninput="obecLookup(this,document.getElementById('inst-adresa_psc'))">
+            </div>
           </div>
         </div>
       <div class="field"><label>Telefónne číslo <span class="req">*</span></label><input type="tel" id="telefon" placeholder="+421 900 000 000"></div>
@@ -2549,6 +2577,7 @@ function resetApp(){
   ['meno','priezvisko','telefon','email','chladivo','chladivo_celkom','poznamky','ico',
    'firma-nazov','firma-dic','firma-icdph','firma-kontakt','firma-telefon','firma-email',
    'adresa_ulica','adresa_psc','adresa_obec',
+   'inst-adresa_ulica','inst-adresa_psc','inst-adresa_obec',
    'firma-adresa_ulica','firma-adresa_psc','firma-adresa_obec',
    'firma-inst-adresa_ulica','firma-inst-adresa_psc','firma-inst-adresa_obec'
   ].forEach(id=>{const el=document.getElementById(id);if(el){el.value='';el.disabled=false;el.style.background='';el.style.color='';} });
@@ -3086,6 +3115,15 @@ function toggleZakaznikNepritomny(cb, typ) {
   }
 }
 
+function toggleInaAdresaFyz(checked) {
+  document.getElementById('ina-adresa-fyz-fields').style.display = checked ? '' : 'none';
+  if (!checked) {
+    ['inst-adresa_ulica','inst-adresa_psc','inst-adresa_obec'].forEach(id => {
+      const el = document.getElementById(id); if(el) el.value = '';
+    });
+  }
+}
+
 function toggleInaAdresa(prefix, checked) {
   document.getElementById('ina-adresa-fields-' + prefix).style.display = checked ? '' : 'none';
   if (!checked) {
@@ -3156,7 +3194,8 @@ function buildZakaznikObject(prefix, datum) {
   }
   return {
     meno: g(prefix+'meno'), priezvisko: g(prefix+'priezvisko'), isFirma: false,
-    adresa: getFullAdresa('adresa_'), instAdresa: '',
+    adresa: getFullAdresa('adresa_'),
+    instAdresa: document.getElementById('cb-ina-adresa-fyz')?.checked ? getFullAdresa('inst-adresa_') : '',
     telefon: g(prefix+'telefon'), email: g(prefix+'email'), datum
   };
 }
@@ -3689,6 +3728,7 @@ function potvrdNovehoZakaznika() {
   const meno = document.getElementById('nz-meno').value.trim();
   const priezvisko = document.getElementById('nz-priezvisko').value.trim();
   const adresa = getFullAdresa('nz-adresa_');
+  const instAdresa = document.getElementById('cb-ina-adresa-nz')?.checked ? getFullAdresa('nz-inst-adresa_') : '';
   const telefon = document.getElementById('nz-telefon').value.trim();
   const email = document.getElementById('nz-email').value.trim();
   const model = document.getElementById('nz-model').value.trim();
@@ -3698,7 +3738,7 @@ function potvrdNovehoZakaznika() {
     return;
   }
 
-  servisZakaznik = { meno, priezvisko, adresa, telefon, email, modely: model };
+  servisZakaznik = { meno, priezvisko, adresa, instAdresa, telefon, email, modely: model };
 
   // Zobraz potvrdenie
   const card = document.getElementById('servis-zakaznik-card');
